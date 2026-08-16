@@ -1,0 +1,10 @@
+# The rendered page is compared byte for byte: `cs-ledger check` re-renders the
+# records and asserts the committed ledger.html matches. A checkout on Windows
+# applies core.autocrlf, rewrites the page to CRLF, and the freshness gate then
+# fails for a reason no diff explains.
+#
+# The scripts here carry a `#!/usr/bin/env bash` shebang, which the same rewrite
+# turns into `bash\r` — an error naming the interpreter rather than the script.
+#
+# text=auto still lets git detect and leave binaries alone.
+* text=auto eol=lf

@@ -1,0 +1,119 @@
+# goreleaser config for cs-ledger: a CGO_ENABLED=0 static
+# multi-arch binary, checksummed + SBOM'd + cosign-signed releases (supply chain).
+#
+#   goreleaser check                                  # validate this file
+#   goreleaser build --single-target --snapshot --clean --output bin/cs-ledger
+#   goreleaser release --snapshot --clean             # full local dry-run (dist/)
+#   goreleaser release --clean                        # tagged release (needs a git tag)
+version: 2
+
+project_name: cs-ledger
+
+# The viewer's JavaScript is embedded in the binary, so its suite gates a
+# release exactly as the Go suite does. Both are what `make check` runs, and
+# node is already required to work on this repo (CONTRIBUTING.md).
+before:
+  hooks:
+    - go mod tidy
+    - go vet ./...
+    - go test ./...
+    - make test-js
+
+builds:
+  - id: cs-ledger
+    main: ./cmd/cs-ledger
+    binary: cs-ledger
+    env:
+      - CGO_ENABLED=0 # static, no cgo
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.Version={{ .Version }}
+    # Linux and macOS, both architectures: darwin/amd64 costs nothing to add and
+    # is what an Intel Mac still needs.
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    mod_timestamp: "{{ .CommitTimestamp }}" # reproducible builds
+
+archives:
+  - id: cs-ledger
+    ids:
+      - cs-ledger
+    formats:
+      - tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    # What someone holding the binary needs: the setup steps, the manual, the
+    # schema, and the file an agent harness reads. The rest of the docs are for
+    # working on the tool, and stay in the repository.
+    files:
+      - README.md
+      - INSTALL.md
+      - MANUAL.md
+      - GUIDE.md
+      - SPEC.md
+      - AGENTS.md
+      - LICENSE
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+# Software bill of materials per archive (supply chain). Requires cyclonedx-gomod:
+#   go install github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@latest
+sboms:
+  - id: archive
+    artifacts: archive
+    documents:
+      - "{{ .ArtifactName }}.sbom.json"
+    cmd: cyclonedx-gomod
+    args: ["app", "-json", "-output", "$document", "-main", "cmd/cs-ledger", "../../.."]
+
+# Keyless cosign signing of the checksums (supply chain). Requires cosign; runs
+# in release mode. Uses ambient OIDC (CI) — set COSIGN_EXPERIMENTAL=1 locally.
+signs:
+  - id: cosign
+    cmd: cosign
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--output-signature=${signature}"
+      - "--output-certificate=${certificate}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: checksum
+    output: true
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot-{{ .ShortCommit }}"
+
+changelog:
+  sort: asc
+  use: git
+  filters:
+    exclude:
+      - "^docs:"
+      - "^chore:"
+      - "^test:"
+      - "merge conflict"
+
+release:
+  draft: true
+  name_template: "cs-ledger {{ .Tag }}"
+  header: |
+    ## cs-ledger {{ .Tag }}
+
+    Structured issue tracking for agent-managed repositories: agents write small
+    JSON records, humans read a generated, interactive, self-contained
+    `ledger.html`. There is no service to run, and the binary is the whole tool.
+
+    A release binary also stamps the `toolVersion` pin that `cs-ledger check`
+    enforces, so renders made with it are committable where a dev build's are not.
+
+    Static `CGO_ENABLED=0` binaries; verify with `checksums.txt` (+ cosign `.sig`).

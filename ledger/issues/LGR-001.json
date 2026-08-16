@@ -1,0 +1,16 @@
+{
+  "id": "LGR-001",
+  "title": "Initial implementation",
+  "type": "improvement",
+  "severity": "low",
+  "status": "open",
+  "foundBy": "the repository's first commit",
+  "opened": "2026-08-16",
+  "resolved": null,
+  "stint": null,
+  "evidence": { "commits": [], "integrated": [], "verified": null },
+  "resolution": null,
+  "details": "Structured issue tracking for agent-managed repositories: agents write small JSON records, humans read a generated, interactive, self-contained `ledger.html`.",
+  "notes": [],
+  "links": []
+}

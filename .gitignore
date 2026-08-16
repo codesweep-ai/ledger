@@ -1,0 +1,15 @@
+# Rendered output DOES live in the tree — ledger/ledger.json, queue.json and
+# ledger.html are the reviewed artifact of `cs-ledger render`, so they are
+# deliberately not ignored here. Nothing else mutable belongs in the source tree.
+
+# Go build output
+/bin/
+
+# goreleaser release artifacts
+/dist/
+
+# Local credentials and env config
+/.env
+
+# Python bytecode, written when anything imports scripts/lint-docs.py
+__pycache__/

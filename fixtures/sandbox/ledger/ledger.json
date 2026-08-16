@@ -1,0 +1,9 @@
+{
+  "project": "sandbox",
+  "idPrefix": "SBX",
+  "schemaVersion": "issue.v1",
+  "staleAfterDays": 14,
+  "description": "cs-sandbox creates disposable, isolated Linux dev sandboxes for AI coding agents, on rootless Podman containers or Firecracker microVMs. This is a frozen copy of its ledger, kept here as a test corpus.",
+  "toolVersion": "0.3.2",
+  "commitUrlTemplate": "https://github.com/codesweep-ai/sandbox/commit/{sha}"
+}

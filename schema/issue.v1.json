@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codesweep.ai/ledger/schema/issue.v1.json",
+  "title": "ledger issue record (issue.v1)",
+  "description": "One issue record per file at ledger/issues/<id>.json; the filename MUST equal the record id. Drafts (ledger/drafts/<member>/<slug>.json) use this same schema minus `id` — ids are minted only on the integration branch (SPEC.md R29). This file is documentation and agent reference; the cs-ledger binary enforces these rules natively, and the test suite pins the two to the same verdicts.",
+  "type": "object",
+  "required": ["id", "title", "type", "severity", "status", "foundBy", "opened", "resolved", "stint", "evidence", "resolution", "details", "notes", "links"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]{2,6}-[0-9]{3,}$",
+      "description": "Stable forever; never renumbered or reused. Prefix comes from ledger.json idPrefix."
+    },
+    "title": { "type": "string", "minLength": 1, "description": "One line." },
+    "type": { "enum": ["defect", "improvement", "feature-idea"] },
+    "severity": { "enum": ["low", "med", "high", "critical"] },
+    "status": {
+      "enum": ["open", "in-progress", "closed", "wont-fix", "moved-to-roadmap"],
+      "description": "Lifecycle: open -> in-progress -> closed | wont-fix | moved-to-roadmap. Roadmap-style directions are feature-idea records with status open."
+    },
+    "foundBy": { "type": "string", "minLength": 1, "description": "e.g. 'rev-2 orchestrator', 'user report', 'nightly smoke suite'." },
+    "opened": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "resolved": {
+      "type": ["string", "null"],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date the record reached a terminal status. Required non-null for closed/wont-fix/moved-to-roadmap; must be null otherwise."
+    },
+    "stint": {
+      "type": ["string", "null"],
+      "description": "Which stint selected it — the slug-named scoped burst of work (an orchestrated run like 'rev-5', a branch, a working session). Required non-null when status is in-progress; null is valid on closed rows fixed host-direct."
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["commits", "integrated", "verified"],
+      "properties": {
+        "commits": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Resolving commit sha(s)." },
+        "integrated": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Integration-branch commit sha(s), where the workflow distinguishes them." },
+        "verified": { "type": ["string", "null"], "description": "How the closure was verified (markdown). Required non-empty when closed." }
+      }
+    },
+    "resolution": {
+      "type": ["string", "null"],
+      "description": "Why the record ended without a fix (markdown). Required non-empty for wont-fix / moved-to-roadmap."
+    },
+    "details": { "type": "string", "description": "The narrative writeup (markdown). Original observation only — later updates go to notes." },
+    "notes": {
+      "type": "array",
+      "description": "Append-only dated updates; dates must be non-decreasing.",
+      "items": {
+        "type": "object",
+        "required": ["date", "text"],
+        "properties": {
+          "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z]{2,6}-[0-9]{3,}$" },
+      "description": "Stated relationships to other issues. An unresolvable link is a warning, not a failure (partial migration is a normal state)."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "enum": ["closed", "wont-fix", "moved-to-roadmap"] } } },
+      "then": { "properties": { "resolved": { "type": "string" } } },
+      "else": { "properties": { "resolved": { "type": "null" } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "in-progress" } } },
+      "then": { "properties": { "stint": { "type": "string", "minLength": 1 } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "closed" } } },
+      "then": {
+        "properties": { "evidence": { "properties": { "verified": { "type": "string", "minLength": 1 } } } },
+        "$comment": "Additionally: evidence.commits non-empty OR links non-empty (delegation closure, e.g. an umbrella row closed via child issues). Expressed in `cs-ledger check`; JSON Schema alone cannot state the cross-field disjunction cleanly."
+      }
+    },
+    {
+      "if": { "properties": { "status": { "enum": ["wont-fix", "moved-to-roadmap"] } } },
+      "then": { "properties": { "resolution": { "type": "string", "minLength": 1 } } }
+    }
+  ]
+}

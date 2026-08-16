@@ -1,0 +1,9 @@
+{
+  "project": "ledger",
+  "idPrefix": "LGR",
+  "schemaVersion": "issue.v1",
+  "staleAfterDays": 14,
+  "description": "Single-file issue ledger + viewer for agent-managed repos: agents write JSON records with evidence, humans read this generated page. This is the ledger tracking its own repo.",
+  "toolVersion": "0.3.2",
+  "commitUrlTemplate": "https://github.com/codesweep-ai/ledger/commit/{sha}"
+}
