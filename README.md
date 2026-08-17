@@ -25,9 +25,10 @@ with the repository and what to do next. There is no service to run. A single st
 
 No build and no server. Open either of these in a browser:
 
-- [`ledger/ledger.html`](ledger/ledger.html) — this repository's own ledger, tracking its own work.
-- [`fixtures/sandbox/ledger/ledger.html`](fixtures/sandbox/ledger/ledger.html) —
-  a frozen copy of another project's ledger, kept as a test corpus.
+- [This repository's own ledger](https://codesweep.ai/ledger/ledger/ledger.html), tracking its own
+  work — [source](ledger/ledger.html).
+- [A frozen copy of another project's ledger](https://codesweep.ai/ledger/fixtures/sandbox/ledger/ledger.html),
+  kept as a test corpus — [source](fixtures/sandbox/ledger/ledger.html).
 
 ## Why a ledger
 
