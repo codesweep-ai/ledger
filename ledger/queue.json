@@ -3,10 +3,6 @@
   "updated": "2026-08-17",
   "items": [
     {
-      "id": "LGR-002",
-      "why": "The quickstart's sample contradicts the page it links, one click away."
-    },
-    {
       "id": "LGR-009",
       "why": "The first install route a new reader takes ends on an empty page."
     },
