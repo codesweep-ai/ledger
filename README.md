@@ -39,10 +39,11 @@ the session that wrote it, and the next agent starts from it.
 
 ## Quickstart
 
-Build the tool and put a ledger in a repository that has none.
+Build the tool from a clone and put a ledger in a repository that has none.
 [INSTALL.md](INSTALL.md) has the other ways to get it:
 
 ```bash
+git clone https://github.com/codesweep-ai/ledger && cd ledger
 make install                                        # ~/.local/bin/cs-ledger
 cd ~/my-service
 cs-ledger init ledger --project my-service --prefix MYS
