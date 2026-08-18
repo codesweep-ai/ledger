@@ -459,6 +459,36 @@ func TestCLIRenderCheckStale(t *testing.T) {
 	mustMatch(t, string(out), `STALE`)
 }
 
+// The page and guide gates are errors, and check has to report them as errors.
+// They used to print after the warnings block, so a stale page read as one more
+// warning and the errors header's count did not match the list beneath it.
+func TestCLICheckReportsPageFailuresAsErrors(t *testing.T) {
+	// One open critical with no queue, so the run carries a warning as well.
+	dir := makeCorpus(t, map[string]string{
+		"TST-001.json": record("TST-001", map[string]any{"severity": "critical"}),
+	}, nil, "")
+	if out, err := exec.Command(binPath, "render", dir).CombinedOutput(); err != nil {
+		t.Fatalf("render failed: %v\n%s", err, out)
+	}
+	p := filepath.Join(dir, "issues", "TST-001.json")
+	content, _ := os.ReadFile(p)
+	edited := strings.Replace(string(content), "Test issue TST-001", "edited after render", 1)
+	if err := os.WriteFile(p, []byte(edited), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	out, err := exec.Command(binPath, "check", dir).CombinedOutput()
+	if err == nil {
+		t.Fatal("check should fail on a stale page")
+	}
+	s := string(out)
+	mustMatch(t, s, `validation errors \(1\):\n  - ledger\.html: STALE`)
+	mustMatch(t, s, `check FAILED: 1 error\(s\), 1 warning\(s\)`)
+	if i, j := strings.Index(s, "STALE"), strings.Index(s, "warnings ("); i < 0 || j < 0 || i > j {
+		t.Errorf("the stale error must print above the warnings block:\n%s", s)
+	}
+}
+
 func TestSelfLedgerFresh(t *testing.T) {
 	dir := filepath.Join("..", "..", "ledger")
 	if _, err := os.Stat(dir); err != nil {

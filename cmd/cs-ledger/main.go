@@ -164,8 +164,10 @@ func main() {
 		return
 	}
 
-	// check — always gates against the embedded (release) assets.
-	report("validation errors", res.Errors)
+	// check — always gates against the embedded (release) assets. Collect the
+	// page and guide failures before reporting anything: they are errors, and an
+	// error printed after the warnings block reads as one more warning.
+	errors := res.Errors
 	warnings := res.Warnings
 	// Freshness is only assertable within a renderer version. Across two of
 	// them the bytes differ whatever the records say, so a comparison cannot
@@ -175,34 +177,30 @@ func main() {
 			"ledger.html was rendered by %s and this binary renders %s — run: cs-ledger render %s (freshness not checked across versions)",
 			pin, ledger.RendererVersion, dir))
 	}
-	report("warnings", warnings)
-	nErrors := len(res.Errors)
 	if tr.ConfigError == "" {
 		committed, err := os.ReadFile(outPath)
 		switch {
 		case err != nil:
-			nErrors++
-			fmt.Fprintln(os.Stderr, "  - ledger.html: missing — run: cs-ledger render")
+			errors = append(errors, "ledger.html: missing — run: cs-ledger render")
 		case strings.Contains(string(committed), ledger.DevStamp):
-			nErrors++
-			fmt.Fprintln(os.Stderr, "  - ledger.html: rendered in dev mode (--assets) — re-render with the release binary before committing")
+			errors = append(errors, "ledger.html: rendered in dev mode (--assets) — re-render with the release binary before committing")
 		case skew:
 			// Handled as a warning above.
 		case string(committed) != ledger.RenderHTML(tr, releaseAssets()):
-			nErrors++
-			fmt.Fprintln(os.Stderr, "  - ledger.html: STALE — records changed without re-render. Run: cs-ledger render")
+			errors = append(errors, "ledger.html: STALE — records changed without re-render. Run: cs-ledger render")
 		}
 		// guide-sync gate: the generated half of a materialized guide must match
 		// the binary's copy. What sits below the project marker is the
 		// repository's own and is not compared.
 		if g, err := os.ReadFile(guidePath); err == nil &&
 			root.GeneratedGuide(string(g)) != root.GeneratedGuide(root.GuideMD) {
-			nErrors++
-			fmt.Fprintln(os.Stderr, "  - GUIDE.md: does not match this binary's embedded guide — run: cs-ledger render")
+			errors = append(errors, "GUIDE.md: does not match this binary's embedded guide — run: cs-ledger render")
 		}
 	}
-	if nErrors > 0 {
-		fmt.Fprintf(os.Stderr, "check FAILED: %d error(s), %d warning(s)\n", nErrors, len(warnings))
+	report("validation errors", errors)
+	report("warnings", warnings)
+	if len(errors) > 0 {
+		fmt.Fprintf(os.Stderr, "check FAILED: %d error(s), %d warning(s)\n", len(errors), len(warnings))
 		os.Exit(1)
 	}
 	freshness := "ledger.html fresh"
