@@ -22,9 +22,18 @@ make build     # bin/cs-ledger
 make check     # the full local gate
 ```
 
-`make check` runs the gofmt check, `go vet`, the Go suite, the viewer's JavaScript suite, and the
-prose linter. Run it before pushing. CI runs that target and one gate on top: the freshness check
-on both ledger corpora.
+`make check` runs the gofmt check, `go vet`, `golangci-lint`, `deadcode`, the Go suite, the
+viewer's JavaScript suite, the prose linter and the publication linter. Run it before pushing. CI
+runs that target and one gate on top: the freshness check on both ledger corpora.
+
+Two of those do not come with Go. Install them once, pinning `golangci-lint` to the version CI
+runs, so a newer release's added checks arrive when you move the pin rather than on an unrelated
+pull request:
+
+```bash
+go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+go install golang.org/x/tools/cmd/deadcode@latest
+```
 
 This repo keeps a **ledger** of open issues in `ledger/`. Read
 [`ledger/AGENTS.md`](ledger/AGENTS.md) before you start work, and follow it as you go. A commit
