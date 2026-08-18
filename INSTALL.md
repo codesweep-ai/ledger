@@ -29,11 +29,18 @@ cosign verify-blob checksums.txt \
 Releases carry Linux and macOS builds for both architectures, each with a software bill of
 materials beside its archive.
 
+**No version has been tagged yet, so there is nothing on the releases page today.** This route
+starts working at the first tag, which is what cuts the archives, the checksum file and the
+signature. Until then, take one of the two below.
+
 ### Or with `go install`
 
 ```bash
 go install github.com/codesweep-ai/ledger/cmd/cs-ledger@latest
 ```
+
+This route stamps no version, so `cs-ledger version` reports `dev` for the tool. The renderer
+version it prints beside that is the one a ledger records, and it is correct either way.
 
 ### Or build from source
 
