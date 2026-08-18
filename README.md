@@ -62,8 +62,8 @@ this repository's own ledger:
 
 ```console
 $ cs-ledger render && cs-ledger check
-wrote ledger/ledger.html (195856 bytes, 56 issues, 0 drafts)
-check OK: 56 issues, 0 drafts, 0 warning(s), ledger.html fresh
+wrote ledger/ledger.html (88719 bytes, 10 issues, 0 drafts)
+check OK: 10 issues, 0 drafts, 0 warning(s), ledger.html fresh
 ```
 
 If the page no longer matches the records, `check` says so and exits non-zero, so a stale page
