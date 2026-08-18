@@ -130,7 +130,7 @@ Prints three versions: the tool's own, the renderer's, and the pinned design tok
 
 ```console
 $ cs-ledger version
-cs-ledger v1-complete-110-g7ea68dc (renderer 0.3.1, ui tokens 1.12.0)
+cs-ledger v1-complete-110-g7ea68dc (renderer 0.3.2, ui tokens 1.12.0)
 ```
 
 The first field is a `git describe` of the build, so yours will read differently. The renderer
@@ -245,7 +245,7 @@ Move a ledger onto a newer binary:
 
 ```bash
 cs-ledger render ledger
-git add ledger && git commit -m "Re-render the ledger on renderer 0.3.1"
+git add ledger && git commit -m "Re-render the ledger on the current renderer"
 ```
 
 ## See also

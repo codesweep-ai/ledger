@@ -61,7 +61,7 @@ the repository and what to do next. `init` scaffolds one and renders it:
 ```console
 $ cd ~/my-service
 $ cs-ledger init ledger --project my-service --prefix MYS
-initialized ledger (project my-service, prefix MYS, toolVersion 0.3.1)
+initialized ledger (project my-service, prefix MYS, toolVersion 0.3.2)
 next: read ledger/GUIDE.md — ledger/AGENTS.md routes agents to it
 ```
 
