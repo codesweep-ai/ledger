@@ -62,7 +62,7 @@ this repository's own ledger:
 
 ```console
 $ cs-ledger render && cs-ledger check
-wrote ledger/ledger.html (88719 bytes, 10 issues, 0 drafts)
+wrote ledger/ledger.html (… bytes, 10 issues, 0 drafts)
 check OK: 10 issues, 0 drafts, 0 warning(s), ledger.html fresh
 ```
 
