@@ -426,7 +426,26 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 	binPath = filepath.Join(tmp, "cs-ledger")
-	cmd := exec.Command("go", "build", "-o", binPath, "github.com/codesweep-ai/ledger/cmd/cs-ledger")
+	// These tests drive the real binary rather than calling into it, so what it
+	// executes counts towards coverage only when it is built instrumented and
+	// told where to write. Without this the CLI tier contributes nothing and
+	// cmd/cs-ledger reads as uncovered however much of it the tests exercise.
+	//
+	// CS_COVERDIR is set by the Makefile's test targets. It carries the path
+	// rather than GOCOVERDIR because `go test` overwrites GOCOVERDIR in the test
+	// process with a directory of its own and does not fold what lands there
+	// back into the profile. Setting GOCOVERDIR here, after that, is what points
+	// the children at the tier directory: exec.Command passes on the current
+	// environment, so every exec.Command(binPath, ...) below inherits it and no
+	// call site needs to know about coverage. Under a plain `go test` the
+	// variable is unset, the build stays ordinary and nothing is written.
+	build := []string{"build", "-o", binPath, "github.com/codesweep-ai/ledger/cmd/cs-ledger"}
+	if dir := os.Getenv("CS_COVERDIR"); dir != "" {
+		build = append([]string{"build", "-cover", "-covermode=atomic",
+			"-coverpkg=github.com/codesweep-ai/ledger/..."}, build[1:]...)
+		_ = os.Setenv("GOCOVERDIR", dir)
+	}
+	cmd := exec.Command("go", build...)
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "building cs-ledger for CLI tests failed:", err)

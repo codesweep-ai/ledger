@@ -49,7 +49,10 @@ bin/cs-ledger render ledger --assets ./viewer
 Those renders are dev-stamped and `check` refuses them, so a page built this way cannot reach a
 commit by accident.
 
-## Testing
+## Tests are part of the change
+
+Every behavior change ships with test coverage. A change with no test is only acceptable when the
+behavior genuinely cannot be observed in a test — say so in the PR.
 
 The Go suite covers validation, rendering and the command-line surface, each rule against its own
 synthetic corpus. Two real corpora act as scale fixtures: this repository's own ledger, and
@@ -62,6 +65,18 @@ corpora to still round-trip through the freshness check.
 `schema/issue.v1.json` documents the record shape for readers and agents, while the binary enforces
 it natively. The suite pins the two to the same verdicts. If you change one, change the other in
 the same commit.
+
+### Coverage
+
+Every test target writes coverage into its own tier under `.coverage/`, so running several
+aggregates rather than overwrites. `make coverage` merges what is there and prints the report.
+
+`make coverage-check` runs inside `make check` and in CI. It fails when a package
+`.coverage-baseline` lists stops being reached — presence, not a percentage. What it catches is a
+suite that stopped running while the tests still report green. When a package is meant to lose its
+coverage, rerun `make coverage-baseline` and commit the result.
+
+The CLI tests build `cs-ledger` with `-cover`, so what the real binary runs counts too.
 
 ## Commits
 

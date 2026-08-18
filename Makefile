@@ -1,7 +1,7 @@
 # cs-ledger — build/test/install.
 # `make build` produces bin/cs-ledger (version-stamped, CGO_ENABLED=0).
 # `make check` is the full local gate: formatting, vet, the Go suite, the
-# viewer's JavaScript suite and both linters. Building needs Go alone; the
+# viewer's JavaScript suite, the coverage gate and both linters. Building needs Go alone; the
 # gate also needs node (test-js) and python3 (docs, oss).
 
 GORELEASER ?= goreleaser
@@ -12,7 +12,23 @@ VERSION  := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev
 LDFLAGS  := -s -w -X main.Version=$(VERSION)
 GO_FILES := $(shell git ls-files '*.go')
 
-.PHONY: help build install uninstall test test-js vet fmt fmt-check check docs oss ledger lint deadcode snapshot release release-check clean
+# Coverage is not a separate mode: every test target below writes Go binary
+# coverage data into its own tier directory under $(COVERDIR), and `make
+# coverage` merges whichever tiers are present. That is what lets
+# `make test test-integration` report one aggregate number instead of the last
+# tier overwriting the one before it. scripts/coverage.sh documents the layout.
+# -test.gocoverdir must be absolute: `go test` runs each package's test binary
+# with that package's directory as its working directory, so a relative path
+# would scatter the data one directory per package.
+COVERDIR   ?= .coverage
+COVER_ABS  := $(abspath $(COVERDIR))
+COVERFLAGS := -covermode=atomic -coverpkg=./...
+# CS_COVERDIR, passed per tier below, tells a test that builds and execs the
+# real binary where the instrumented child should write. It is not GOCOVERDIR
+# because `go test` overwrites that one in the test process with a directory of
+# its own, and does not fold what lands there back into the profile.
+
+.PHONY: help build install uninstall test test-js coverage coverage-check coverage-baseline vet fmt fmt-check check docs oss ledger lint deadcode snapshot release release-check clean
 
 .DEFAULT_GOAL := help
 
@@ -42,12 +58,30 @@ uninstall:
 # compares against embedded assets, so a change to GUIDE.md or viewer/ leaves the
 # cached result green while the gate it stands for has started failing.
 test:
-	go test ./... -count=1
+	@scripts/coverage.sh reset unit
+	CS_COVERDIR=$(COVER_ABS)/unit go test $(COVERFLAGS) ./... -count=1 -args -test.gocoverdir=$(COVER_ABS)/unit
 	$(MAKE) test-js
 
 ## test-js: the viewer-asset suite (markdown renderer in viewer/viewer.js)
 test-js:
 	node test/run.mjs
+
+## coverage: merge every tier present under $(COVERDIR) and print the report
+coverage:
+	@scripts/coverage.sh report
+
+## coverage-check: report, then fail if a package .coverage-baseline records as
+## covered has stopped being reached. It checks presence, never a percentage:
+## what it exists to catch is a suite that quietly stopped running.
+coverage-check: coverage
+	@scripts/coverage.sh check
+
+## coverage-baseline: re-record .coverage-baseline. Records every tier present
+## by default; pass BASELINE_TIERS to restrict it to the tiers CI actually runs,
+## e.g. `make coverage-baseline BASELINE_TIERS="unit race smoke"`. Recording a
+## tier CI never runs commits a promise nothing keeps.
+coverage-baseline:
+	@scripts/coverage.sh baseline $(BASELINE_TIERS)
 
 ## vet: go vet
 vet:
@@ -81,7 +115,7 @@ ledger: build
 	./bin/cs-ledger check fixtures/sandbox/ledger
 
 ## check: the full local gate — fmt-check, vet, the linters, and the tests
-check: fmt-check vet lint deadcode test docs oss walkthrough
+check: fmt-check vet lint deadcode test coverage-check docs oss walkthrough
 
 ## lint: the Go rules from .golangci.yml (see that file for what is on and why)
 lint:
@@ -119,4 +153,4 @@ release-check:
 
 ## clean: remove build output
 clean:
-	rm -rf bin dist
+	rm -rf bin dist $(COVERDIR)
