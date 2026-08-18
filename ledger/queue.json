@@ -1,5 +1,18 @@
 {
-  "recommendedBy": "the repository owner, at publication",
-  "updated": "2026-08-16",
-  "items": []
+  "recommendedBy": "session agent, from the 2026-08-17 documentation walkthrough",
+  "updated": "2026-08-17",
+  "items": [
+    {
+      "id": "LGR-002",
+      "why": "The quickstart's sample contradicts the page it links, one click away."
+    },
+    {
+      "id": "LGR-009",
+      "why": "The first install route a new reader takes ends on an empty page."
+    },
+    {
+      "id": "LGR-010",
+      "why": "A reader meets \"1 issues\" at the moment they file their first record."
+    }
+  ]
 }

@@ -1,0 +1,22 @@
+{
+  "id": "LGR-005",
+  "title": "check printed the page and guide failures outside its errors block",
+  "type": "defect",
+  "severity": "med",
+  "status": "closed",
+  "foundBy": "session agent, following README.md and INSTALL.md as a first-time reader",
+  "opened": "2026-08-17",
+  "resolved": "2026-08-17",
+  "stint": "2026-08-17 documentation walkthrough",
+  "evidence": {
+    "commits": [
+      "501cf9e"
+    ],
+    "integrated": [],
+    "verified": "TestCLICheckReportsPageFailuresAsErrors builds a stale corpus that also warns, and asserts the header, the count and the ordering. Against the previous binary it fails, printing the STALE line under `warnings (1):`."
+  },
+  "resolution": null,
+  "details": "`cs-ledger check` reported record-validation errors under a `validation errors (N):` header, then printed the freshness, dev-stamp, missing-page and guide-drift failures as bare lines after the warnings block. Three consequences, all visible:\n\n- With other errors present the header's count contradicted the list beneath it: `validation errors (2):` followed by three bullets.\n- With a warning present the stale-page error printed under `warnings (1):`, which reads as something a reader may pass over.\n- With neither, the failure printed with no heading at all.\n\nThe README documents the form the tool never printed, with the STALE line under `validation errors (1):`.",
+  "notes": [],
+  "links": []
+}

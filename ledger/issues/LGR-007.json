@@ -1,0 +1,22 @@
+{
+  "id": "LGR-007",
+  "title": "make check needs two tools no document named",
+  "type": "defect",
+  "severity": "med",
+  "status": "closed",
+  "foundBy": "session agent, following README.md and INSTALL.md as a first-time reader",
+  "opened": "2026-08-17",
+  "resolved": "2026-08-17",
+  "stint": "2026-08-17 documentation walkthrough",
+  "evidence": {
+    "commits": [
+      "d07f8a4"
+    ],
+    "integrated": [],
+    "verified": "`env PATH=/usr/bin:/bin:/usr/local/go/bin make lint` exited 2 with \"golangci-lint is not installed\". CONTRIBUTING.md now names both tools and pins golangci-lint to v2.12.2, the version .github/workflows/ci.yml installs."
+  },
+  "resolution": null,
+  "details": "CONTRIBUTING.md tells a contributor to run `make check` before pushing. The target is `check: fmt-check vet lint deadcode test docs oss`, and `lint` and `deadcode` shell out to `golangci-lint` and `deadcode`, neither of which comes with Go.\n\nOn a machine without them the documented gate stops at `golangci-lint is not installed` with exit 2. The CI workflow installs both, under the comment \"the two tools make check shells out to\", so the requirement was known and only the documents were silent.\n\nThe sandbox repository already carries the paragraph this one needed, pinned version included.",
+  "notes": [],
+  "links": []
+}

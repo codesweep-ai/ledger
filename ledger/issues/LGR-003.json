@@ -1,0 +1,22 @@
+{
+  "id": "LGR-003",
+  "title": "The quickstart's first command fails for the reader it is written for",
+  "type": "defect",
+  "severity": "med",
+  "status": "closed",
+  "foundBy": "session agent, following README.md and INSTALL.md as a first-time reader",
+  "opened": "2026-08-17",
+  "resolved": "2026-08-17",
+  "stint": "2026-08-17 documentation walkthrough",
+  "evidence": {
+    "commits": [
+      "ed9d1ba"
+    ],
+    "integrated": [],
+    "verified": "Ran the block verbatim in an empty git repository: make exited 2 with \"No rule to make target 'install'\". The block now opens with the clone, which INSTALL.md's source route uses."
+  },
+  "resolution": null,
+  "details": "The quickstart opened with \"Build the tool and put a ledger in a repository that has none\", then:\n\n```bash\nmake install\ncd ~/my-service\ncs-ledger init ledger \u2026\n```\n\nA reader who has not already cloned the repository gets `make: *** No rule to make target 'install'.  Stop.` The `cd ~/my-service` on the next line implies a starting directory the block never established.",
+  "notes": [],
+  "links": []
+}

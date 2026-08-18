@@ -1,0 +1,20 @@
+{
+  "id": "LGR-002",
+  "title": "The README's console sample reports a ledger 56 times the size of this one",
+  "type": "defect",
+  "severity": "med",
+  "status": "open",
+  "foundBy": "session agent, following README.md and INSTALL.md as a first-time reader",
+  "opened": "2026-08-17",
+  "resolved": null,
+  "stint": "2026-08-17 documentation walkthrough",
+  "evidence": {
+    "commits": [],
+    "integrated": [],
+    "verified": null
+  },
+  "resolution": null,
+  "details": "The quickstart introduces its sample with \"Here they are against this repository's own ledger\" and shows:\n\n```\nwrote ledger/ledger.html (195856 bytes, 56 issues, 0 drafts)\ncheck OK: 56 issues, 0 drafts, 0 warning(s), ledger.html fresh\n```\n\nThis repository's ledger held one record, so the real output was `(78029 bytes, 1 issues, 0 drafts)`. The launch reduction moved the corpus and the sample stayed behind.\n\nA reader who follows the link two sections above lands on the rendered page and counts the records themselves, so the contradiction is one click away.\n\nThe number tracks a live corpus and will drift again. Either quote what this ledger prints today and accept that, or move the sample onto the frozen fixture under fixtures/.",
+  "notes": [],
+  "links": []
+}

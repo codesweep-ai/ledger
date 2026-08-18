@@ -1,0 +1,24 @@
+{
+  "id": "LGR-008",
+  "title": "CONTRIBUTING described a gate smaller than the one make check runs",
+  "type": "defect",
+  "severity": "low",
+  "status": "closed",
+  "foundBy": "session agent, following README.md and INSTALL.md as a first-time reader",
+  "opened": "2026-08-17",
+  "resolved": "2026-08-17",
+  "stint": "2026-08-17 documentation walkthrough",
+  "evidence": {
+    "commits": [
+      "d07f8a4"
+    ],
+    "integrated": [],
+    "verified": "Read against the Makefile's check target. CONTRIBUTING.md now lists all eight."
+  },
+  "resolution": null,
+  "details": "\"`make check` runs the gofmt check, `go vet`, the Go suite, the viewer's JavaScript suite, and the prose linter.\" The target is `check: fmt-check vet lint deadcode test docs oss`. The three it left out are the two that need an install and the publication linter, which is the one whose warnings a contributor is most likely to meet first.",
+  "notes": [],
+  "links": [
+    "LGR-007"
+  ]
+}

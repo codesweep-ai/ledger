@@ -1,0 +1,20 @@
+{
+  "id": "LGR-010",
+  "title": "Every count prints as a plural, so a one-record ledger reports \"1 issues\"",
+  "type": "improvement",
+  "severity": "low",
+  "status": "open",
+  "foundBy": "session agent, following README.md and INSTALL.md as a first-time reader",
+  "opened": "2026-08-17",
+  "resolved": null,
+  "stint": "2026-08-17 documentation walkthrough",
+  "evidence": {
+    "commits": [],
+    "integrated": [],
+    "verified": null
+  },
+  "resolution": null,
+  "details": "`render` and `check` both print `%d issues, %d drafts, %d warning(s)`. A ledger holding one record reports `1 issues`, and one warning reports `1 warning(s)`.\n\nA reader meets it at the moment they file their first record, which is the first thing the guide asks them to do. It is also quoted in the documents, so the sample outputs carry it.",
+  "notes": [],
+  "links": []
+}
