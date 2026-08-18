@@ -71,13 +71,17 @@ docs:
 oss:
 	python3 scripts/lint-oss.py
 
+## walkthrough: check the docs against the binary, the code and the build
+walkthrough: build
+	python3 scripts/lint-walkthrough.py
+
 ## ledger: validate this repo's own records and prove ledger.html is current
 ledger: build
 	./bin/cs-ledger check ledger
 	./bin/cs-ledger check fixtures/sandbox/ledger
 
 ## check: the full local gate — fmt-check, vet, the linters, and the tests
-check: fmt-check vet lint deadcode test docs oss
+check: fmt-check vet lint deadcode test docs oss walkthrough
 
 ## lint: the Go rules from .golangci.yml (see that file for what is on and why)
 lint:
