@@ -56,6 +56,7 @@ jobs:
           name: coverage-profile
           path: .coverage/coverage.txt
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 7
 
       - name: build
