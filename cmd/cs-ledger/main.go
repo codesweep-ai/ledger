@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	root "github.com/codesweep-ai/ledger"
@@ -18,8 +19,26 @@ import (
 	"github.com/codesweep-ai/ledger/internal/ojson"
 )
 
+// devVersion marks a binary that carried no release stamp.
+const devVersion = "dev"
+
 // Version is the tool version (set via -ldflags at release).
-var Version = "dev"
+var Version = devVersion
+
+// buildVersion reports the release stamp when there is one, and otherwise the
+// module version the toolchain recorded. A binary installed straight from the
+// module path carries no stamp, so without this it would answer "dev" and
+// leave you guessing which revision wrote a page.
+func buildVersion() string {
+	if Version != devVersion {
+		return Version
+	}
+	info, ok := debug.ReadBuildInfo()
+	if !ok || info.Main.Version == "" || info.Main.Version == "(devel)" {
+		return Version
+	}
+	return info.Main.Version
+}
 
 func usage() {
 	fmt.Fprint(os.Stderr, `usage: cs-ledger <verb> [ledgerDir] [flags]
@@ -68,7 +87,7 @@ func main() {
 
 	switch verb {
 	case "version", "--version":
-		fmt.Printf("cs-ledger %s (renderer %s, ui tokens %s)\n", Version, ledger.RendererVersion, ledger.UITokensVersion)
+		fmt.Printf("cs-ledger %s (renderer %s, ui tokens %s)\n", buildVersion(), ledger.RendererVersion, ledger.UITokensVersion)
 		return
 	case "manual":
 		fmt.Print(root.ManualMD)
