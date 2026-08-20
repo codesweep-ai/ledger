@@ -1,0 +1,96 @@
+# The knobs cs-lint reads for this repository.
+#
+# The linters carry no project knowledge. Everything that differs between
+# repositories lives here, so a fix to a check reaches every project without
+# carrying one project's exceptions into the next.
+#
+# Run `cs-lint <linter> --explain` to read what each rule wants. Tune until
+# every reported problem is a real one: a check that cries wolf is worse than
+# no check.
+
+docs:
+  # Directories holding fixtures, corpora or generated Markdown, added to the
+  # linter's own list.
+  skipExtra:
+    - fixtures
+
+  # The domain terms a reader of this project cannot infer. Each must be
+  # introduced where a document first uses it: glossed on the spot, defined in a
+  # glossary table, or linked to the page that defines it.
+  #
+  # "pin" is deliberately absent: it collides with the ordinary verb "pins".
+  glossary:
+    - ledger
+    - record
+    - draft
+    - stint
+    - queue
+    - viewer
+
+  # The project's own command name, which starts sentences in lower case.
+  # Without it the splitter reads "Nothing prompts. cs-ledger exits 1." as one
+  # six-word sentence and reports a length that is not real.
+  lowercaseStarters:
+    - cs-ledger
+
+  projectVerbs: []
+
+oss:
+  project: cs-ledger
+  githubRepo: codesweep-ai/ledger
+
+  # True once the repository is public. Published history cannot be rewritten,
+  # so the history rules report as warnings from that point on. Flip this in the
+  # same commit that makes the repository public.
+  published: false
+
+  docSet:
+    - README.md
+    - INSTALL.md
+    - MANUAL.md
+    - SPEC.md
+    - CONTRIBUTING.md
+    - AGENTS.md
+
+  # A genuine standalone how-to, long enough that folding it would bury the
+  # document it landed in. The router must name it too.
+  extraDocs:
+    - GUIDE.md
+
+  skipPaths:
+    "templates/": "a template materialized into a consumer repo, where its relative links resolve; they do not resolve from here"
+
+  requiredTargets: ["build", "test", "check", "lint", "docs", "oss", "clean"]
+  expectedTargets: ["help", "install", "uninstall", "fmt", "fmt-check", "vet", "deadcode"]
+
+walkthrough:
+  tool: cs-ledger
+  toolPath: bin/cs-ledger
+
+  docs:
+    - README.md
+    - INSTALL.md
+    - MANUAL.md
+    - SPEC.md
+    - CONTRIBUTING.md
+    - GUIDE.md
+
+  envPrefix: CS_LEDGER_
+
+  # Read-only, offline, and safe to run on every gate. `render` is deliberately
+  # absent: it writes the page, and a checker that writes can hide the very
+  # staleness the ledger's own gate exists to catch.
+  safeVerbs:
+    - version
+    - check
+    - check ledger
+    - check fixtures/sandbox/ledger
+
+  sampleSkip:
+    "cs-ledger version": "the first field is a git describe of the build, which the manual says will read differently for every one. WALK-402 still holds the renderer version"
+    "cs-ledger render && cs-ledger check": "render writes the page, and this check must not"
+    "cs-ledger check": "the sample is the failure a stale page produces, which a healthy tree cannot reproduce"
+    "cs-ledger check ledger": "the sample is a freshly scaffolded ledger in another repository, not this one"
+
+  # INSTALL.md and the README both say to change into your own repository first.
+  placeholderOK: ["~/my-service"]

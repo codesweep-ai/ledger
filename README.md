@@ -26,9 +26,9 @@ with the repository and what to do next. There is no service to run. A single st
 No build and no server. Open either of these in a browser:
 
 - [This repository's own ledger](https://codesweep.ai/ledger/ledger/ledger.html), tracking its own
-  work — [source](ledger/ledger.html).
+  work ([source](ledger/ledger.html)).
 - [A frozen copy of another project's ledger](https://codesweep.ai/ledger/fixtures/sandbox/ledger/ledger.html),
-  kept as a test corpus — [source](fixtures/sandbox/ledger/ledger.html).
+  kept as a test corpus ([source](fixtures/sandbox/ledger/ledger.html)).
 
 ## Why a ledger
 
@@ -112,11 +112,11 @@ which commit did it. Notes append and never rewrite history. IDs are never renum
 `ledger.html` inlines its own data, CSS and JavaScript, so it works from `file://` with no network
 request. Four views share one masthead:
 
-- **brief** — the landing view. What changed lately, what the queue says to fix next and why, and
+- **brief**: the landing view. What changed lately, what the queue says to fix next and why, and
   what needs a human right now.
-- **board** — records stacked by status.
-- **list** — the full inventory, grouped and sorted on demand.
-- **activity** — every dated event, newest first.
+- **board**: records stacked by status.
+- **list**: the full inventory, grouped and sorted on demand.
+- **activity**: every dated event, newest first.
 
 The page is a pure function of the records, with no timestamp of its own. That is what lets `check`
 prove it is current, by rendering again and comparing bytes. It also makes a merge conflict in

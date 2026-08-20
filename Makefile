@@ -1,10 +1,11 @@
 # cs-ledger — build/test/install.
 # `make build` produces bin/cs-ledger (version-stamped, CGO_ENABLED=0).
 # `make check` is the full local gate: formatting, vet, the Go suite, the
-# viewer's JavaScript suite, the coverage gate and both linters. Building needs Go alone; the
-# gate also needs node (test-js) and python3 (docs, oss).
+# viewer's JavaScript suite, the coverage gate and the linters. Building needs Go
+# alone; the gate also needs node (test-js) and cs-lint (docs, oss, walkthrough).
 
 GORELEASER ?= goreleaser
+CS_LINT  ?= cs-lint
 BIN      := bin/cs-ledger
 PKG      := ./cmd/cs-ledger
 PREFIX   ?= $(HOME)/.local
@@ -28,7 +29,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help build install uninstall test test-js coverage coverage-check coverage-baseline vet fmt fmt-check check docs oss ledger lint deadcode snapshot release release-check clean
+.PHONY: help build install uninstall test test-js coverage coverage-check coverage-baseline vet fmt fmt-check check docs oss walkthrough cs-lint-installed ledger lint deadcode snapshot release release-check clean
 
 .DEFAULT_GOAL := help
 
@@ -98,16 +99,25 @@ fmt-check:
 		exit 1; \
 	fi
 ## docs: the prose rules from CONTRIBUTING.md
-docs:
-	python3 scripts/lint-docs.py
+docs: cs-lint-installed
+	$(CS_LINT) docs
 
 ## oss: the rules this repo has to satisfy as a published project
-oss:
-	python3 scripts/lint-oss.py
+oss: cs-lint-installed
+	$(CS_LINT) oss
 
 ## walkthrough: check the docs against the binary, the code and the build
-walkthrough: build
-	python3 scripts/lint-walkthrough.py
+walkthrough: build cs-lint-installed
+	$(CS_LINT) walkthrough
+
+# The three targets above are one shared tool: github.com/codesweep-ai/lint.
+# Its knobs for this repo live in .cs-lint.yaml, and `cs-lint <linter> --explain`
+# says what each rule wants.
+cs-lint-installed:
+	@command -v $(CS_LINT) >/dev/null 2>&1 || { \
+		echo "cs-lint is not installed: go install github.com/codesweep-ai/lint/cmd/cs-lint@latest" >&2; \
+		exit 2; \
+	}
 
 ## ledger: validate this repo's own records and prove ledger.html is current
 ledger: build

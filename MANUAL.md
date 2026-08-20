@@ -1,8 +1,8 @@
-# cs-ledger(1) — manual
+# The cs-ledger manual
 
 ## Name
 
-**cs-ledger** — validate a repository's issue records and render them as a single HTML page.
+`cs-ledger`: validate a repository's issue records and render them as a single HTML page.
 
 ## Synopsis
 
@@ -177,28 +177,40 @@ prints the same text on stderr and exits 2.
 
 ## Diagnostics
 
-**`ledger.html: STALE — records changed without re-render`** — the committed page is not what these
-records render to. Run `cs-ledger render` and commit the page with the records.
+**`ledger.html: STALE — records changed without re-render`**
 
-**`ledger.html: rendered in dev mode (--assets)`** — the page came from viewer files on disk rather
-than from the binary. Render again without `--assets`.
+The committed page is not what these records render to. Run `cs-ledger render` and commit the page
+with the records.
 
-**`ledger.html was rendered by X and this binary renders Y`** — a warning. Another renderer wrote
-the committed page, so `check` cannot tell a stale page from version skew and does not try. Run
-`cs-ledger render` to bring the page and `toolVersion` to your binary.
+**`ledger.html: rendered in dev mode (--assets)`**
 
-**`GUIDE.md: does not match this binary's embedded guide`** — the generated half of the
-materialized guide has drifted from the binary's copy. `cs-ledger render` refreshes it and keeps
-your conventions below the marker.
+The page came from viewer files on disk rather than from the binary. Render again without
+`--assets`.
 
-**`filename must equal id`** — a record's `id` field and its filename disagree. The filename is the
-ID claim, so one of the two is a typo.
+**`ledger.html was rendered by X and this binary renders Y`**
 
-**`status "closed" requires non-empty evidence.verified`** — a record was closed without saying how
-it was proved. Write what you measured, or reopen it.
+A warning. Another renderer wrote the committed page, so `check` cannot tell a stale page from
+version skew and does not try. Run `cs-ledger render` to bring the page and `toolVersion` to your
+binary.
 
-**`is an open critical missing from the queue — needs triage`** — a warning. Something critical is
-open and nothing scheduled it. Add it to `queue.json`, or lower the severity and say why in a note.
+**`GUIDE.md: does not match this binary's embedded guide`**
+
+The generated half of the materialized guide has drifted from the binary's copy. `cs-ledger render`
+refreshes it and keeps your conventions below the marker.
+
+**`filename must equal id`**
+
+A record's `id` field and its filename disagree. The filename is the ID claim, so one of the two is
+a typo.
+
+**`status "closed" requires non-empty evidence.verified`**
+
+A record was closed without saying how it was proved. Write what you measured, or reopen it.
+
+**`is an open critical missing from the queue — needs triage`**
+
+A warning. Something critical is open and nothing scheduled it. Add it to `queue.json`, or lower the
+severity and say why in a note.
 
 ## Notes for agents
 

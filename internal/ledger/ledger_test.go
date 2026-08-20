@@ -667,7 +667,7 @@ func TestManualPrintsTheCommandSurface(t *testing.T) {
 	if err != nil {
 		t.Fatalf("manual: %v", err)
 	}
-	mustMatch(t, out, `cs-ledger\(1\)`)
+	mustMatch(t, out, `The cs-ledger manual`)
 	mustMatch(t, out, `evidence\.verified`)
 }
 
@@ -682,7 +682,7 @@ func TestGuidePrintsTheDoctrine(t *testing.T) {
 	mustMatch(t, out, `The five moves`)
 	mustMatch(t, out, `evidence\.verified`)
 	// The two documents are not the same text: one is the command surface.
-	mustNotMatch(t, out, `cs-ledger\(1\)`)
+	mustNotMatch(t, out, `The cs-ledger manual`)
 }
 
 func TestGuideSyncGate(t *testing.T) {

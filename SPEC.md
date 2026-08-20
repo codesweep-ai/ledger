@@ -1,4 +1,4 @@
-# ledger — specification
+# The cs-ledger specification
 
 This document specifies the ledger format and the behaviour of the `cs-ledger` tool. It is the
 contract between the tool, the records agents write, and the page humans read.

@@ -1,4 +1,4 @@
-# ledger — installation
+# Installing cs-ledger
 
 `cs-ledger` is a single static binary with no runtime dependencies. Get it, put it on your PATH,
 then scaffold a ledger in the repository you want it to track. After that, head for the
