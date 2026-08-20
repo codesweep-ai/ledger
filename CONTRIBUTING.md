@@ -1,4 +1,4 @@
-# Contributing to ledger
+# Contributing to cs-ledger
 
 Bug reports and pull requests are welcome. For a security issue, use GitHub's private
 vulnerability reporting on this repository's Security tab, rather than opening a public issue.
@@ -10,10 +10,13 @@ Two properties hold the design together, and a change that weakens either needs 
 **The rendered page is a pure function of the records.** It reads no wall-clock timestamp, no
 environment and no network. That is what lets `check` prove the page is current by rendering again
 and comparing bytes, and it is why a conflict in `ledger.html` is never hand-merged.
+`TestRenderDeterministic` renders one corpus twice and compares, and
+`TestRenderEmbedsDataNoTimestamps` holds the second half.
 
 **A closed record proves its claim.** `evidence.verified` says what was measured, and
 `evidence.commits` says which commit did it. A ledger whose closed records assert rather than prove
-is worth less than no ledger.
+is worth less than no ledger. `TestClosedRequiresVerified` and `TestClosedRequiresCommitsOrLinks`
+reject a record that closes without either.
 
 ## Getting set up
 
@@ -161,6 +164,34 @@ cs-lint oss --explain
 
 13. **Say what it costs.** If a flag makes output uncommittable, or a rule blocks a merge, say so
     where the reader meets it.
+
+14. **Describe what the software does, not how it came to do it.** Leave out what the project used
+    to do, what was tried and dropped, and numbers from a run someone did once. The reason a rule
+    exists belongs beside the rule in `SPEC.md`; the investigation that found it belongs in the PR.
+
+15. **State the point first, then qualify it.** Opening with the qualifier makes the reader decode
+    the sentence backwards. "Appended and never rewritten, so an interrupted run leaves the records
+    intact" names its subject last. Start with the file, and let the consequence follow it.
+
+16. **Do not explain a design by contrast with a worse one.** "A directory, so a change reads as a
+    diff rather than as one unreadable line" asks the reader to picture a format nobody proposed.
+    Say what it is and what you get.
+
+17. **A walkthrough is steps that work.** Put the reasons somewhere else. A reader working through
+    one wants commands that run, not an account of which field the schema used to spell differently.
+
+18. **Do not make the reader hold two halves of a sentence apart.** "What the records say may
+    change; what the page shows may not" is a puzzle. Name the subject in each clause.
+
+19. **Do not write in the register a model defaults to.** Untouched model output has a signature
+    readers now recognise and discount. `cs-lint docs --explain` lists the words this house
+    declines and what to write instead, so the table lives in one place rather than here. Two
+    shapes matter as much as the words. Negative parallelism sets up a contrast nobody asked for.
+    The rule of three is a rhythm rather than an argument, and a reader stops counting the third
+    item as information.
+
+These rules are about mechanics, and this project's voice is a strength: concrete, opinionated, and
+free of padding. Where a rule fights the voice, the voice wins. Say so in the PR when it does.
 
 Run the linter on its own while you write:
 
