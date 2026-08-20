@@ -38,8 +38,18 @@ help:
 	@echo "cs-ledger make targets:"
 	@grep -E '^## [a-z][a-z0-9-]*: ' $(MAKEFILE_LIST) | sed -E 's/^## ([^:]+): (.*)/  \1|\2/' | column -t -s '|'
 
-## build: host binary at bin/cs-ledger
+## build: host binary at bin/cs-ledger via goreleaser (single target)
 build:
+	@mkdir -p $(dir $(BIN))
+	@if command -v $(GORELEASER) >/dev/null 2>&1; then \
+		VERSION='$(VERSION)' $(GORELEASER) build --single-target --snapshot --clean --output $(BIN); \
+	else \
+		echo "goreleaser not found; using go build (run 'make build-go' explicitly to force)"; \
+		$(MAKE) build-go; \
+	fi
+
+## build-go: bin/cs-ledger straight from go build, no goreleaser
+build-go:
 	@mkdir -p $(dir $(BIN))
 	CGO_ENABLED=0 go build -trimpath -ldflags '$(LDFLAGS)' -o $(BIN) $(PKG)
 
