@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"strings"
 
@@ -87,7 +88,8 @@ func main() {
 
 	switch verb {
 	case "version", "--version":
-		fmt.Printf("cs-ledger %s (renderer %s, ui tokens %s)\n", buildVersion(), ledger.RendererVersion, ledger.UITokensVersion)
+		fmt.Printf("cs-ledger %s (%s/%s, %s, renderer %s, ui tokens %s)\n",
+			buildVersion(), runtime.GOOS, runtime.GOARCH, runtime.Version(), ledger.RendererVersion, ledger.UITokensVersion)
 		return
 	case "manual":
 		fmt.Print(root.ManualMD)
