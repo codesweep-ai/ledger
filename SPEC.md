@@ -314,7 +314,26 @@ impossible by construction, because every control shows its own value.
 Markdown rendering is a small built-in subset: headings, emphasis, code, lists, links and tables.
 No library is vendored for it.
 
-## 11. Conformance
+## 11. Testing
+
+The Go suite covers validation, rendering and the command-line surface, each rule against its own
+synthetic corpus. Two real corpora act as scale fixtures: this repository's own ledger, and
+`fixtures/sandbox`, a frozen copy of the sandbox project's. A renderer change has to leave both
+round-tripping through the freshness check.
+
+### Coverage
+
+Every test target writes coverage into its own tier under `.coverage/`, so running several
+aggregates rather than overwrites. `make coverage` merges what is there and prints the report.
+
+`make coverage-check` runs inside `make check` and in CI. It fails when a package
+`.coverage-baseline` lists stops being reached: presence, not a percentage. What it catches is a
+suite that stopped running while the tests still report green. When a package is meant to lose its
+coverage, rerun `make coverage-baseline` and commit the result.
+
+The CLI tests build `cs-ledger` with `-cover`, so what the real binary runs counts too.
+
+## 12. Conformance
 
 An implementation conforms when it satisfies R1–R54. The tool's own test suite is the reference. It
 validates a corpus of well-formed and malformed records, renders both this repository's ledger and
@@ -325,7 +344,7 @@ a standing gate in the suite. `schema/issue.v1.json` documents §4 for readers a
 binary enforces §4 natively, and the suite pins the two to the same verdicts so they cannot drift
 apart.
 
-## 12. Non-goals
+## 13. Non-goals
 
 - **No record types beyond issues.** Decisions, stints and specifications stay in Markdown.
 - **No migration tooling.** The tool reads no other issue format. `fixtures/sandbox` is a test
@@ -335,7 +354,7 @@ apart.
   work. The tool never reads a harness's run directories.
 - **No server and no build step**, ever, for the rendered page.
 
-## 13. Open questions
+## 14. Open questions
 
 1. **Drafts have no promotion command.** An orchestrator moves a draft to `issues/<ID>.json` by
    hand. Whether that deserves a verb is open.

@@ -84,29 +84,18 @@ commit by accident.
 Ship a test with your change. Where a behaviour genuinely cannot be observed in a test, say so in
 the pull request.
 
-The Go suite covers validation, rendering and the command-line surface, each rule against its own
-synthetic corpus. Two real corpora act as scale fixtures: this repository's own ledger, and
-`fixtures/sandbox`, a frozen copy of the sandbox project's.
-
 A change to validation needs a case on both sides: a record that should pass and one that should
-fail, each asserting the message a reader would act on. A change to the renderer needs the two
+fail, each asserting the message a reader would act on. A change to the renderer needs both real
 corpora to still round-trip through the freshness check.
 
 `schema/issue.v1.json` documents the record shape for readers and agents, while the binary enforces
-it natively. The suite pins the two to the same verdicts. If you change one, change the other in
-the same commit.
+it natively. If you change one, change the other in the same commit.
 
-### Coverage
+Test the contract, not the implementation: the exit code, the message a reader acts on, and the
+bytes the page renders to. Say why the case matters in a comment when it is not obvious.
 
-Every test target writes coverage into its own tier under `.coverage/`, so running several
-aggregates rather than overwrites. `make coverage` merges what is there and prints the report.
-
-`make coverage-check` runs inside `make check` and in CI. It fails when a package
-`.coverage-baseline` lists stops being reached: presence, not a percentage. What it catches is a
-suite that stopped running while the tests still report green. When a package is meant to lose its
-coverage, rerun `make coverage-baseline` and commit the result.
-
-The CLI tests build `cs-ledger` with `-cover`, so what the real binary runs counts too.
+Never lower a coverage baseline to make a run green. [`SPEC.md`](SPEC.md#11-testing) holds what the
+suite covers, the two real corpora it runs against, and how coverage is measured and gated.
 
 ## Commits
 
