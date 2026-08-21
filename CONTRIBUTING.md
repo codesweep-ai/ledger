@@ -1,9 +1,31 @@
 # Contributing to cs-ledger
 
-Bug reports and pull requests are welcome. For a security issue, use GitHub's private
-vulnerability reporting on this repository's Security tab, rather than opening a public issue.
+Bug reports and pull requests are welcome. These rules apply to humans and coding agents alike. If
+you are an agent working in this repository, read this file before you change anything and follow
+it.
 
-## What this project will not trade away
+For a security issue, use GitHub's private vulnerability reporting on this repository's Security
+tab, rather than opening a public issue.
+
+## How a change gets in
+
+File a bug or an idea as a GitHub issue on this repository. For a fix that stands on its own, a pull
+request on its own is enough. For anything that changes behaviour a user can see, open an issue
+first, so the design gets settled before you write it.
+
+1. Fork the repository, and create a branch off `main`.
+2. Make the change, with its test.
+3. Run `make check`, which is the same gate CI runs.
+4. Open a pull request against `main`, and say what the change does and why.
+
+Review asks four questions. Does the change hold the invariants below? Does a test fail without it?
+Does every user-visible change land in exactly one document? Does the history read the way this file
+describes? Expect comments rather than silence, and expect a small change to move quickly.
+
+By opening a pull request you agree that your contribution ships under the
+[Apache 2.0 licence](LICENSE) this project is released under.
+
+## What a change must not break
 
 Two properties hold the design together, and a change that weakens either needs a very good reason.
 
@@ -18,7 +40,7 @@ and comparing bytes, and it is why a conflict in `ledger.html` is never hand-mer
 is worth less than no ledger. `TestClosedRequiresVerified` and `TestClosedRequiresCommitsOrLinks`
 reject a record that closes without either.
 
-## Getting set up
+## Before you push
 
 ```bash
 make build     # bin/cs-ledger
@@ -87,24 +109,70 @@ The CLI tests build `cs-ledger` with `-cover`, so what the real binary runs coun
 
 ## Commits
 
-Keep one idea per commit. A commit that fixes a bug and tidies neighbouring code is two commits.
+Keep one idea per commit. If a change will not fit that shape, it is doing more than one thing, so
+split it.
 
-Write the subject in the imperative and keep it under 60 characters: "Reject a draft that carries
-an id", not "Fixed draft validation". Most commits need no body. Write one when the reason is not
-visible in the diff, and say why rather than what.
+**Subject**, always. Under 60 characters, imperative, no trailing period, completing *"If applied,
+this commit will …"*. Say what the change does, in plain English rather than in this project's
+internal shorthand. Use no conventional-commit prefix: `fix(proxy):` names a category rather than a
+change, and the category is already in the diff.
 
-Drop any trailer linking to the agent's session or transcript. A reader of the history has no
-access to it, and a link that resolves for nobody is noise.
+**Body**, only when the subject leaves a real question a reader would otherwise have to open the
+diff to answer. Write the answer in plain English, in whole sentences, addressed to somebody who was
+not there. Wrap it at 72 columns. Most commits need no body at all.
 
-A change that touches the ledger directory needs `cs-ledger render && cs-ledger check` to pass in
-the same commit, because the freshness gate compares the committed page against the records beside
-it.
+Say what the change does and what constrained it. Leave out how the work was scheduled, how it was
+tested, and what prompted it. A rule's reason belongs beside the rule in [`SPEC.md`](SPEC.md), and
+the investigation that found it belongs in the pull request.
+
+Where a body carries more than one independent point, one line each reads better than a paragraph.
+Never reach for another point to fill the shape. A line that restates the subject in different words
+is worse than no body, and a body written to a length is the commonest way a message stops being
+read.
+
+```
+Reject a draft that carries an id
+```
+
+```
+Re-render the page when the renderer version moves
+
+A ledger records the renderer that wrote its page, so two
+binaries claiming one version would render different bytes.
+```
+
+```
+Key a record on its id, not its file name
+
+- A file can be renamed; the id is what a closure cites.
+- The freshness check compares bytes, so order is data.
+```
+
+Keep the `Co-Authored-By:` trailer when an agent wrote the change. Drop any trailer linking to the
+agent's session or transcript. Such a link is private to whoever ran it and dead to everyone else,
+and it cannot be fixed after publication.
 
 ## Writing
 
-The docs drift into a style that reads as terse and knowing rather than clear. These rules push
-back. [`cs-lint`](https://github.com/codesweep-ai/lint) enforces the mechanical ones. It carries
-three linters, and `make check` runs all three:
+Six principles carry the voice. Read them before you write a document, and apply them when you edit
+one:
+
+1. **Introduce a term where you first use it**, in the same sentence, or link to the page that
+   defines it. A reader should never meet a word the docs have not explained.
+2. **State the point first, then qualify it.** Opening with the qualifier makes the reader decode
+   the sentence backwards.
+3. **Give every sentence a subject and a verb.** "Two version numbers, one verdict, one remedy"
+   reads as knowing rather than clear. Say what the thing is.
+4. **A walkthrough is steps that work.** Put the reasons somewhere else. A reader working through
+   one wants commands that run.
+5. **Describe what the software does, not how it came to do it.** Leave out what the project used
+   to do, what was tried and dropped, and numbers from a run somebody did once.
+6. **Do not explain a design by contrast with a worse one.** Say what it is and what you get,
+   rather than asking the reader to picture a design nobody proposed.
+
+The mechanical rules are enforced rather than restated here.
+[`cs-lint`](https://github.com/codesweep-ai/lint) carries them, and `make check` runs all three of
+its linters over this repository:
 
 | Command | Target | What it checks |
 |---|---|---|
@@ -112,107 +180,23 @@ three linters, and `make check` runs all three:
 | `cs-lint oss` | `make oss` | What this repository owes a reader as a published project. |
 | `cs-lint walkthrough` | `make walkthrough` | Whether the documents still describe the software. |
 
-The third checks the claims rather than the prose. Every command the docs name goes against the
-binary's help tree, every setting against the code that reads it, and every sample output against
-the command re-run now. `--run` lists every command the documents tell a reader to run, in reading
-order, and `--review` prints the half that needs a reader.
-
-Read what a rule wants with `--explain`, which prints the guidance behind each one rather than
-leaving you to argue with the tool:
+`--explain` prints what each rule wants and the guidance behind it:
 
 ```bash
-cs-lint oss --explain
+cs-lint docs --explain
 ```
 
-1. **Write to the reader, in second person.** "Run `cs-ledger check` before committing", not "the
-   check should be run before committing".
+That listing is the authority. Where this section and the linter disagree, the linter is right and
+this section is a bug. Every knob lives in [`.cs-lint.yaml`](.cs-lint.yaml), and a check that
+reports noise is a check to fix rather than a report to work around.
 
-2. **Introduce a term where you first use it.** A reader meeting *draft*, *stint* or *queue* for
-   the first time needs it introduced. Give a definition on the spot, an entry in a glossary
-   table, or a link to the page that defines it. The linter carries the project's vocabulary. It
-   reports a term used before anything explains it.
+A check turned off here is a waiver, written under `allow` as an identifier and the reason it was
+traded away. The reason is required, and it is printed with the finding, because a waiver nobody can
+review is a rule deleted in private.
 
-3. **No em-dash.** The aside one introduces is a full stop, a comma, or a cut. It is also the
-   first punctuation a model reaches for, so a page full of them reads as unedited whoever wrote it.
-
-4. **Sentences under 30 words.** Longer than that and a sentence is carrying two ideas.
-
-5. **Every sentence has a verb.** "Two version numbers, one verdict" is an epigram, not a
-   sentence. It sounds knowing and tells the reader nothing.
-
-6. **Delete the frame.** "It is worth noting that", "put simply", "in other words", "to be clear".
-   Each one comments on the writing instead of getting on with it. Say the thing.
-
-7. **Do not say a thing twice in one sentence.** "Which command you type is the difference, and it
-   is the difference that decides the outcome" circles and lands nowhere.
-
-8. **Show a file before running it.** A block that runs `./build.sh` has to have shown the reader
-   what is in `build.sh`.
-
-9. **Explain the case, or leave it out.** If a walkthrough has two shapes, walk through both fully,
-   or pick one. Half an explanation, hedged, is worse than either.
-
-10. **Do not mention what does not happen.** "The `--assets` flag is ignored here" makes a reader
-    wonder why they were told. Cut it.
-
-11. **Do not document the absence of a feature** as a section of its own. A "What it does not do"
-    list mostly answers questions nobody asked. Non-goals belong in the spec, where a reader is
-    looking for the boundary.
-
-12. **Prefer a concrete example to a general statement.** A record with real field values teaches
-    the schema faster than a paragraph about it.
-
-13. **Say what it costs.** If a flag makes output uncommittable, or a rule blocks a merge, say so
-    where the reader meets it.
-
-14. **Describe what the software does, not how it came to do it.** Leave out what the project used
-    to do, what was tried and dropped, and numbers from a run someone did once. The reason a rule
-    exists belongs beside the rule in `SPEC.md`; the investigation that found it belongs in the PR.
-
-15. **State the point first, then qualify it.** Opening with the qualifier makes the reader decode
-    the sentence backwards. "Appended and never rewritten, so an interrupted run leaves the records
-    intact" names its subject last. Start with the file, and let the consequence follow it.
-
-16. **Do not explain a design by contrast with a worse one.** "A directory, so a change reads as a
-    diff rather than as one unreadable line" asks the reader to picture a format nobody proposed.
-    Say what it is and what you get.
-
-17. **A walkthrough is steps that work.** Put the reasons somewhere else. A reader working through
-    one wants commands that run, not an account of which field the schema used to spell differently.
-
-18. **Do not make the reader hold two halves of a sentence apart.** "What the records say may
-    change; what the page shows may not" is a puzzle. Name the subject in each clause.
-
-19. **Do not write in the register a model defaults to.** Untouched model output has a signature
-    readers now recognise and discount. `cs-lint docs --explain` lists the words this house
-    declines and what to write instead, so the table lives in one place rather than here. Two
-    shapes matter as much as the words. Negative parallelism sets up a contrast nobody asked for.
-    The rule of three is a rhythm rather than an argument, and a reader stops counting the third
-    item as information.
-
-These rules are about mechanics, and this project's voice is a strength: concrete, opinionated, and
-free of padding. Where a rule fights the voice, the voice wins. Say so in the PR when it does.
-
-Run the linter on its own while you write:
-
-```bash
-cs-lint docs              # check
-cs-lint docs --stats      # per-file measurements
-cs-lint docs --list       # which files are checked
-cs-lint docs --explain    # what each rule wants, and the guidance behind it
-```
-
-Every knob lives in [`.cs-lint.yaml`](.cs-lint.yaml) at the repository root, one section per
-linter. The `docs` section carries `glossary`, `skipExtra`, `lowercaseStarters` and `projectVerbs`.
-When a real sentence trips the verb check, add the verb. When a report is noise, fix the config. A
-linter that cries wolf gets ignored, and then it protects nothing.
-
-A rule turned off for this repository is a waiver: a rule identifier and the reason it was traded
-away, under `allow`. The reason is required, and it is printed with the finding, because a waiver
-nobody can review is a rule deleted in private.
-
-The linter is a project of its own, shared across this family. A fix to a check belongs there, and
-reaches this repository the next time somebody installs it.
+**What not to change.** This project's voice is a strength: concrete, opinionated, free of
+marketing padding. These rules are about mechanics. Where one of them fights the voice, the voice
+wins, and the exception is worth a sentence in the pull request.
 
 ## Which document does a change belong in?
 
@@ -243,3 +227,20 @@ from `check` naming the renderer that wrote its page, and `cs-ledger render` bri
 Say what it costs: skip the bump and two binaries claim the same version while rendering different
 bytes. `check` reports that as a stale page rather than as version skew, and sends the reader after
 the wrong problem. Nothing catches a forgotten bump for you.
+
+## AI-assisted contributions
+
+An agent wrote most of this repository, and you are welcome to use one. The standard is the same
+either way: you are responsible for what you submit.
+
+Point your tool at [`AGENTS.md`](AGENTS.md), which routes it to the documents that hold the
+conventions, and check three things before you open the pull request:
+
+- You understand every line, and can answer a question about it without going back to the tool.
+- You ran `make check` and it passed.
+- You cut what the tool added to fill space. A model pads a commit body to the shape it was shown,
+  and comments that restate the code around them. Both read as noise to a maintainer, and both are
+  yours to remove.
+
+Keep the `Co-Authored-By:` trailer, which is how the work is disclosed. An unattended agent must not
+open pull requests or comment on this repository.
