@@ -130,7 +130,7 @@ JSON is secondary to the quality of what it says.
 
 ```json
 { "recommendedBy": "orchestrator", "updated": "2026-08-14",
-  "items": [ { "id": "LGR-012", "why": "blocks the 0.4 release" } ] }
+  "items": [ { "id": "MYS-012", "why": "blocks the 0.4 release" } ] }
 ```
 
 **R17.** When present, `queue.json` **MUST** carry a non-empty `recommendedBy`, an `updated` date, and an
