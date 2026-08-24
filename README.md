@@ -1,6 +1,6 @@
 # ledger
 
-> **Structured issue tracking for agent-managed repositories: agents write small JSON records,
+> **Structured issue tracking for agent-managed repositories: AI agents write small JSON records,
 > humans read a generated, interactive, self-contained `ledger.html`.**
 
 [![CI](https://github.com/codesweep-ai/ledger/actions/workflows/ci.yml/badge.svg)](https://github.com/codesweep-ai/ledger/actions/workflows/ci.yml)
