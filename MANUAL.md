@@ -130,7 +130,7 @@ Prints three versions: the tool's own, the renderer's, and the pinned design tok
 
 ```console
 $ cs-ledger version
-cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.26.2, renderer 0.3.2, ui tokens 1.12.0)
+cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.26.2, renderer 0.3.3, ui tokens 1.12.0)
 ```
 
 The first field is a `git describe` of the build, so yours will read differently. The renderer

@@ -15,8 +15,9 @@ import (
 // STALE). 0.3.0: first cs-ledger release — derived-data block, the earlier
 // JavaScript renderer retired. 0.3.1: evidence-sha links via
 // commitUrlTemplate. 0.3.2: viewer stylesheet comments, which are
-// embedded verbatim and so change the page's bytes.
-const RendererVersion = "0.3.2"
+// embedded verbatim and so change the page's bytes. 0.3.3: viewer
+// JavaScript comments, embedded the same way.
+const RendererVersion = "0.3.3"
 const UITokensVersion = "1.12.0"
 
 // DevStamp marks HTML rendered from --assets (dev mode); check refuses it.
