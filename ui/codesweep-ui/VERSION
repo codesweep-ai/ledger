@@ -10,7 +10,7 @@ the no-build rendered page and embedded into the cs-ledger binary at build.
 The adaptation touches four things and nothing else: the @tailwind directives
 are stripped, a provenance header is added, two comments lose the
 "(unreleased)" note this mirror was copied with, and two comment lines in
-base.css trade backticks for quotes. Run `diff -u vendor/codesweep-ui/base.css
+base.css trade backticks for quotes. Run `diff -u ui/codesweep-ui/base.css
 viewer/base.css` (and the same for tokens.css) to see the whole of it.
 Re-vendoring: refresh this mirror from upstream, re-apply the adaptation to
 viewer/, make build.

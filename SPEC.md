@@ -298,7 +298,7 @@ a build step.
 
 The full `@codesweep-ai/ui` package is React and Tailwind behind a private registry, which a
 no-build artifact cannot use. So the project keeps a pinned copy of that design system's
-`tokens.css` and `base.css` under `vendor/codesweep-ui/`, adapts it in `viewer/`, and embeds the
+`tokens.css` and `base.css` under `ui/codesweep-ui/`, adapts it in `viewer/`, and embeds the
 result. The token version appears in the page footer next to the renderer version, and moving it is
 a release followed by `cs-ledger render`.
 

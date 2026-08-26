@@ -136,7 +136,7 @@ bin/cs-ledger render ledger --assets ./viewer # iterate on the viewer, no recomp
 `--assets` reads them from disk instead, which is how you iterate on the design. Those renders are
 dev-stamped and `check` refuses them, so only a release binary's output is committable.
 
-`vendor/codesweep-ui/` is a pinned copy of the design system's tokens, and `viewer/` carries the
+`ui/codesweep-ui/` is a pinned copy of the design system's tokens, and `viewer/` carries the
 adaptation the no-build page ships. The viewer is styled through those tokens alone, with no React,
 no Tailwind and no build step.
 
