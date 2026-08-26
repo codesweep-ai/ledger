@@ -2,7 +2,7 @@
 # `make build` produces bin/cs-ledger (version-stamped, CGO_ENABLED=0).
 # `make check` is the full local gate: formatting, vet, the Go suite, the
 # viewer's JavaScript suite, the coverage gate and the linters. Building needs Go
-# alone; the gate also needs node (test-js) and cs-lint (docs, oss, surface).
+# alone; the gate also needs node (test-js) and cs-lint (prose, refs, oss, surface).
 
 GORELEASER ?= goreleaser
 CS_LINT  ?= cs-lint
@@ -29,7 +29,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help build install uninstall test test-js coverage coverage-check coverage-baseline vet fmt fmt-check check docs oss surface cs-lint-installed ledger lint deadcode snapshot release release-check clean
+.PHONY: help build install uninstall test test-js coverage coverage-check coverage-baseline vet fmt fmt-check check prose refs oss surface cs-lint-installed ledger lint deadcode snapshot release release-check clean
 
 .DEFAULT_GOAL := help
 
@@ -108,9 +108,12 @@ fmt-check:
 		echo "$$unformatted"; \
 		exit 1; \
 	fi
-## docs: the prose rules, and the references the documents make
-docs: cs-lint-installed
+## prose: check how this repository's documents are written
+prose: cs-lint-installed
 	$(CS_LINT) prose
+
+## refs: check that everything the documents point at is there
+refs: cs-lint-installed
 	$(CS_LINT) refs
 
 ## oss: the rules this repo has to satisfy as a published project
@@ -121,8 +124,9 @@ oss: cs-lint-installed
 surface: build cs-lint-installed
 	$(CS_LINT) surface
 
-# The three targets above are one shared tool: github.com/codesweep-ai/lint.
-# docs asks for no binary and runs first; surface reads the one build makes.
+# The four targets above are one shared tool: github.com/codesweep-ai/lint.
+# prose and refs ask for no binary and run first; surface reads the one
+# build makes.
 # Its knobs for this repo live in .cs-lint.yaml, and `cs-lint <linter> --explain`
 # says what each rule wants.
 cs-lint-installed:
@@ -137,7 +141,7 @@ ledger: build
 	./bin/cs-ledger check fixtures/sandbox/ledger
 
 ## check: the full local gate — fmt-check, vet, the linters, and the tests
-check: fmt-check vet lint deadcode test coverage-check docs oss surface
+check: fmt-check vet lint deadcode test coverage-check prose refs oss surface
 
 ## lint: the Go rules from .golangci.yml (see that file for what is on and why)
 lint:
