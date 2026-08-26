@@ -8,32 +8,70 @@
 # every reported problem is a real one: a check that cries wolf is worse than
 # no check.
 
+# The documentation block: the set of documents the checks read, then one
+# section per documentation linter.
 docs:
-  # Directories holding fixtures, corpora or generated Markdown, added to the
-  # linter's own list.
-  skipExtra:
-    - fixtures
+  # The set `refs` and `surface` read the claims from. It sits above both
+  # because both read it, and a second copy would drift.
+  documents:
+    - README.md
+    - INSTALL.md
+    - MANUAL.md
+    - SPEC.md
+    - CONTRIBUTING.md
+    - GUIDE.md
 
-  # The domain terms a reader of this project cannot infer. Each must be
-  # introduced where a document first uses it: glossed on the spot, defined in a
-  # glossary table, or linked to the page that defines it.
-  #
-  # "pin" is deliberately absent: it collides with the ordinary verb "pins".
-  glossary:
-    - ledger
-    - record
-    - draft
-    - stint
-    - queue
-    - viewer
+  prose:
+    # Directories holding fixtures, corpora or generated Markdown, added to the
+    # linter's own list.
+    skipExtra:
+      - fixtures
 
-  # The project's own command name, which starts sentences in lower case.
-  # Without it the splitter reads "Nothing prompts. cs-ledger exits 1." as one
-  # six-word sentence and reports a length that is not real.
-  lowercaseStarters:
-    - cs-ledger
+    # The domain terms a reader of this project cannot infer. Each must be
+    # introduced where a document first uses it: glossed on the spot, defined in a
+    # glossary table, or linked to the page that defines it.
+    #
+    # "pin" is deliberately absent: it collides with the ordinary verb "pins".
+    glossary:
+      - ledger
+      - record
+      - draft
+      - stint
+      - queue
+      - viewer
 
-  projectVerbs: []
+    # The project's own command name, which starts sentences in lower case.
+    # Without it the splitter reads "Nothing prompts. cs-ledger exits 1." as one
+    # six-word sentence and reports a length that is not real.
+    lowercaseStarters:
+      - cs-ledger
+
+    projectVerbs: []
+
+  refs:
+    # INSTALL.md and the README both say to change into your own repository first.
+    placeholderOK: ["~/my-service"]
+
+  surface:
+    tool: cs-ledger
+    toolPath: bin/cs-ledger
+
+    envPrefix: CS_LEDGER_
+
+    # Read-only, offline, and safe to run on every gate. `render` is deliberately
+    # absent: it writes the page, and a checker that writes can hide the very
+    # staleness the ledger's own gate exists to catch.
+    safeVerbs:
+      - version
+      - check
+      - check ledger
+      - check fixtures/sandbox/ledger
+
+    sampleSkip:
+      "cs-ledger version": "the first field is a git describe of the build, which the manual says will read differently for every one. SURF-302 still holds the renderer version"
+      "cs-ledger render && cs-ledger check": "render writes the page, and this check must not"
+      "cs-ledger check": "the sample is the failure a stale page produces, which a healthy tree cannot reproduce"
+      "cs-ledger check ledger": "the sample is a freshly scaffolded ledger in another repository, not this one"
 
 oss:
   project: cs-ledger
@@ -62,35 +100,3 @@ oss:
 
   requiredTargets: ["build", "test", "check", "lint", "docs", "oss", "clean"]
   expectedTargets: ["help", "install", "uninstall", "fmt", "fmt-check", "vet", "deadcode"]
-
-walkthrough:
-  tool: cs-ledger
-  toolPath: bin/cs-ledger
-
-  docs:
-    - README.md
-    - INSTALL.md
-    - MANUAL.md
-    - SPEC.md
-    - CONTRIBUTING.md
-    - GUIDE.md
-
-  envPrefix: CS_LEDGER_
-
-  # Read-only, offline, and safe to run on every gate. `render` is deliberately
-  # absent: it writes the page, and a checker that writes can hide the very
-  # staleness the ledger's own gate exists to catch.
-  safeVerbs:
-    - version
-    - check
-    - check ledger
-    - check fixtures/sandbox/ledger
-
-  sampleSkip:
-    "cs-ledger version": "the first field is a git describe of the build, which the manual says will read differently for every one. WALK-402 still holds the renderer version"
-    "cs-ledger render && cs-ledger check": "render writes the page, and this check must not"
-    "cs-ledger check": "the sample is the failure a stale page produces, which a healthy tree cannot reproduce"
-    "cs-ledger check ledger": "the sample is a freshly scaffolded ledger in another repository, not this one"
-
-  # INSTALL.md and the README both say to change into your own repository first.
-  placeholderOK: ["~/my-service"]
