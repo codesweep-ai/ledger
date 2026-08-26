@@ -10,7 +10,7 @@ BIN      := bin/cs-ledger
 PKG      := ./cmd/cs-ledger
 PREFIX   ?= $(HOME)/.local
 VERSION  := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
-LDFLAGS  := -s -w -X main.Version=$(VERSION)
+LDFLAGS  := -s -w
 GO_FILES := $(shell git ls-files '*.go')
 
 # Coverage is not a separate mode: every test target below writes Go binary
@@ -57,10 +57,12 @@ build-go:
 ## the Go toolchain, and whether a workspace is overriding the go.mod pins. Each
 ## line is read by asking that binary its own version. It deliberately depends on
 ## nothing and runs from source: reporting a version must not trigger a build.
+## -buildvcs=true because `go run` leaves out the VCS stamp by default, and that
+## stamp is the version now that nothing injects one with -X.
 .PHONY: versions
 versions:
-	@if out="$$(go run -ldflags '$(LDFLAGS)' $(PKG) version 2>&1)"; then \
-		printf '%-12s %-38s %s\n' '$(notdir $(BIN))' "$$(printf '%s\n' "$$out" | awk 'NR==1{print $$2}')" 'this repo'; \
+	@if out="$$(go run -buildvcs=true -ldflags '$(LDFLAGS)' $(PKG) version 2>&1)"; then \
+		printf '%-12s %-42s %s\n' '$(notdir $(BIN))' "$$(printf '%s\n' "$$out" | awk 'NR==1{print $$2}')" 'this repo'; \
 	else \
 		printf '%-12s %s\n' '$(notdir $(BIN))' "FAILED — $$(printf '%s\n' "$$out" | head -1)"; \
 	fi

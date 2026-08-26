@@ -29,7 +29,6 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -X main.Version={{ .Version }}
     # Linux and macOS, both architectures: darwin/amd64 costs nothing to add and
     # is what an Intel Mac still needs.
     goos:
