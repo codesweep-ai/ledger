@@ -43,18 +43,17 @@ reject a record that closes without either.
 
 ## Before you push
 
+One command:
+
 ```bash
-make build     # bin/cs-ledger
-make check     # the full local gate
+make ci
 ```
 
-`make check` runs the gofmt check, `go vet`, `golangci-lint`, `deadcode`, the Go suite, the
-viewer's JavaScript suite, and the three linters `cs-lint` carries. Run it before pushing. CI runs
-that target and one gate on top: the freshness check on both ledger corpora.
+That is every gate the CI workflow has, on this machine and in the order the workflow takes them,
+so a green run here is a green run there. `make check` is the faster subset to keep beside you
+while you work, and `make ci` is the one that has to pass.
 
-Three of those do not come with Go. Install them once, pinning `golangci-lint` to the version CI
-runs, so a newer release's added checks arrive when you move the pin rather than on an unrelated
-pull request:
+It shells out to tools the Go distribution does not carry. Install them once:
 
 ```bash
 go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.13.1
@@ -62,22 +61,19 @@ go install golang.org/x/tools/cmd/deadcode@latest
 go install github.com/codesweep-ai/lint/cmd/cs-lint@latest
 ```
 
-`cs-lint` is not pinned. CI installs it from source the same way you do, so a check it gains reaches
-you on the day it lands.
+`golangci-lint` is pinned to the version CI runs, so a release that gains checks reaches you when
+you move the pin rather than on an unrelated pull request. `cs-lint` is not pinned: CI installs it
+from source the same way you do, so a check it gains reaches you on the day it lands.
 
-This repo keeps a **ledger** of open issues in `ledger/`. Read
+The viewer's assets live in `viewer/` as real files and are embedded into the binary at build
+time. To iterate on them without recompiling, render with
+`bin/cs-ledger render ledger --assets ./viewer`. Those renders are dev-stamped and the freshness
+check refuses them, so a page built this way cannot reach a commit by accident.
+
+This repository keeps a **ledger** of open issues in `ledger/`. Read
 [`ledger/AGENTS.md`](ledger/AGENTS.md) before you start work, and follow it as you go. A commit
-that touches `ledger/` needs `cs-ledger render && cs-ledger check` to pass first.
-
-The viewer's assets live in `viewer/` as real files and are embedded into the binary at build time.
-To iterate on them without recompiling:
-
-```bash
-bin/cs-ledger render ledger --assets ./viewer
-```
-
-Those renders are dev-stamped and `check` refuses them, so a page built this way cannot reach a
-commit by accident.
+that touches `ledger/` needs `cs-ledger render && cs-ledger check` to pass first, and
+`make ledger` runs the check half.
 
 ## Tests
 
