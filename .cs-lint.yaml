@@ -101,4 +101,4 @@ oss:
     "templates/": "a template materialized into a consumer repo, where its relative links resolve; they do not resolve from here"
 
   requiredTargets: ["build", "test", "check", "lint", "prose", "refs", "oss", "clean"]
-  expectedTargets: ["help", "install", "uninstall", "fmt", "fmt-check", "vet", "deadcode"]
+  expectedTargets: ["help", "install", "uninstall", "fmt", "fmt-check", "vet", "deadcode", "ci"]

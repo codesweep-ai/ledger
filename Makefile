@@ -29,7 +29,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help build install uninstall test test-js coverage coverage-check coverage-baseline vet fmt fmt-check check prose refs oss surface cs-lint-installed ledger lint deadcode snapshot release release-check clean
+.PHONY: help build install uninstall test test-js coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface cs-lint-installed ledger lint deadcode snapshot release release-check clean
 
 .DEFAULT_GOAL := help
 
@@ -142,6 +142,19 @@ ledger: build
 
 ## check: the full local gate — fmt-check, vet, the linters, and the tests
 check: fmt-check vet lint deadcode test coverage-check prose refs oss surface
+
+## ci: every gate the CI workflow runs, on this machine
+##
+## One Linux leg of .github/workflows/ci.yml, in the order CI runs it, so a
+## red build is something you can see before you push rather than after. What
+## it cannot reproduce it names on the way out: a run that skipped a gate must
+## never read as a run that ran them all.
+ci:
+	@$(MAKE) --no-print-directory check
+	@$(MAKE) --no-print-directory build
+	@$(MAKE) --no-print-directory release-check
+	@$(MAKE) --no-print-directory ledger
+	@printf '\nci: every gate ran. Not reproduced here: build-test on macOS.\n'
 
 ## lint: the Go rules from .golangci.yml (see that file for what is on and why)
 lint:
