@@ -58,12 +58,12 @@ It shells out to tools the Go distribution does not carry. Install them once:
 ```bash
 go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.13.1
 go install golang.org/x/tools/cmd/deadcode@latest
-go install github.com/codesweep-ai/lint/cmd/cs-lint@latest
 ```
 
 `golangci-lint` is pinned to the version CI runs, so a release that gains checks reaches you when
-you move the pin rather than on an unrelated pull request. `cs-lint` is not pinned: CI installs it
-from source the same way you do, so a check it gains reaches you on the day it lands.
+you move the pin rather than on an unrelated pull request. `cs-lint` needs no install: it is pinned
+in `go.mod` and run with `go tool`. `make repin` moves that pin to the branch tip, and
+`make versions` says which build the gates used.
 
 The viewer's assets live in `viewer/` as real files and are embedded into the binary at build
 time. To iterate on them without recompiling, render with
