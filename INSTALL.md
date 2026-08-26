@@ -44,7 +44,7 @@ version it prints beside that is the one a ledger records, and it is correct eit
 
 ### Or build from source
 
-Needs **Go 1.26+** and nothing else. The version is stamped from `git describe`, so build from a
+Needs **Go 1.27+** and nothing else. The version is stamped from `git describe`, so build from a
 clone rather than from a source tarball:
 
 ```bash
