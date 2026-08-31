@@ -16,7 +16,7 @@
     "verified": "`cs-ledger version` prints renderer 0.3.2 and `cs-ledger init` prints toolVersion 0.3.2. `grep -rn '0\\.3\\.1' *.md` now returns nothing."
   },
   "resolution": null,
-  "details": "INSTALL.md's `init` sample printed `toolVersion 0.3.1` and MANUAL.md's `version` sample printed `(renderer 0.3.1, ui tokens 1.12.0)`. Both are 0.3.2 now.\n\nMANUAL.md warns that the first field of `version` is a `git describe` and will read differently per build, then says \"the renderer version is the one that matters to a ledger\" \u2014 which is the half that was wrong.\n\nA third instance sat in an example commit message.",
+  "details": "INSTALL.md's `init` sample printed `toolVersion 0.3.1` and MANUAL.md's `version` sample printed `(renderer 0.3.1, ui tokens 1.12.0)`. Both are 0.3.2 now.\n\nMANUAL.md warns that the first field of `version` is a `git describe` and will read differently per build. It then says \"the renderer version is the one that matters to a ledger\", which is the half that was wrong.\n\nA third instance sat in an example commit message.",
   "notes": [],
   "links": []
 }

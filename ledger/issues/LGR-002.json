@@ -20,7 +20,7 @@
   "notes": [
     {
       "date": "2026-08-17",
-      "text": "The drift is accepted knowingly rather than designed away. Moving the sample onto the frozen fixture would fix the count for good, but the block exists to show the two commands an agent runs in its own ledger, and those take no directory argument."
+      "text": "The drift is accepted knowingly rather than designed away. Moving the sample onto the frozen fixture would fix the count for good. It stays where it is because the block exists to show the two commands an agent runs in its own ledger, and those take no directory argument."
     },
     {
       "date": "2026-08-17",
