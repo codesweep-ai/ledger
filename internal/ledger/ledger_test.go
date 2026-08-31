@@ -69,10 +69,21 @@ type sentinel struct{}
 
 var deleted = sentinel{} // marker: omit this field entirely
 
+// testConfig leaves commit resolution off. A corpus in a temp directory is not
+// inside the repository whose shas it cites, so resolving them would say
+// nothing; the tests that do exercise resolution build a repository of their
+// own with gitCorpus.
+const testConfig = `{"project":"test-project","idPrefix":"TST","schemaVersion":"issue.v1","staleAfterDays":14,"verifyCommits":false}`
+
 func makeCorpus(t *testing.T, records map[string]string, drafts map[string]string, queueJSON string) string {
 	t.Helper()
 	dir := t.TempDir()
-	cfg := `{"project":"test-project","idPrefix":"TST","schemaVersion":"issue.v1","staleAfterDays":14}`
+	writeCorpus(t, dir, testConfig, records, drafts, queueJSON)
+	return dir
+}
+
+func writeCorpus(t *testing.T, dir, cfg string, records, drafts map[string]string, queueJSON string) {
+	t.Helper()
 	if err := os.WriteFile(filepath.Join(dir, "ledger.json"), []byte(cfg), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +109,6 @@ func makeCorpus(t *testing.T, records map[string]string, drafts map[string]strin
 			t.Fatal(err)
 		}
 	}
-	return dir
 }
 
 func validCorpus(t *testing.T) string {
@@ -206,7 +216,7 @@ func TestBadOrMisplacedDates(t *testing.T) {
 		"TST-002.json": record("TST-002", map[string]any{"resolved": "2026-08-02"}), // resolved while open
 		"TST-003.json": record("TST-003", map[string]any{
 			"status": "closed", "resolved": nil,
-			"evidence": json.RawMessage(`{"commits":["abc"],"integrated":[],"verified":"v"}`),
+			"evidence": json.RawMessage(`{"commits":["abc1234"],"integrated":[],"verified":"v"}`),
 		}),
 	}, nil, "")
 	e := errsOf(t, dir)
@@ -245,7 +255,7 @@ func TestClosedRequiresVerified(t *testing.T) {
 	dir := makeCorpus(t, map[string]string{
 		"TST-001.json": record("TST-001", map[string]any{
 			"status": "closed", "resolved": "2026-08-02",
-			"evidence": json.RawMessage(`{"commits":["abc"],"integrated":[],"verified":null}`),
+			"evidence": json.RawMessage(`{"commits":["abc1234"],"integrated":[],"verified":null}`),
 		}),
 	}, nil, "")
 	mustMatch(t, errsOf(t, dir), `requires non-empty evidence.verified`)
@@ -267,12 +277,206 @@ func TestClosedRequiresCommitsOrLinks(t *testing.T) {
 		}),
 		"TST-002.json": record("TST-002", map[string]any{
 			"status": "closed", "resolved": "2026-08-02",
-			"evidence": json.RawMessage(`{"commits":["abc"],"integrated":[],"verified":"v"}`),
+			"evidence": json.RawMessage(`{"commits":["abc1234"],"integrated":[],"verified":"v"}`),
 		}),
 	}, nil, "")
 	if res := checkDir(t, delegation); len(res.Errors) != 0 {
 		t.Fatalf("delegation closure should pass, got: %s", strings.Join(res.Errors, "; "))
 	}
+}
+
+// ---- commit citations (SPEC R15, R28-R30) ----
+
+// gitTestConfig leaves resolution on, which is the default a real ledger has.
+const gitTestConfig = `{"project":"test-project","idPrefix":"TST","schemaVersion":"issue.v1","staleAfterDays":14}`
+
+// gitIn runs git in dir with a fixed identity and no user configuration, so a
+// global commit.gpgsign or hooks path cannot fail a commit that has nothing to
+// do with what is being tested. A git that will not run skips the test rather
+// than failing it: the suite has to pass on a machine without one.
+func gitIn(t *testing.T, dir string) func(args ...string) string {
+	t.Helper()
+	return func(args ...string) string {
+		t.Helper()
+		cmd := exec.Command("git", args...)
+		cmd.Dir = dir
+		cmd.Env = append(os.Environ(),
+			"GIT_CONFIG_GLOBAL=/dev/null", "GIT_CONFIG_SYSTEM=/dev/null",
+			"GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@example.invalid",
+			"GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@example.invalid")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Skipf("git %v: %v\n%s", args, err, out)
+		}
+		return strings.TrimSpace(string(out))
+	}
+}
+
+// gitCorpus builds a repository holding an empty ledger, and returns the ledger
+// directory, the sha of the one commit in it and that commit's tree sha.
+// Resolution only means anything against a real object database, so these tests
+// make one rather than standing in for git.
+func gitCorpus(t *testing.T, cfg string) (dir, commit, tree string) {
+	t.Helper()
+	repo := t.TempDir()
+	git := gitIn(t, repo)
+	git("init", "-q", "-b", "main")
+	git("commit", "-q", "--allow-empty", "-m", "first")
+	dir = filepath.Join(repo, "ledger")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeCorpus(t, dir, cfg, nil, nil, "")
+	return dir, git("rev-parse", "HEAD"), git("rev-parse", "HEAD^{tree}")
+}
+
+func writeRecord(t *testing.T, dir, name, content string) {
+	t.Helper()
+	if err := os.WriteFile(filepath.Join(dir, "issues", name), []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// closedWith is a record closed on one cited sha, which is the shape every rule
+// in this section is about.
+func closedWith(id, sha string) string {
+	return record(id, map[string]any{
+		"status": "closed", "resolved": "2026-08-02", "stint": "rev-1",
+		"evidence": json.RawMessage(`{"commits":["` + sha + `"],"integrated":[],"verified":"gates green"}`),
+	})
+}
+
+// A citation nobody can follow is not evidence, and its shape is a property of
+// the record: it is checked wherever the ledger sits.
+func TestEvidenceShaMustBeWellFormed(t *testing.T) {
+	dir := makeCorpus(t, map[string]string{
+		"TST-001.json": record("TST-001", map[string]any{
+			"status": "closed", "resolved": "2026-08-02", "stint": "rev-1",
+			"evidence": json.RawMessage(`{"commits":["HEAD~1","abc","A1B2C3D"],"integrated":["see the pull request"],"verified":"v"}`),
+		}),
+		"TST-002.json": closedWith("TST-002", "0123456789abcdef0123456789abcdef01234567"),
+	}, nil, "")
+	e := errsOf(t, dir)
+	mustMatch(t, e, `TST-001\.json: evidence\.commits\[0\] "HEAD~1" is not a commit sha \(lower-case hexadecimal, at least 7 characters\)`)
+	mustMatch(t, e, `TST-001\.json: evidence\.commits\[1\] "abc" is not a commit sha`)
+	mustMatch(t, e, `TST-001\.json: evidence\.commits\[2\] "A1B2C3D" is not a commit sha`)
+	mustMatch(t, e, `TST-001\.json: evidence\.integrated\[0\] "see the pull request" is not a commit sha`)
+	// A full sha is as good a citation as an abbreviation.
+	mustNotMatch(t, e, `TST-002`)
+}
+
+// The rule the format exists for. An invented sha reads exactly like a real
+// one, so nothing but resolving it against the repository tells them apart.
+func TestEvidenceShasResolveAgainstTheRepository(t *testing.T) {
+	dir, commit, tree := gitCorpus(t, gitTestConfig)
+	writeRecord(t, dir, "TST-001.json", closedWith("TST-001", commit[:7]))
+	writeRecord(t, dir, "TST-002.json", closedWith("TST-002", commit))
+	writeRecord(t, dir, "TST-003.json", closedWith("TST-003", "a1b2c3d4"))
+	writeRecord(t, dir, "TST-004.json", closedWith("TST-004", tree))
+
+	res := checkDir(t, dir)
+	e := strings.Join(res.Errors, "\n")
+	mustNotMatch(t, e, `TST-001|TST-002`) // the abbreviation and the full sha both resolve
+	mustMatch(t, e, `TST-003\.json: evidence\.commits\[0\] a1b2c3d4 is not a commit in this repository`)
+	mustMatch(t, e, `TST-004\.json: evidence\.commits\[0\] `+tree+` names a tree, not a commit`)
+	mustNotMatch(t, strings.Join(res.Warnings, "\n"), `not checked`)
+
+	// The gate has to fail on it rather than mention it in passing.
+	if out, err := run(t, "render", dir); err != nil {
+		t.Fatalf("render: %v\n%s", err, out)
+	}
+	out, err := run(t, "check", dir)
+	if err == nil {
+		t.Fatalf("check should fail on an invented sha:\n%s", out)
+	}
+	mustMatch(t, out, `is not a commit in this repository`)
+}
+
+// Where the question cannot be asked the citations are unchecked rather than
+// wrong, and unchecked never fails the gate: CI checks out shallow by default,
+// and a ledger can be read from an unpacked archive.
+func TestCitationsOutsideARepositoryAreUnchecked(t *testing.T) {
+	dir := t.TempDir()
+	// git walks up from the ledger looking for a repository, and a temp
+	// directory could sit inside one. The ceiling stops the walk, so the test
+	// asserts the same thing wherever it runs.
+	t.Setenv("GIT_CEILING_DIRECTORIES", filepath.Dir(dir))
+	writeCorpus(t, dir, gitTestConfig, map[string]string{
+		"TST-001.json": closedWith("TST-001", "a1b2c3d4"),
+	}, nil, "")
+
+	res := checkDir(t, dir)
+	if len(res.Errors) != 0 {
+		t.Fatalf("an unanswerable question is not a failure, got: %s", strings.Join(res.Errors, "; "))
+	}
+	mustMatch(t, strings.Join(res.Warnings, "\n"),
+		`commit citations not checked against the repository — the ledger is not inside a git repository`)
+}
+
+// A shallow clone holds a slice of the history, so a sha missing from it says
+// nothing about the record citing it.
+func TestShallowCloneLeavesCitationsUnchecked(t *testing.T) {
+	dir, first, _ := gitCorpus(t, gitTestConfig)
+	writeRecord(t, dir, "TST-001.json", closedWith("TST-001", first))
+	repo := filepath.Dir(dir)
+	git := gitIn(t, repo)
+	git("add", "-A")
+	git("commit", "-q", "-m", "the ledger")
+	clone := filepath.Join(t.TempDir(), "clone")
+	git("clone", "-q", "--depth", "1", "file://"+repo, clone)
+
+	res := checkDir(t, filepath.Join(clone, "ledger"))
+	if len(res.Errors) != 0 {
+		t.Fatalf("a shallow clone must not fail the gate, got: %s", strings.Join(res.Errors, "; "))
+	}
+	mustMatch(t, strings.Join(res.Warnings, "\n"), `not checked against the repository — the clone is shallow`)
+}
+
+// A ledger that travels apart from the code it describes says so, and then its
+// citations are checked for shape alone. An opt-out is a decision rather than a
+// gap, so it carries no warning.
+func TestVerifyCommitsFalseSkipsResolution(t *testing.T) {
+	dir, _, _ := gitCorpus(t, `{"project":"test-project","idPrefix":"TST","schemaVersion":"issue.v1","staleAfterDays":14,"verifyCommits":false}`)
+	writeRecord(t, dir, "TST-001.json", closedWith("TST-001", "a1b2c3d4"))
+	writeRecord(t, dir, "TST-002.json", closedWith("TST-002", "nope"))
+
+	res := checkDir(t, dir)
+	e := strings.Join(res.Errors, "\n")
+	mustNotMatch(t, e, `TST-001`)
+	mustMatch(t, e, `TST-002\.json: evidence\.commits\[0\] "nope" is not a commit sha`)
+	mustNotMatch(t, strings.Join(res.Warnings, "\n"), `not checked`)
+}
+
+func TestVerifyCommitsMustBeBoolean(t *testing.T) {
+	dir := t.TempDir()
+	writeCorpus(t, dir, `{"project":"p","idPrefix":"TST","schemaVersion":"issue.v1","verifyCommits":"yes"}`, nil, nil, "")
+	mustMatch(t, errsOf(t, dir), `verifyCommits, when present, must be true or false`)
+}
+
+// A sha named in prose is a claim about the history too, but reading one out of
+// a sentence is a guess about what the words meant, so it is a warning. A word
+// spelled in hexadecimal and a bare run of digits are not shas.
+func TestProseShaMentionsWarn(t *testing.T) {
+	dir, commit, _ := gitCorpus(t, gitTestConfig)
+	writeRecord(t, dir, "TST-001.json", record("TST-001", map[string]any{
+		"details": "Follows on from a1b2c3d4, unlike " + commit[:8] + ", which landed.",
+		"notes":   json.RawMessage(`[{"date":"2026-08-01","text":"defaced by 1234567890, and by deadbee1"}]`),
+	}))
+	queue := `{"recommendedBy":"t","updated":"2026-08-01","items":[{"id":"TST-001","why":"blocked on c0ffee12"}]}`
+	if err := os.WriteFile(filepath.Join(dir, "queue.json"), []byte(queue), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	res := checkDir(t, dir)
+	if len(res.Errors) != 0 {
+		t.Fatalf("a mention is never an error, got: %s", strings.Join(res.Errors, "; "))
+	}
+	w := strings.Join(res.Warnings, "\n")
+	mustMatch(t, w, `details mentions a1b2c3d4, which is not a commit in this repository`)
+	mustMatch(t, w, `notes\[0\]\.text mentions deadbee1, which is not a commit`)
+	mustMatch(t, w, `queue\.json: items\[0\]\.why mentions c0ffee12, which is not a commit`)
+	mustNotMatch(t, w, `mentions `+commit[:8]) // the real one resolves
+	mustNotMatch(t, w, `defaced|1234567890`)   // a word and a count are not shas
 }
 
 func TestWontFixRequiresResolution(t *testing.T) {
@@ -821,7 +1025,7 @@ func TestCommitUrlTemplate(t *testing.T) {
 	dir := validCorpus(t)
 	cfgPath := filepath.Join(dir, "ledger.json")
 	write := func(tpl string) {
-		cfg := `{"project":"test-project","idPrefix":"TST","schemaVersion":"issue.v1","staleAfterDays":14,"commitUrlTemplate":` + tpl + `}`
+		cfg := `{"project":"test-project","idPrefix":"TST","schemaVersion":"issue.v1","staleAfterDays":14,"verifyCommits":false,"commitUrlTemplate":` + tpl + `}`
 		if err := os.WriteFile(cfgPath, []byte(cfg), 0o644); err != nil {
 			t.Fatal(err)
 		}
@@ -843,7 +1047,7 @@ func TestCommitUrlTemplate(t *testing.T) {
 	html := RenderHTML(LoadLedger(dir), testAssets(t))
 	mustMatch(t, html, `"commitUrlTemplate":"https://github.com/org/repo/commit/\{sha\}"`)
 	// absent template: payload carries null, viewer keeps plain text
-	cfg := `{"project":"test-project","idPrefix":"TST","schemaVersion":"issue.v1","staleAfterDays":14}`
+	cfg := testConfig
 	if err := os.WriteFile(cfgPath, []byte(cfg), 0o644); err != nil {
 		t.Fatal(err)
 	}

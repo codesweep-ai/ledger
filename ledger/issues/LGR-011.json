@@ -1,0 +1,25 @@
+{
+  "id": "LGR-011",
+  "title": "check accepts a commit sha that does not exist",
+  "type": "improvement",
+  "severity": "high",
+  "status": "in-progress",
+  "foundBy": "user request (host): \"Make sure that the ledger checks that commit shas reported as evidence (and/or other places where they are mentioned) are actual valid and existing commit shas\"",
+  "opened": "2026-08-30",
+  "resolved": null,
+  "stint": "session agent, 2026-08-30",
+  "evidence": {
+    "commits": [],
+    "integrated": [],
+    "verified": null
+  },
+  "resolution": null,
+  "details": "A closed record cites the commit that resolved it, and nothing checked that the commit was real. An invented sha has the same shape as a real one, so `check` passed it and the claim sat in the ledger unverified. The agent most likely to write one is the agent closing a record it did not finish.\n\nThe evidence rule is the reason the format exists, and until now it only asked that the field be filled in. Resolving the sha against the object database is the one thing that tells a real citation from a plausible one.",
+  "notes": [
+    {
+      "date": "2026-08-30",
+      "text": "The suite covers the shape rule, resolution against the repository holding the ledger, and the prose mention. It also covers the two ways the question goes unanswered: a shallow clone, and `verifyCommits: false` for a ledger that travels apart from its code."
+    }
+  ],
+  "links": []
+}

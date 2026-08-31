@@ -104,7 +104,8 @@ One file per issue, named after its ID:
 ```
 
 The rules are few and they are the point. A `closed` record has to say how the fix was proved and
-which commit did it. Notes append and never rewrite history. IDs are never renumbered or reused.
+which commit did it. `check` resolves that sha against the repository, so an invented one fails the
+gate. Notes append and never rewrite history. IDs are never renumbered or reused.
 [SPEC.md](SPEC.md) states all of them.
 
 ## What the page shows

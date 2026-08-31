@@ -37,8 +37,9 @@ repository it describes.
 **R2.** The rendered page **MUST** open from `file://` with no network request, no build step and no
 server.
 
-**R3.** The tool **MUST NOT** read or write anything outside the ledger directory, and **MUST NOT** reach the
-network.
+**R3.** The tool **MUST NOT** write anything outside the ledger directory, and **MUST NOT** reach the
+network. It **MUST NOT** read anything outside the ledger directory either, apart from the commit
+objects of the repository holding it, which resolving the evidence shas needs (§6).
 
 The point of R1 is that the ledger travels with the code. A clone carries the issue history the way
 it carries the source, and a reviewer sees a record change in the same diff as the fix.
@@ -69,6 +70,7 @@ and `schemaVersion` (exactly `issue.v1`).
 | `description` | A non-empty sentence describing the project. |
 | `links` | An array of `{label, url}`. |
 | `commitUrlTemplate` | An `http` or `https` URL containing the `{sha}` placeholder. |
+| `verifyCommits` | A boolean. Whether evidence shas resolve against the repository holding the ledger (§6). Defaults to true. |
 | `toolVersion` | The pin (§8). |
 
 **R7.** A `links` entry's `url` **MUST** be `http`, `https`, or a relative path. Any other scheme is an
@@ -115,10 +117,14 @@ parses as text but not as a day, such as `2026-02-30`, is an error.
 **R14.** `links` entries **MUST** be well-formed IDs. A link to a record that does not exist **SHOULD** be
 reported as a warning rather than an error, because partial migrations are a normal state.
 
-**R15.** A field the schema does not name **SHOULD** be reported as a warning and **MUST NOT** fail
+**R15.** Every entry in `evidence.commits` and `evidence.integrated` **MUST** be a commit sha in
+lower-case hexadecimal, of at least seven characters. A branch name, a URL or a pull-request number
+is an error.
+
+**R16.** A field the schema does not name **SHOULD** be reported as a warning and **MUST NOT** fail
 validation. Evolution within `issue.v1` is additive.
 
-**R16.** `details` **SHOULD** be non-empty. An empty one is a warning, because a record with no narrative
+**R17.** `details` **SHOULD** be non-empty. An empty one is a warning, because a record with no narrative
 is a row rather than an observation.
 
 Prose fields hold Markdown. The rendered page is the reading surface, so readability of the raw
@@ -133,18 +139,18 @@ JSON is secondary to the quality of what it says.
   "items": [ { "id": "MYS-012", "why": "blocks the 0.4 release" } ] }
 ```
 
-**R17.** When present, `queue.json` **MUST** carry a non-empty `recommendedBy`, an `updated` date, and an
+**R18.** When present, `queue.json` **MUST** carry a non-empty `recommendedBy`, an `updated` date, and an
 `items` array.
 
-**R18.** Every item **MUST** carry an `id` that resolves to a record in this ledger and a non-empty `why`.
+**R19.** Every item **MUST** carry an `id` that resolves to a record in this ledger and a non-empty `why`.
 
-**R19.** An item **MUST NOT** name a record in a terminal status, and **MUST NOT** repeat an ID already in the
+**R20.** An item **MUST NOT** name a record in a terminal status, and **MUST NOT** repeat an ID already in the
 array.
 
-**R20.** An item naming an `in-progress` record **SHOULD** be reported as a warning. The recommendation is
+**R21.** An item naming an `in-progress` record **SHOULD** be reported as a warning. The recommendation is
 redundant once someone has claimed the work.
 
-**R21.** An `open` `critical` record that is not a `feature-idea` and is absent from the queue **SHOULD**
+**R22.** An `open` `critical` record that is not a `feature-idea` and is absent from the queue **SHOULD**
 be reported as a warning. Nothing scheduled it and nobody claimed it.
 
 Ordering lives in this one file rather than as a priority number on each record. Per-record
@@ -160,42 +166,71 @@ open ──> in-progress ──> closed
   └───────────────> moved-to-roadmap
 ```
 
-**R22.** A record in a terminal status **MUST** carry a non-null `resolved` date.
+**R23.** A record in a terminal status **MUST** carry a non-null `resolved` date.
 
-**R23.** A record in a non-terminal status **MUST** carry `resolved: null`.
+**R24.** A record in a non-terminal status **MUST** carry `resolved: null`.
 
-**R24.** A record with `status: in-progress` **MUST** carry a non-null `stint`.
+**R25.** A record with `status: in-progress` **MUST** carry a non-null `stint`.
 
-**R25.** A record with `status: closed` **MUST** carry a non-empty `evidence.verified`.
+**R26.** A record with `status: closed` **MUST** carry a non-empty `evidence.verified`.
 
-**R26.** A record with `status: closed` **MUST** carry either a non-empty `evidence.commits` or non-empty
+**R27.** A record with `status: closed` **MUST** carry either a non-empty `evidence.commits` or non-empty
 `links`.
 
-**R27.** A record with `status: wont-fix` or `status: moved-to-roadmap` **MUST** carry a non-empty
+**R28.** Where the ledger sits in a git repository and `verifyCommits` is not false, `check` **MUST**
+resolve every entry in `evidence.commits` and `evidence.integrated` against it. An entry that
+resolves to nothing, matches more than one object, or names anything but a commit, **MUST** be an
+error.
+
+**R29.** Where that question cannot be answered, `check` **MUST NOT** fail on the citations and **MUST**
+report that they went unchecked. The cases are a machine with no `git`, a ledger outside any
+repository, and a shallow clone. A ledger that set `verifyCommits` to false has answered the
+question itself, and gets no such report.
+
+**R30.** A sha-shaped token in a prose field that resolves to no commit **SHOULD** be reported as a
+warning.
+
+**R31.** A record with `status: wont-fix` or `status: moved-to-roadmap` **MUST** carry a non-empty
 `resolution`.
 
-**R28.** Records in a terminal status **SHOULD NOT** be edited except to append a note.
+**R32.** Records in a terminal status **SHOULD NOT** be edited except to append a note.
 
-R25 and R26 are the rules the format exists for. A closed record has to say how the fix was proved,
-and it has to point at the commit that did it. The `links` alternative in R26 covers an umbrella
+R26 and R27 are the rules the format exists for. A closed record has to say how the fix was proved,
+and it has to point at the commit that did it. The `links` alternative in R27 covers an umbrella
 record closed by delegation to its children, where no single commit resolves it; `verified` must
 then explain the delegation.
+
+R28 is what makes R27 more than a formality. An invented sha reads exactly like a real one, and the
+agent most likely to write one is the agent closing a record it did not finish. Resolving the sha
+against the object database is what tells the two apart, and it is the one read R3 allows outside
+the ledger directory. The shape rule in R15 catches the rest: a branch name or a pull-request
+number is not a commit, wherever the ledger sits.
+
+R29 keeps that gate honest about what it knows. A shallow clone holds a slice of the history, and
+answers "missing" for most of it. A ledger copied into another project as a test corpus cites
+commits the new repository never had. In both cases the citation is unchecked, which is a different
+verdict from wrong, and `check` says which one it reached. `verifyCommits: false` is for the second
+case, and it leaves R15 in force.
+
+R30 is a warning because reading a sha out of a sentence is a guess about what the words meant. A
+hexadecimal run with no digit is a word, and one with no letter is a count. What is left gets
+reported, including a mention of a commit in another repository.
 
 Staleness is deliberately not validated. Whether an issue has sat too long is project-management
 policy rather than a property of the data, so the viewer surfaces it and the tool stays out of it.
 
 ### ID allocation across branches
 
-**R29.** Only the integration branch **MAY** create `issues/<ID>.json`. A branch that may not allocate IDs
+**R33.** Only the integration branch **MAY** create `issues/<ID>.json`. A branch that may not allocate IDs
 **MUST** write to `drafts/<member>/<slug>.json` instead.
 
-**R30.** A draft **MUST** have the same shape as a record, minus `id`. A draft carrying an `id` is an
+**R34.** A draft **MUST** have the same shape as a record, minus `id`. A draft carrying an `id` is an
 error.
 
-**R31.** Drafts **MUST** be validated for shape, and **MUST NOT** be validated for the ID and lifecycle rules
+**R35.** Drafts **MUST** be validated for shape, and **MUST NOT** be validated for the ID and lifecycle rules
 that assume a numbered record.
 
-R29 is load-bearing rather than tidy. Under `git merge`, two branches minting the same ID collide
+R33 is load-bearing rather than tidy. Under `git merge`, two branches minting the same ID collide
 as an add/add conflict, which is loud. Under pathspec checkout, which is what integration actually
 uses, the second checkout silently overwrites the first, and validation cannot detect it: the
 resulting tree holds one well-formed file. The draft protocol is the protection, and git and the
@@ -203,20 +238,20 @@ tool are only partial backstops.
 
 ## 7. Determinism and freshness
 
-**R32.** `ledger.html` **MUST** be a pure function of the records, `ledger.json` and the renderer version.
+**R36.** `ledger.html` **MUST** be a pure function of the records, `ledger.json` and the renderer version.
 
-**R33.** The rendered page **MUST NOT** contain a wall-clock timestamp. Any "last updated" shown **MUST**
+**R37.** The rendered page **MUST NOT** contain a wall-clock timestamp. Any "last updated" shown **MUST**
 derive from the dates in the records.
 
-**R34.** `check` **MUST** verify freshness by rendering to memory and comparing bytes against the
+**R38.** `check` **MUST** verify freshness by rendering to memory and comparing bytes against the
 committed page, and **MUST** do so only when the page was written by this renderer.
 
-**R35.** Every derivation over the record set **MUST** be computed by the tool at render time and embedded
+**R39.** Every derivation over the record set **MUST** be computed by the tool at render time and embedded
 in the page. The browser **MAY** compute only what depends on the reader's clock or history, such as
 staleness ages and new-since-last-visit badges.
 
-Determinism is what makes R34 possible, and it makes a merge conflict in `ledger.html` a non-event:
-the file is never hand-merged, only rendered again. R35 keeps one implementation of each
+Determinism is what makes R38 possible, and it makes a merge conflict in `ledger.html` a non-event:
+the file is never hand-merged, only rendered again. R39 keeps one implementation of each
 derivation, so a number in the page cannot disagree with the same number computed elsewhere.
 
 The embedded derivations are the activity events, the daily found-and-resolved buckets, and each
@@ -225,58 +260,59 @@ awaiting IDs, the unqueued criticals, and the set of terminal statuses.
 
 ## 8. Versioning and the pin
 
-**R36.** `ledger.json` **SHOULD** carry `toolVersion`, the renderer version that last rendered the page.
+**R40.** `ledger.json` **SHOULD** carry `toolVersion`, the renderer version that last rendered the page.
 
-**R37.** The renderer version **MUST** change whenever rendered output can differ between builds, whether
+**R41.** The renderer version **MUST** change whenever rendered output can differ between builds, whether
 the cause is render code or an embedded viewer asset.
 
-**R38.** Where the recorded version differs from this binary's, `check` **MUST** report it as a warning,
+**R42.** Where the recorded version differs from this binary's, `check` **MUST** report it as a warning,
 **MUST NOT** compare bytes, and **MUST NOT** fail on that account.
 
-**R39.** `render` **MUST** write the page, record this binary's renderer as `toolVersion`, and refresh the
+**R43.** `render` **MUST** write the page, record this binary's renderer as `toolVersion`, and refresh the
 generated part of a materialized `GUIDE.md`. Where the guide or the router is absent, `render`
 **MUST** write it, so a ledger scaffolded by an older binary picks it up.
 
-**R40.** `render --assets` **MUST** write the page alone, leaving `toolVersion` and the documents as they
+**R44.** `render --assets` **MUST** write the page alone, leaving `toolVersion` and the documents as they
 were, because a dev-stamped page certifies nothing.
 
-**R41.** A ledger with no recorded version **MUST** be accepted, because R36 makes `toolVersion` optional.
+**R45.** A ledger with no recorded version **MUST** be accepted, because R40 makes `toolVersion` optional.
 
 `toolVersion` describes rather than gates. It says which renderer wrote the committed page, which
-is what R38 needs to tell version skew from a stale page. Two people on different builds will
+is what R42 needs to tell version skew from a stale page. Two people on different builds will
 rewrite `ledger.html` past each other, and the cost of that is a churning diff rather than a
 blocked commit. Neither of them is ever stopped, and `render` always resolves it.
 
-R37 is what makes the recorded version mean anything. Skip a bump and two binaries reporting the
+R41 is what makes the recorded version mean anything. Skip a bump and two binaries reporting the
 same version render different bytes. `check` then reports the divergence as a stale page rather
 than version skew, which sends the reader after the wrong problem.
 
 ## 9. The tool
 
-**R42.** `cs-ledger` **MUST** be a single static binary with no runtime dependencies.
+**R46.** `cs-ledger` **MUST** be a single static binary with no runtime dependencies. It **MAY** run
+`git` to resolve evidence shas where one is on the PATH, and **MUST** do everything else without it.
 
-**R43.** The viewer assets, the man page and the operating guide **MUST** be embedded in the binary, so a
+**R47.** The viewer assets, the man page and the operating guide **MUST** be embedded in the binary, so a
 target repository needs no vendored files.
 
-**R44.** `render` **MUST** write the page even when records fail validation, and **MUST** report the failures.
+**R48.** `render` **MUST** write the page even when records fail validation, and **MUST** report the failures.
 `check` fails on them separately.
 
-**R45.** `render --assets DIR` **MUST** load viewer assets from disk and **MUST** mark its output as
+**R49.** `render --assets DIR` **MUST** load viewer assets from disk and **MUST** mark its output as
 dev-stamped.
 
-**R46.** `check` **MUST** reject a dev-stamped page, so only a release binary's render is committable.
+**R50.** `check` **MUST** reject a dev-stamped page, so only a release binary's render is committable.
 
-**R47.** `check` **MUST** reject a materialized `GUIDE.md` whose generated part differs from the binary's
+**R51.** `check` **MUST** reject a materialized `GUIDE.md` whose generated part differs from the binary's
 copy, and **MUST NOT** compare what follows the project marker.
 
-**R48.** `init` **MUST** refuse to overwrite an existing `ledger.json`.
+**R52.** `init` **MUST** refuse to overwrite an existing `ledger.json`.
 
-**R49.** Exit status **MUST** be 0 on success, 1 on a failed check or an error, and 2 on a usage error.
+**R53.** Exit status **MUST** be 0 on success, 1 on a failed check or an error, and 2 on a usage error.
 
-**R50.** `init` and `render` **MUST** materialize the guide as `LEDGERDIR/GUIDE.md` and a router as
+**R54.** `init` and `render` **MUST** materialize the guide as `LEDGERDIR/GUIDE.md` and a router as
 `LEDGERDIR/AGENTS.md`.
 
-A ledger nobody is told about is a ledger nobody keeps, and R50 is the whole of discovery. Agent
+A ledger nobody is told about is a ledger nobody keeps, and R54 is the whole of discovery. Agent
 harnesses read the `AGENTS.md` nearest the file being edited, so a router beside the records is
 what an agent that opens one will find. Putting it there rather than in the repository's own
 `AGENTS.md` keeps R3 intact: the tool writes inside the ledger directory and nowhere else.
@@ -287,14 +323,14 @@ The rendered page is one column at every viewport. Records render as cards, and 
 shared modal that link chips navigate between. A `feature-idea` card is muted and dashed, so a
 roadmap direction never reads as defect backlog.
 
-**R51.** The page **MUST** inline all CSS, JavaScript and record data, and **MUST** make no external request.
+**R55.** The page **MUST** inline all CSS, JavaScript and record data, and **MUST** make no external request.
 
-**R52.** The page **MUST** offer a light and a dark theme.
+**R56.** The page **MUST** offer a light and a dark theme.
 
-**R53.** Styling **MUST** go through the pinned design tokens rather than through a component framework or
+**R57.** Styling **MUST** go through the pinned design tokens rather than through a component framework or
 a build step.
 
-**R54.** A view **MUST** be reachable by a `?view=` parameter, and a record by a `#<id>` fragment.
+**R58.** A view **MUST** be reachable by a `?view=` parameter, and a record by a `#<id>` fragment.
 
 The full `@codesweep-ai/ui` package is React and Tailwind behind a private registry, which a
 no-build artifact cannot use. So the project keeps a pinned copy of that design system's
@@ -335,7 +371,7 @@ The CLI tests build `cs-ledger` with `-cover`, so what the real binary runs coun
 
 ## 12. Conformance
 
-An implementation conforms when it satisfies R1–R54. The tool's own test suite is the reference. It
+An implementation conforms when it satisfies R1–R58. The tool's own test suite is the reference. It
 validates a corpus of well-formed and malformed records, renders both this repository's ledger and
 the `fixtures/sandbox` corpus, and asserts the freshness comparison.
 

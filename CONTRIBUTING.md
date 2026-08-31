@@ -39,7 +39,8 @@ and comparing bytes, and it is why a conflict in `ledger.html` is never hand-mer
 **A closed record proves its claim.** `evidence.verified` says what was measured, and
 `evidence.commits` says which commit did it. A ledger whose closed records assert rather than prove
 is worth less than no ledger. `TestClosedRequiresVerified` and `TestClosedRequiresCommitsOrLinks`
-reject a record that closes without either.
+reject a record that closes without either, and `TestEvidenceShasResolveAgainstTheRepository`
+rejects one whose sha names no commit, which is what an invented citation looks like.
 
 ## Before you push
 

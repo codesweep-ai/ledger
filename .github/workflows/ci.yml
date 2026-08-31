@@ -153,12 +153,18 @@ jobs:
 
   # The freshness gate, on both corpora. A record changed without a re-render
   # must block the merge rather than surface later as a confusing diff.
+  # fetch-depth: 0 because check resolves the shas the records cite against this
+  # repository, and a shallow clone holds too little history to answer. It would
+  # report the citations as unchecked and pass, which is the gate going quiet
+  # rather than green.
   ledgers:
     name: ledger check
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod

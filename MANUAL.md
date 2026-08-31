@@ -26,7 +26,8 @@ formed and renders them into `ledger.html`, a self-contained page a human opens 
 
 Everything the ledger holds is committed alongside the code it describes: the records, the config,
 and the rendered page. There is no server and no database. The tool is one static binary with no
-runtime dependencies, and the page it writes makes no network request.
+runtime dependencies, and the page it writes makes no network request. It runs `git` where there is
+one, to resolve the commits records cite, and does everything else without it.
 
 The rendered page is a pure function of the records, the config and the renderer version. Nothing
 in it comes from the wall clock. That is what lets `check` prove the page is current by rendering
@@ -56,6 +57,19 @@ Two more states fail. One is a page rendered in dev mode with `--assets`, which 
 unreproducible page into a commit. The other is a materialized `GUIDE.md` whose generated half no
 longer matches the copy inside the binary. Whatever sits below the `<!-- LEDGER:PROJECT -->`
 marker belongs to the project, and `check` leaves it alone.
+
+A `closed` record cites the commit that resolved it, and `check` resolves that citation. Every sha
+in `evidence.commits` and `evidence.integrated` has to be lower-case hexadecimal of at least seven
+characters, and has to name a commit in the repository holding the ledger. A sha that resolves to
+nothing, matches more than one object, or names something other than a commit is an error. A
+sha-shaped word in `details`, `notes` or `verified` is checked the same way and reported as a
+warning. Reading a sha out of prose is a guess about what the words meant.
+
+Where that question cannot be answered the citations are unchecked rather than wrong, so the run
+says so and carries on. That covers a machine with no `git`, a ledger outside any repository, and a
+shallow clone, which is what CI checks out by default. A ledger that travels apart from the code it
+describes, such as a corpus copied into another project, sets `"verifyCommits": false` in
+`ledger.json`. The shape rule still applies.
 
 A page written by a different renderer is a warning rather than a failure. Freshness is only
 assertable within one renderer version, because the version is stamped into the page and the bytes
@@ -159,7 +173,7 @@ prints the same text on stderr and exits 2.
 
 | Path | What it is |
 |---|---|
-| `ledger/ledger.json` | Config. `project`, `idPrefix` and `schemaVersion` are required; `toolVersion`, `staleAfterDays`, `description`, `links` and `commitUrlTemplate` are optional. |
+| `ledger/ledger.json` | Config. `project`, `idPrefix` and `schemaVersion` are required; `toolVersion`, `staleAfterDays`, `description`, `links`, `commitUrlTemplate` and `verifyCommits` are optional. |
 | `ledger/issues/<ID>.json` | One record per issue. The filename must equal the record's `id`. |
 | `ledger/drafts/<member>/<slug>.json` | An observation from a branch that may not mint IDs. Same shape, without `id`. |
 | `ledger/queue.json` | Optional. The ordered recommendation of what to fix next. |
@@ -207,6 +221,27 @@ a typo.
 
 A record was closed without saying how it was proved. Write what you measured, or reopen it.
 
+**`evidence.commits[0] "HEAD~1" is not a commit sha`**
+
+Something that is not a sha is sitting in an evidence array. A citation is lower-case hexadecimal of
+at least seven characters. A branch name, a URL or a pull-request number belongs in `details`.
+
+**`evidence.commits[0] a1b2c3d4 is not a commit in this repository`**
+
+The record cites a sha the repository does not have. Land the fix first and cite the sha it
+produced, rather than predicting one. Where a squash on merge replaced the commit you cited, cite
+the one that reached the integration branch.
+
+**`commit citations not checked against the repository`**
+
+A warning. Nothing could resolve the shas: no `git`, no repository around the ledger, or only a
+shallow clone of one. Every other rule still ran.
+
+**`details mentions a1b2c3d4, which is not a commit in this repository`**
+
+A warning. A prose field names something shaped like a sha that this repository does not have.
+Correct it, or leave it where the text meant a commit in another repository.
+
 **`is an open critical missing from the queue — needs triage`**
 
 A warning. Something critical is open and nothing scheduled it. Add it to `queue.json`, or lower the
@@ -220,8 +255,10 @@ severity and say why in a note.
 - `check` is the gate to run before any commit that touches the ledger. Its messages name the file
   and the rule, so they can be acted on without reading the source.
 - `render` writes only inside the ledger directory: the page, `ledger.json` and the two documents.
-  It reads nothing outside that directory, apart from an `--assets` directory you name, and it
-  reaches no network.
+  It reads nothing outside that directory, apart from an `--assets` directory you name and the
+  commit objects of the repository holding the ledger, and it reaches no network.
+- Close a record on a sha that exists. `check` resolves every sha a record cites, so a predicted one
+  fails the gate rather than sitting in the ledger as a claim nobody rechecks.
 - Never edit `ledger.html`. It is generated, and `check` compares it byte for byte against a fresh
   render.
 - Records accrete. Append to `notes` rather than rewriting `details`, and never renumber an ID.

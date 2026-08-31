@@ -100,6 +100,9 @@ func ValidateAll(tr *Tracker) *Result {
 				E("ledger.json", "commitUrlTemplate must contain the {sha} placeholder")
 			}
 		}
+		if v := cfg.Get("verifyCommits"); cfg.Has("verifyCommits") && (v == nil || v.Kind != ojson.Bool) {
+			E("ledger.json", "verifyCommits, when present, must be true or false")
+		}
 		if cfg.Has("links") {
 			links := cfg.Get("links")
 			if links == nil || links.Kind != ojson.Array {
@@ -116,6 +119,36 @@ func ValidateAll(tr *Tracker) *Result {
 		}
 	}
 	idRe := regexp.MustCompile("^" + prefix + `-\d{3,}$`)
+
+	// Every sha the ledger names, resolved against the repository holding it in
+	// one git process for the whole directory (SPEC R28). A ledger that travels
+	// apart from the code it describes sets verifyCommits to false and keeps the
+	// shape check alone; an environment that cannot answer says so and fails
+	// nothing (SPEC R29).
+	var commits *commitIndex
+	if cited := citedShas(tr); len(cited) > 0 && verifyCommits(cfg) {
+		commits = resolveShas(tr.Dir, cited)
+		if !commits.live() {
+			W("evidence", "commit citations not checked against the repository — "+commits.Skipped)
+		}
+	}
+
+	// A citation has to be a sha, and it has to be one this repository holds.
+	// The shape is a property of the record and is checked always; resolution
+	// needs the repository and is checked when there is one to ask.
+	checkCitations := func(file, field string, arr *ojson.Value) {
+		for i, e := range arr.Arr {
+			sha, _ := e.StrVal()
+			switch {
+			case !shaRe.MatchString(sha):
+				E(file, fmt.Sprintf("%s[%d] %q is not a commit sha (lower-case hexadecimal, at least 7 characters)", field, i, sha))
+			case commits.live():
+				if fault := commits.fault(sha); fault != "" {
+					E(file, fmt.Sprintf("%s[%d] %s %s", field, i, sha, fault))
+				}
+			}
+		}
+	}
 
 	ids := map[string]bool{}
 	for _, r := range tr.Records {
@@ -148,7 +181,7 @@ func ValidateAll(tr *Tracker) *Result {
 			}
 		}
 		if isDraft && d.Has("id") {
-			E(file, "drafts must not carry an id — ids are minted on the integration branch (SPEC R29)")
+			E(file, "drafts must not carry an id — ids are minted on the integration branch (SPEC R33)")
 		}
 		if !isDraft && d.Has("id") {
 			id, ok := d.Get("id").StrVal()
@@ -204,14 +237,25 @@ func ValidateAll(tr *Tracker) *Result {
 			if ev == nil || ev.Kind != ojson.Object {
 				E(file, "evidence must be an object {commits, integrated, verified}")
 			} else {
-				if !strArr(ev.Get("commits")) {
-					E(file, "evidence.commits must be an array of non-empty strings")
-				}
-				if !strArr(ev.Get("integrated")) {
-					E(file, "evidence.integrated must be an array of non-empty strings")
+				for _, field := range []string{"commits", "integrated"} {
+					if !strArr(ev.Get(field)) {
+						E(file, "evidence."+field+" must be an array of non-empty strings")
+						continue
+					}
+					checkCitations(file, "evidence."+field, ev.Get(field))
 				}
 				if v := ev.Get("verified"); !v.IsNull() && !isStr(v) {
 					E(file, "evidence.verified must be null or a string")
+				}
+			}
+		}
+		// A sha named in the narrative is a claim about the history too, but
+		// reading one out of prose is a guess about what the words meant, so an
+		// unresolvable mention is a warning (SPEC R30).
+		if commits.live() {
+			for _, m := range proseMentions(d) {
+				if fault := commits.fault(m.sha); fault != "" {
+					W(file, m.field+" mentions "+m.sha+", which "+fault)
 				}
 			}
 		}
@@ -360,13 +404,20 @@ func ValidateAll(tr *Tracker) *Result {
 						W("queue.json", fmt.Sprintf("items[%d] %s is already in progress — recommendation is redundant", i, id))
 					}
 				}
+				if commits.live() {
+					for _, m := range queueMentions(q) {
+						if fault := commits.fault(m.sha); fault != "" {
+							W("queue.json", m.field+" mentions "+m.sha+", which "+fault)
+						}
+					}
+				}
 			}
 		}
 	}
 
 	// Derived triage signal (agent-facing mirror of the brief's needs-you block):
 	// an OPEN critical absent from the queue means nobody scheduled it and nobody
-	// is working it (SPEC R21).
+	// is working it (SPEC R22).
 	queuedIDs := map[string]bool{}
 	if tr.Queue != nil {
 		if items := tr.Queue.Get("items"); items != nil && items.Kind == ojson.Array {
