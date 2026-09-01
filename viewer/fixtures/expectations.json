@@ -1,0 +1,2345 @@
+{
+  "meta": {
+    "recordedAt": "2026-09-01",
+    "clock": "2026-08-21T12:00:00Z",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "sizeBudgetBytes": 1000000,
+    "axeTags": [
+      "wcag2a",
+      "wcag2aa",
+      "wcag21a",
+      "wcag21aa",
+      "wcag22aa",
+      "best-practice"
+    ],
+    "note": "Values are measured facts about the viewer's behaviour. A viewer developer may edit selectors.mjs, never these values; re-record only with the reviewer's sign-off."
+  },
+  "checks": [
+    {
+      "id": "LF-01",
+      "name": "structure own/brief (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 2,
+        "ids": [
+          "LGR-009",
+          "LGR-010"
+        ],
+        "severityLabels": [
+          "low",
+          "med"
+        ],
+        "statusLabels": [],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [],
+        "search": false
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-02",
+      "name": "structure own/board (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 4,
+        "ids": [
+          "LGR-001",
+          "LGR-009",
+          "LGR-010",
+          "LGR-012"
+        ],
+        "severityLabels": [
+          "low",
+          "med"
+        ],
+        "statusLabels": [
+          "Closed / retired",
+          "Open"
+        ],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [
+          "[search] search id, title, details…",
+          "status · all",
+          "type · all",
+          "sev · all",
+          "stale only",
+          "reset"
+        ],
+        "search": true,
+        "lanes": [
+          {
+            "label": "Open",
+            "count": 4
+          },
+          {
+            "label": "Closed / retired",
+            "count": 8
+          }
+        ],
+        "darkDiffers": {
+          "records": 4,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed / retired",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "new since last visit (2)"
+          ],
+          "search": true,
+          "lanes": [
+            {
+              "label": "Open",
+              "count": 4
+            },
+            {
+              "label": "Closed / retired",
+              "count": 8
+            }
+          ]
+        }
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "previous": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 3,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed / retired",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset"
+          ],
+          "search": true,
+          "lanes": [
+            {
+              "label": "Open",
+              "count": 3
+            },
+            {
+              "label": "Closed / retired",
+              "count": 7
+            }
+          ]
+        },
+        "measured": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 4,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed / retired",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset"
+          ],
+          "search": true,
+          "lanes": [
+            {
+              "label": "Open",
+              "count": 4
+            },
+            {
+              "label": "Closed / retired",
+              "count": 8
+            }
+          ],
+          "darkDiffers": {
+            "records": 4,
+            "ids": [
+              "LGR-001",
+              "LGR-009",
+              "LGR-010",
+              "LGR-012"
+            ],
+            "severityLabels": [
+              "low",
+              "med"
+            ],
+            "statusLabels": [
+              "Closed / retired",
+              "Open"
+            ],
+            "viewSwitch": [
+              "brief",
+              "board",
+              "list",
+              "activity",
+              "?"
+            ],
+            "toolbar": [
+              "[search] search id, title, details…",
+              "status · all",
+              "type · all",
+              "sev · all",
+              "stale only",
+              "reset",
+              "new since last visit (2)"
+            ],
+            "search": true,
+            "lanes": [
+              {
+                "label": "Open",
+                "count": 4
+              },
+              {
+                "label": "Closed / retired",
+                "count": 8
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "LF-03",
+      "name": "structure own/list (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 4,
+        "ids": [
+          "LGR-001",
+          "LGR-009",
+          "LGR-010",
+          "LGR-012"
+        ],
+        "severityLabels": [
+          "low",
+          "med"
+        ],
+        "statusLabels": [
+          "Closed",
+          "Open"
+        ],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [
+          "[search] search id, title, details…",
+          "status · all",
+          "type · all",
+          "sev · all",
+          "stale only",
+          "reset",
+          "group · status",
+          "sort · id"
+        ],
+        "search": true,
+        "groups": [
+          {
+            "label": "Open",
+            "count": 4
+          },
+          {
+            "label": "Closed",
+            "count": 8
+          }
+        ],
+        "darkDiffers": {
+          "records": 4,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "group · status",
+            "sort · id",
+            "new since last visit (2)"
+          ],
+          "search": true,
+          "groups": [
+            {
+              "label": "Open",
+              "count": 4
+            },
+            {
+              "label": "Closed",
+              "count": 8
+            }
+          ]
+        }
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "previous": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 3,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "group · status",
+            "sort · id"
+          ],
+          "search": true,
+          "groups": [
+            {
+              "label": "Open",
+              "count": 3
+            },
+            {
+              "label": "Closed",
+              "count": 7
+            }
+          ]
+        },
+        "measured": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 4,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "group · status",
+            "sort · id"
+          ],
+          "search": true,
+          "groups": [
+            {
+              "label": "Open",
+              "count": 4
+            },
+            {
+              "label": "Closed",
+              "count": 8
+            }
+          ],
+          "darkDiffers": {
+            "records": 4,
+            "ids": [
+              "LGR-001",
+              "LGR-009",
+              "LGR-010",
+              "LGR-012"
+            ],
+            "severityLabels": [
+              "low",
+              "med"
+            ],
+            "statusLabels": [
+              "Closed",
+              "Open"
+            ],
+            "viewSwitch": [
+              "brief",
+              "board",
+              "list",
+              "activity",
+              "?"
+            ],
+            "toolbar": [
+              "[search] search id, title, details…",
+              "status · all",
+              "type · all",
+              "sev · all",
+              "stale only",
+              "reset",
+              "group · status",
+              "sort · id",
+              "new since last visit (2)"
+            ],
+            "search": true,
+            "groups": [
+              {
+                "label": "Open",
+                "count": 4
+              },
+              {
+                "label": "Closed",
+                "count": 8
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "LF-04",
+      "name": "structure own/activity (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 25,
+        "ids": [
+          "LGR-001",
+          "LGR-002",
+          "LGR-003",
+          "LGR-004",
+          "LGR-005",
+          "LGR-006",
+          "LGR-007",
+          "LGR-008",
+          "LGR-009",
+          "LGR-010",
+          "LGR-011",
+          "LGR-012"
+        ],
+        "severityLabels": [],
+        "statusLabels": [
+          "Activity — newest first",
+          "closed",
+          "note",
+          "opened"
+        ],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [
+          "[search] search id, title, details…",
+          "status · all",
+          "type · all",
+          "sev · all",
+          "stale only",
+          "reset"
+        ],
+        "search": true,
+        "darkDiffers": {
+          "records": 25,
+          "ids": [
+            "LGR-001",
+            "LGR-002",
+            "LGR-003",
+            "LGR-004",
+            "LGR-005",
+            "LGR-006",
+            "LGR-007",
+            "LGR-008",
+            "LGR-009",
+            "LGR-010",
+            "LGR-011",
+            "LGR-012"
+          ],
+          "severityLabels": [],
+          "statusLabels": [
+            "Activity — newest first",
+            "closed",
+            "note",
+            "opened"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "new since last visit (2)"
+          ],
+          "search": true
+        }
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "Appending LGR-012's note added a dated event, which moved the own activity count. This is the fault LGR-012 records, demonstrated by the record itself.",
+        "previous": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 24,
+          "ids": [
+            "LGR-001",
+            "LGR-002",
+            "LGR-003",
+            "LGR-004",
+            "LGR-005",
+            "LGR-006",
+            "LGR-007",
+            "LGR-008",
+            "LGR-009",
+            "LGR-010",
+            "LGR-011",
+            "LGR-012"
+          ],
+          "severityLabels": [],
+          "statusLabels": [
+            "Activity — newest first",
+            "closed",
+            "note",
+            "opened"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset"
+          ],
+          "search": true,
+          "darkDiffers": {
+            "records": 24,
+            "ids": [
+              "LGR-001",
+              "LGR-002",
+              "LGR-003",
+              "LGR-004",
+              "LGR-005",
+              "LGR-006",
+              "LGR-007",
+              "LGR-008",
+              "LGR-009",
+              "LGR-010",
+              "LGR-011",
+              "LGR-012"
+            ],
+            "severityLabels": [],
+            "statusLabels": [
+              "Activity — newest first",
+              "closed",
+              "note",
+              "opened"
+            ],
+            "viewSwitch": [
+              "brief",
+              "board",
+              "list",
+              "activity",
+              "?"
+            ],
+            "toolbar": [
+              "[search] search id, title, details…",
+              "status · all",
+              "type · all",
+              "sev · all",
+              "stale only",
+              "reset",
+              "new since last visit (2)"
+            ],
+            "search": true
+          }
+        },
+        "measured": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 25,
+          "ids": [
+            "LGR-001",
+            "LGR-002",
+            "LGR-003",
+            "LGR-004",
+            "LGR-005",
+            "LGR-006",
+            "LGR-007",
+            "LGR-008",
+            "LGR-009",
+            "LGR-010",
+            "LGR-011",
+            "LGR-012"
+          ],
+          "severityLabels": [],
+          "statusLabels": [
+            "Activity — newest first",
+            "closed",
+            "note",
+            "opened"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset"
+          ],
+          "search": true,
+          "darkDiffers": {
+            "records": 25,
+            "ids": [
+              "LGR-001",
+              "LGR-002",
+              "LGR-003",
+              "LGR-004",
+              "LGR-005",
+              "LGR-006",
+              "LGR-007",
+              "LGR-008",
+              "LGR-009",
+              "LGR-010",
+              "LGR-011",
+              "LGR-012"
+            ],
+            "severityLabels": [],
+            "statusLabels": [
+              "Activity — newest first",
+              "closed",
+              "note",
+              "opened"
+            ],
+            "viewSwitch": [
+              "brief",
+              "board",
+              "list",
+              "activity",
+              "?"
+            ],
+            "toolbar": [
+              "[search] search id, title, details…",
+              "status · all",
+              "type · all",
+              "sev · all",
+              "stale only",
+              "reset",
+              "new since last visit (2)"
+            ],
+            "search": true
+          }
+        }
+      }
+    },
+    {
+      "id": "LF-05",
+      "name": "structure sandbox/brief (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 3,
+        "ids": [
+          "SBX-001",
+          "SBX-002",
+          "SBX-003"
+        ],
+        "severityLabels": [
+          "high",
+          "med"
+        ],
+        "statusLabels": [],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [],
+        "search": false
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-06",
+      "name": "structure sandbox/board (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 13,
+        "ids": [
+          "SBX-001",
+          "SBX-002",
+          "SBX-003",
+          "SBX-004",
+          "SBX-005",
+          "SBX-007",
+          "SBX-008",
+          "SBX-010",
+          "SBX-011",
+          "SBX-012",
+          "SBX-013",
+          "SBX-014",
+          "SBX-015"
+        ],
+        "severityLabels": [
+          "high",
+          "low",
+          "med"
+        ],
+        "statusLabels": [
+          "Closed / retired",
+          "Ideas",
+          "Open",
+          "in progress"
+        ],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [
+          "[search] search id, title, details…",
+          "status · all",
+          "type · all",
+          "sev · all",
+          "stale only",
+          "reset"
+        ],
+        "search": true,
+        "lanes": [
+          {
+            "label": "Open",
+            "count": 10
+          },
+          {
+            "label": "Ideas",
+            "count": 3
+          },
+          {
+            "label": "Closed / retired",
+            "count": 2
+          }
+        ],
+        "darkDiffers": {
+          "records": 13,
+          "ids": [
+            "SBX-001",
+            "SBX-002",
+            "SBX-003",
+            "SBX-004",
+            "SBX-005",
+            "SBX-007",
+            "SBX-008",
+            "SBX-010",
+            "SBX-011",
+            "SBX-012",
+            "SBX-013",
+            "SBX-014",
+            "SBX-015"
+          ],
+          "severityLabels": [
+            "high",
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed / retired",
+            "Ideas",
+            "Open",
+            "in progress"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "new since last visit (1)"
+          ],
+          "search": true,
+          "lanes": [
+            {
+              "label": "Open",
+              "count": 10
+            },
+            {
+              "label": "Ideas",
+              "count": 3
+            },
+            {
+              "label": "Closed / retired",
+              "count": 2
+            }
+          ]
+        }
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-07",
+      "name": "structure sandbox/list (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 13,
+        "ids": [
+          "SBX-001",
+          "SBX-002",
+          "SBX-003",
+          "SBX-004",
+          "SBX-005",
+          "SBX-007",
+          "SBX-008",
+          "SBX-010",
+          "SBX-011",
+          "SBX-012",
+          "SBX-013",
+          "SBX-014",
+          "SBX-015"
+        ],
+        "severityLabels": [
+          "high",
+          "low",
+          "med"
+        ],
+        "statusLabels": [
+          "Closed",
+          "Ideas / roadmap",
+          "In progress",
+          "Open",
+          "in progress"
+        ],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [
+          "[search] search id, title, details…",
+          "status · all",
+          "type · all",
+          "sev · all",
+          "stale only",
+          "reset",
+          "group · status",
+          "sort · id"
+        ],
+        "search": true,
+        "groups": [
+          {
+            "label": "In progress",
+            "count": 1
+          },
+          {
+            "label": "Open",
+            "count": 9
+          },
+          {
+            "label": "Ideas / roadmap",
+            "count": 3
+          },
+          {
+            "label": "Closed",
+            "count": 2
+          }
+        ],
+        "darkDiffers": {
+          "records": 13,
+          "ids": [
+            "SBX-001",
+            "SBX-002",
+            "SBX-003",
+            "SBX-004",
+            "SBX-005",
+            "SBX-007",
+            "SBX-008",
+            "SBX-010",
+            "SBX-011",
+            "SBX-012",
+            "SBX-013",
+            "SBX-014",
+            "SBX-015"
+          ],
+          "severityLabels": [
+            "high",
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed",
+            "Ideas / roadmap",
+            "In progress",
+            "Open",
+            "in progress"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "group · status",
+            "sort · id",
+            "new since last visit (1)"
+          ],
+          "search": true,
+          "groups": [
+            {
+              "label": "In progress",
+              "count": 1
+            },
+            {
+              "label": "Open",
+              "count": 9
+            },
+            {
+              "label": "Ideas / roadmap",
+              "count": 3
+            },
+            {
+              "label": "Closed",
+              "count": 2
+            }
+          ]
+        }
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-08",
+      "name": "structure sandbox/activity (records, ids, labels, toolbar, lanes) in both themes",
+      "value": {
+        "themes": {
+          "light": "light",
+          "dark": "dark"
+        },
+        "records": 20,
+        "ids": [
+          "SBX-001",
+          "SBX-002",
+          "SBX-003",
+          "SBX-004",
+          "SBX-005",
+          "SBX-006",
+          "SBX-007",
+          "SBX-008",
+          "SBX-009",
+          "SBX-010",
+          "SBX-011",
+          "SBX-012",
+          "SBX-013",
+          "SBX-014",
+          "SBX-015"
+        ],
+        "severityLabels": [],
+        "statusLabels": [
+          "Activity — newest first",
+          "closed",
+          "note",
+          "opened"
+        ],
+        "viewSwitch": [
+          "brief",
+          "board",
+          "list",
+          "activity",
+          "?"
+        ],
+        "toolbar": [
+          "[search] search id, title, details…",
+          "status · all",
+          "type · all",
+          "sev · all",
+          "stale only",
+          "reset"
+        ],
+        "search": true,
+        "darkDiffers": {
+          "records": 20,
+          "ids": [
+            "SBX-001",
+            "SBX-002",
+            "SBX-003",
+            "SBX-004",
+            "SBX-005",
+            "SBX-006",
+            "SBX-007",
+            "SBX-008",
+            "SBX-009",
+            "SBX-010",
+            "SBX-011",
+            "SBX-012",
+            "SBX-013",
+            "SBX-014",
+            "SBX-015"
+          ],
+          "severityLabels": [],
+          "statusLabels": [
+            "Activity — newest first",
+            "closed",
+            "note",
+            "opened"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "new since last visit (1)"
+          ],
+          "search": true
+        }
+      },
+      "status": "keep",
+      "note": "Behaviour freeze: same visible record set, labels and controls on brief/board/list/activity, light and dark.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-09",
+      "name": "search \"wait\" → visible id set (own, list, all groups expanded)",
+      "value": [],
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-10",
+      "name": "search \"SAC-06\" → visible id set (own)",
+      "value": [],
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-11",
+      "name": "search \"<ledger prefix>-00\" → visible id set (own)",
+      "value": {
+        "query": "LGR-00",
+        "ids": [
+          "LGR-001",
+          "LGR-002",
+          "LGR-003",
+          "LGR-004",
+          "LGR-005",
+          "LGR-006",
+          "LGR-007",
+          "LGR-008",
+          "LGR-009",
+          "LGR-012"
+        ]
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "previous": {
+          "query": "LGR-00",
+          "ids": [
+            "LGR-001",
+            "LGR-002",
+            "LGR-003",
+            "LGR-004",
+            "LGR-005",
+            "LGR-006",
+            "LGR-007",
+            "LGR-008",
+            "LGR-009"
+          ]
+        },
+        "measured": {
+          "query": "LGR-00",
+          "ids": [
+            "LGR-001",
+            "LGR-002",
+            "LGR-003",
+            "LGR-004",
+            "LGR-005",
+            "LGR-006",
+            "LGR-007",
+            "LGR-008",
+            "LGR-009",
+            "LGR-012"
+          ]
+        }
+      }
+    },
+    {
+      "id": "LF-12",
+      "name": "status cycle → label + count after 1 and 2 clicks (own, list, all groups expanded)",
+      "value": {
+        "all": 12,
+        "afterClick1": {
+          "label": "status · open",
+          "count": 4
+        },
+        "afterClick2": {
+          "label": "status · closed",
+          "count": 8
+        }
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "previous": {
+          "all": 10,
+          "afterClick1": {
+            "label": "status · open",
+            "count": 3
+          },
+          "afterClick2": {
+            "label": "status · closed",
+            "count": 7
+          }
+        },
+        "measured": {
+          "all": 12,
+          "afterClick1": {
+            "label": "status · open",
+            "count": 4
+          },
+          "afterClick2": {
+            "label": "status · closed",
+            "count": 8
+          }
+        }
+      }
+    },
+    {
+      "id": "LF-13",
+      "name": "severity cycle → label + count after 1 and 2 clicks (own)",
+      "value": {
+        "all": 12,
+        "afterClick1": {
+          "label": "sev · crit",
+          "count": 0
+        },
+        "afterClick2": {
+          "label": "sev · high+",
+          "count": 1
+        }
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "previous": {
+          "all": 10,
+          "afterClick1": {
+            "label": "sev · crit",
+            "count": 0
+          },
+          "afterClick2": {
+            "label": "sev · high+",
+            "count": 0
+          }
+        },
+        "measured": {
+          "all": 12,
+          "afterClick1": {
+            "label": "sev · crit",
+            "count": 0
+          },
+          "afterClick2": {
+            "label": "sev · high+",
+            "count": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "LF-14",
+      "name": "sort cycle → first-5 id order after 0/1/2/3 clicks (own)",
+      "value": {
+        "id": [
+          "LGR-001",
+          "LGR-009",
+          "LGR-010",
+          "LGR-012",
+          "LGR-011"
+        ],
+        "afterClick1": {
+          "label": "sort · activity",
+          "first5": [
+            "LGR-012",
+            "LGR-009",
+            "LGR-010",
+            "LGR-001",
+            "LGR-011"
+          ]
+        },
+        "afterClick2": {
+          "label": "sort · severity",
+          "first5": [
+            "LGR-009",
+            "LGR-012",
+            "LGR-001",
+            "LGR-010",
+            "LGR-011"
+          ]
+        },
+        "afterClick3": {
+          "label": "sort · id",
+          "first5": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012",
+            "LGR-011"
+          ]
+        }
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "previous": {
+          "id": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-008",
+            "LGR-007"
+          ],
+          "afterClick1": {
+            "label": "sort · activity",
+            "first5": [
+              "LGR-009",
+              "LGR-010",
+              "LGR-001",
+              "LGR-002",
+              "LGR-003"
+            ]
+          },
+          "afterClick2": {
+            "label": "sort · severity",
+            "first5": [
+              "LGR-009",
+              "LGR-001",
+              "LGR-010",
+              "LGR-002",
+              "LGR-003"
+            ]
+          },
+          "afterClick3": {
+            "label": "sort · id",
+            "first5": [
+              "LGR-001",
+              "LGR-009",
+              "LGR-010",
+              "LGR-008",
+              "LGR-007"
+            ]
+          }
+        },
+        "measured": {
+          "id": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012",
+            "LGR-011"
+          ],
+          "afterClick1": {
+            "label": "sort · activity",
+            "first5": [
+              "LGR-012",
+              "LGR-009",
+              "LGR-010",
+              "LGR-001",
+              "LGR-011"
+            ]
+          },
+          "afterClick2": {
+            "label": "sort · severity",
+            "first5": [
+              "LGR-009",
+              "LGR-012",
+              "LGR-001",
+              "LGR-010",
+              "LGR-011"
+            ]
+          },
+          "afterClick3": {
+            "label": "sort · id",
+            "first5": [
+              "LGR-001",
+              "LGR-009",
+              "LGR-010",
+              "LGR-012",
+              "LGR-011"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "LF-15",
+      "name": "reset → count returns to all, search cleared (own)",
+      "value": {
+        "beforeReset": 0,
+        "afterReset": 12,
+        "equalsAll": true,
+        "searchCleared": true
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      },
+      "approval": {
+        "id": "host",
+        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "previous": {
+          "beforeReset": 0,
+          "afterReset": 10,
+          "equalsAll": true,
+          "searchCleared": true
+        },
+        "measured": {
+          "beforeReset": 0,
+          "afterReset": 12,
+          "equalsAll": true,
+          "searchCleared": true
+        }
+      }
+    },
+    {
+      "id": "LF-16",
+      "name": "click first card → detail shows its id + title; Escape closes; #hash deep link opens (own)",
+      "value": {
+        "clicked": "LGR-001",
+        "detailOpens": true,
+        "detailId": "LGR-001",
+        "detailTitle": "Initial implementation",
+        "idMatches": true,
+        "escapeCloses": true,
+        "hashOpensDetail": true
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-17",
+      "name": "search \"wait\" → visible id set (sandbox, list, all groups expanded)",
+      "value": [],
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-18",
+      "name": "search \"SAC-06\" → visible id set (sandbox)",
+      "value": [],
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-19",
+      "name": "search \"<ledger prefix>-00\" → visible id set (sandbox)",
+      "value": {
+        "query": "SBX-00",
+        "ids": [
+          "SBX-001",
+          "SBX-002",
+          "SBX-003",
+          "SBX-004",
+          "SBX-005",
+          "SBX-006",
+          "SBX-007",
+          "SBX-008",
+          "SBX-009"
+        ]
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-20",
+      "name": "status cycle → label + count after 1 and 2 clicks (sandbox, list, all groups expanded)",
+      "value": {
+        "all": 15,
+        "afterClick1": {
+          "label": "status · open",
+          "count": 9
+        },
+        "afterClick2": {
+          "label": "status · in prog",
+          "count": 1
+        }
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-21",
+      "name": "severity cycle → label + count after 1 and 2 clicks (sandbox)",
+      "value": {
+        "all": 15,
+        "afterClick1": {
+          "label": "sev · crit",
+          "count": 0
+        },
+        "afterClick2": {
+          "label": "sev · high+",
+          "count": 2
+        }
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-22",
+      "name": "sort cycle → first-5 id order after 0/1/2/3 clicks (sandbox)",
+      "value": {
+        "id": [
+          "SBX-007",
+          "SBX-001",
+          "SBX-002",
+          "SBX-003",
+          "SBX-004"
+        ],
+        "afterClick1": {
+          "label": "sort · activity",
+          "first5": [
+            "SBX-007",
+            "SBX-015",
+            "SBX-001",
+            "SBX-005",
+            "SBX-002"
+          ]
+        },
+        "afterClick2": {
+          "label": "sort · severity",
+          "first5": [
+            "SBX-007",
+            "SBX-001",
+            "SBX-002",
+            "SBX-003",
+            "SBX-004"
+          ]
+        },
+        "afterClick3": {
+          "label": "sort · id",
+          "first5": [
+            "SBX-007",
+            "SBX-001",
+            "SBX-002",
+            "SBX-003",
+            "SBX-004"
+          ]
+        }
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-23",
+      "name": "reset → count returns to all, search cleared (sandbox)",
+      "value": {
+        "beforeReset": 0,
+        "afterReset": 15,
+        "equalsAll": true,
+        "searchCleared": true
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-24",
+      "name": "click first card → detail shows its id + title; Escape closes; #hash deep link opens (sandbox)",
+      "value": {
+        "clicked": "SBX-007",
+        "detailOpens": true,
+        "detailId": "SBX-007",
+        "detailTitle": "The first install path in INSTALL.md leads to an empty releases page",
+        "idMatches": true,
+        "escapeCloses": true,
+        "hashOpensDetail": true
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-25",
+      "name": "theme toggle cycles light → dark → system and persists in localStorage ledger-theme across reload (sandbox)",
+      "value": {
+        "initial": {
+          "theme": "light",
+          "stored": null
+        },
+        "toggle": "button \"Toggle theme. Current: light\"",
+        "afterClick1": {
+          "theme": "dark",
+          "stored": "dark"
+        },
+        "afterReloadNoParam": {
+          "theme": "dark",
+          "stored": "dark"
+        },
+        "afterClick2": {
+          "theme": "light",
+          "stored": "system"
+        },
+        "afterClick3": {
+          "theme": "light",
+          "stored": "light"
+        },
+        "persists": true
+      },
+      "status": "keep",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-26",
+      "name": "axe own/brief violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 2
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 2
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-27",
+      "name": "axe own/board violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 4
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 4
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-28",
+      "name": "axe own/list violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 6
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 6
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-29",
+      "name": "axe own/activity violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-30",
+      "name": "axe sandbox/brief violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 3
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 3
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-31",
+      "name": "axe sandbox/board violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 13
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 13
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-32",
+      "name": "axe sandbox/list violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 17
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "aria-allowed-role": {
+            "impact": "minor",
+            "nodes": 17
+          },
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-33",
+      "name": "axe sandbox/activity violations by rule (light + dark)",
+      "value": {
+        "light": {
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        },
+        "dark": {
+          "page-has-heading-one": {
+            "impact": "moderate",
+            "nodes": 1
+          }
+        }
+      },
+      "status": "must-change",
+      "target": {
+        "seriousOrCriticalNodes": 0
+      },
+      "note": "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-34",
+      "name": "Tab walk: first 20 stop labels (own, board)",
+      "value": [
+        "a \"cs-ledger · ledger\"",
+        "button \"Toggle theme. Current: light\"",
+        "button[radio] \"board\"",
+        "button \"?\"",
+        "input \"search id, title, details…\"",
+        "button \"Search\"",
+        "button#cycStatus \"status · all\"",
+        "button \"type · all\"",
+        "button \"sev · all\"",
+        "button \"stale only\"",
+        "div[button] \"Open4\" (lane)",
+        "article[button] \"LGR-001lowimprovementInitial imp\" (record)",
+        "article[button] \"1LGR-009meddefectThe first insta\" (record)",
+        "article[button] \"2LGR-010lowimprovementEvery coun\" (record)",
+        "article[button] \"LGR-012meddefectThe fixture orac\" (record)",
+        "div[button] \"Closed / retired8\" (lane)",
+        "BODY"
+      ],
+      "status": "must-change",
+      "target": {
+        "includesRecordOrLaneHeader": true
+      },
+      "note": "Baseline records today's chrome-only Tab loop; the target is a record or lane header among the stops.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-35",
+      "name": "Tab reaches a board card and a lane header (own)",
+      "value": {
+        "recordReachable": true,
+        "laneHeaderReachable": true
+      },
+      "status": "must-change",
+      "target": {
+        "recordReachable": true,
+        "laneHeaderReachable": true
+      },
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-36",
+      "name": "Enter on a focused card opens its detail, focus moves inside, Escape closes (own)",
+      "value": {
+        "cardTakesFocus": true,
+        "opensDetail": true,
+        "detailId": "LGR-001",
+        "focusInsideDetail": true,
+        "escapeCloses": true
+      },
+      "status": "must-change",
+      "target": {
+        "opensDetail": true,
+        "escapeCloses": true,
+        "focusInsideDetail": true
+      },
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-37",
+      "name": "focusable records / lane headers vs visible (own, board)",
+      "value": {
+        "records": 4,
+        "focusableRecords": 4,
+        "laneHeaders": 2,
+        "focusableLaneHeaders": 2,
+        "ariaExpanded": 2
+      },
+      "status": "must-change",
+      "target": {
+        "allRecordsFocusable": true,
+        "allLaneHeadersFocusable": true
+      },
+      "note": "Target: every visible record and lane header is keyboard-focusable.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-38",
+      "name": "Tab walk: first 20 stop labels (sandbox, board)",
+      "value": [
+        "a \"cs-ledger · sandbox\"",
+        "button \"Toggle theme. Current: light\"",
+        "button[radio] \"board\"",
+        "button \"?\"",
+        "input \"search id, title, details…\"",
+        "button \"Search\"",
+        "button#cycStatus \"status · all\"",
+        "button \"type · all\"",
+        "button \"sev · all\"",
+        "button \"stale only\"",
+        "div[button] \"Open10\" (lane)",
+        "article[button] \"3SBX-001highdefectBuilding a mic\" (record)",
+        "article[button] \"1SBX-002highdefectA pid file tha\" (record)",
+        "article[button] \"2SBX-003meddefectBuilding a --sn\" (record)",
+        "article[button] \"5SBX-004meddefectA microVM silen\" (record)",
+        "article[button] \"4SBX-005meddefectAn undocumented\" (record)",
+        "article[button] \"SBX-007meddefectin progressThe f\" (record)",
+        "article[button] \"SBX-008lowdefectThe in-use guard\" (record)",
+        "article[button] \"SBX-011medimprovementNothing rec\" (record)",
+        "article[button] \"SBX-014lowimprovementTwo builds \" (record)"
+      ],
+      "status": "must-change",
+      "target": {
+        "includesRecordOrLaneHeader": true
+      },
+      "note": "Baseline records today's chrome-only Tab loop; the target is a record or lane header among the stops.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-39",
+      "name": "Tab reaches a board card and a lane header (sandbox)",
+      "value": {
+        "recordReachable": true,
+        "laneHeaderReachable": true
+      },
+      "status": "must-change",
+      "target": {
+        "recordReachable": true,
+        "laneHeaderReachable": true
+      },
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-40",
+      "name": "Enter on a focused card opens its detail, focus moves inside, Escape closes (sandbox)",
+      "value": {
+        "cardTakesFocus": true,
+        "opensDetail": true,
+        "detailId": "SBX-001",
+        "focusInsideDetail": true,
+        "escapeCloses": true
+      },
+      "status": "must-change",
+      "target": {
+        "opensDetail": true,
+        "escapeCloses": true,
+        "focusInsideDetail": true
+      },
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-41",
+      "name": "focusable records / lane headers vs visible (sandbox, board)",
+      "value": {
+        "records": 13,
+        "focusableRecords": 13,
+        "laneHeaders": 3,
+        "focusableLaneHeaders": 3,
+        "ariaExpanded": 3
+      },
+      "status": "must-change",
+      "target": {
+        "allRecordsFocusable": true,
+        "allLaneHeadersFocusable": true
+      },
+      "note": "Target: every visible record and lane header is keyboard-focusable.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-42",
+      "name": "ledger.html size (own)",
+      "value": {
+        "bytes": 298547,
+        "gzipBytes": 89206,
+        "scriptBytes": 226632,
+        "styleBytes": 52772,
+        "dataBytes": 18696,
+        "records": 12,
+        "withinBudget": true
+      },
+      "status": "must-change",
+      "target": {
+        "bytes": 1000000
+      },
+      "note": "Budget 1,000,000 bytes uncompressed.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-43",
+      "name": "ledger.html size (sandbox)",
+      "value": {
+        "bytes": 304707,
+        "gzipBytes": 91952,
+        "scriptBytes": 226632,
+        "styleBytes": 52772,
+        "dataBytes": 24855,
+        "records": 15,
+        "withinBudget": true
+      },
+      "status": "must-change",
+      "target": {
+        "bytes": 1000000
+      },
+      "note": "Budget 1,000,000 bytes uncompressed.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-44",
+      "name": "no external requests, zero page errors on file:// (own, all views + a detail)",
+      "value": {
+        "requests": 1,
+        "external": [],
+        "pageErrors": 0,
+        "errors": []
+      },
+      "status": "keep",
+      "note": "Compared on external request list and error count only.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-45",
+      "name": "no external requests, zero page errors on file:// (sandbox, all views + a detail)",
+      "value": {
+        "requests": 1,
+        "external": [],
+        "pageErrors": 0,
+        "errors": []
+      },
+      "status": "keep",
+      "note": "Compared on external request list and error count only.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-46",
+      "name": "markdown link safety: javascript:/data: hrefs emptied, ordinary https link survives (sandbox, SBX-015 detail)",
+      "value": {
+        "links": {
+          "the safe link": "https://example.com/sandbox/spec",
+          "the js link": "",
+          "the data link": ""
+        },
+        "fences": 0,
+        "tagged": [],
+        "everyTaggedHighlighted": false
+      },
+      "status": "keep",
+      "note": "The viewer's URL allowlist, watched in our tree: dropped schemes become empty hrefs. SBX-015 is a synthetic record carrying the three link kinds.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    },
+    {
+      "id": "LF-47",
+      "name": "every language-tagged code fence renders highlighted (own, LGR-003 detail; exactly one, bash)",
+      "value": {
+        "links": {},
+        "fences": 1,
+        "tagged": [
+          "bash"
+        ],
+        "everyTaggedHighlighted": true
+      },
+      "status": "keep",
+      "note": "The shipped page carries exactly one tagged fence (```bash); rehype-highlight must mark it. A new tagged fence in the ledger changes this row and forces review.",
+      "origin": {
+        "id": "host",
+        "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
+      }
+    }
+  ]
+}

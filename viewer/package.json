@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build --config vite.config.ts",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "fixtures": "node fixtures/run.mjs"
   },
   "dependencies": {
     "@codesweep-ai/ui": "0.2.1-dev.20260901200135.3160175",
@@ -17,6 +18,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.0.2",
+    "puppeteer-core": "^25.1.0",
     "terser": "^5.50.0",
     "typescript": "^5.6.3",
     "vite": "^8.0.14",

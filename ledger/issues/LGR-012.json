@@ -1,0 +1,25 @@
+{
+  "id": "LGR-012",
+  "title": "The fixture oracle freezes this repo's live ledger, so adding a record fails it",
+  "type": "defect",
+  "severity": "med",
+  "status": "open",
+  "foundBy": "session agent, re-running viewer/fixtures after the @codesweep-ai/ui port",
+  "opened": "2026-09-01",
+  "resolved": null,
+  "stint": null,
+  "evidence": {
+    "commits": [],
+    "integrated": [],
+    "verified": null
+  },
+  "resolution": null,
+  "details": "`viewer/fixtures` runs every behavioural check against two corpora: this repository's own `ledger/`, and the frozen `fixtures/sandbox/ledger`. The `own` half records literal record ids and counts as frozen `keep` values. `ledger/` is the one corpus that grows. So a check that measures the viewer fails whenever the ledger it is pointed at changes.\n\nAdding LGR-011 was enough. Seven checks failed, and none of them describes a viewer defect:\n\n| check | what it froze |\n|---|---|\n| LF-02, LF-03, LF-04 | visible record set on own/board, own/list, own/activity |\n| LF-12, LF-13 | the count behind `status - open` and `sev - crit` |\n| LF-14 | a five-id sort order, `[LGR-001, LGR-009, LGR-010, LGR-008, LGR-007]` |\n| LF-15 | the count `reset` returns to |\n\nEvery one has an exact twin against the sandbox corpus. Those twins are LF-06, LF-07, LF-08, LF-20, LF-21, LF-22 and LF-23, and all seven passed. The failures therefore left no behaviour unasserted.\n\nClosing a record trips it as readily as adding one. LF-12 freezes the open and closed split, and LF-01 freezes the top of the queue as `[LGR-009, LGR-010]`. LF-01 passed only because LGR-011 did not surface in the brief view. About thirteen `own` checks are literal in this way, so six more are latent.\n\nThe cost is not the churn. Re-recording a `keep` row is gated on an approval id and a reason. `viewer/fixtures/README.md` reserves that for the case where a reviewer has agreed a behaviour genuinely changed. Spending the sign-off on a ledger that gained a record is how it becomes a rubber stamp. That disarms it for the change it exists to catch.\n\nNone of this is urgent. `make fixtures` sits outside `make check` and `make ci`, so nothing is red. The live-corpus value of `own` also survives, because its non-literal checks do not drift. LF-44 measures zero page errors and no external requests, and the axe, keyboard and size rows compare against thresholds.\n\nThere are two reasonable fixes. The first drops the literal-equality `own` variants that already have a frozen twin. That costs no behavioural coverage, but it gives up a second dataset shape, because sandbox renders three board lanes to own's two. Freezing a snapshot of `own` as a third corpus recovers it, which is what the sandbox corpus already is. The second makes the `own` variants relative, asserting invariants derived from the payload rather than frozen literals. That keeps the symmetry, at the cost of surgery on `run.mjs`.",
+  "notes": [
+    {
+      "date": "2026-09-01",
+      "text": "The latent set is not theoretical. LF-11, a search over `LGR-00`, drifted as soon as LGR-012 landed, so the approved re-record covered eight rows rather than seven. Appending this note moves the activity count in turn, which is the fault working as described."
+    }
+  ],
+  "links": []
+}

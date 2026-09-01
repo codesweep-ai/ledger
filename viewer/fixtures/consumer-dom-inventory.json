@@ -1,0 +1,26 @@
+{
+  "selectors": [
+    { "file": "viewer/app/src/app.css", "line": 67, "selector": ".detail [data-markdown-content]", "component": "MarkdownViewer" },
+    { "file": "viewer/app/src/app.css", "line": 68, "selector": ".detail [data-markdown-paragraph]", "component": "MarkdownViewer" },
+    { "file": "viewer/app/src/app.css", "line": 68, "selector": ".detail [data-markdown-list]", "component": "MarkdownViewer" },
+    { "file": "viewer/app/src/app.css", "line": 74, "selector": "[data-markdown-blockquote]", "component": "MarkdownViewer" },
+    { "file": "viewer/app/src/app.css", "line": 77, "selector": ".ledger-modal.intro [data-modal-dialog]", "component": "Modal" },
+    { "file": "viewer/app/src/app.css", "line": 110, "selector": ".lane [data-card-header]", "component": "Card" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 22, "selector": ".viewbar [data-component='SegmentedControl'] [data-segmented-option]", "component": "SegmentedControl" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 22, "selector": ".viewbar > [data-component='Chip']", "component": "Chip" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 26, "selector": ".controls.filterbar [data-component='Chip']", "component": "Chip" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 26, "selector": ".controls.filterbar [data-component='SearchInput'] [data-search-input]", "component": "SearchInput" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 28, "selector": ".controls.filterbar [data-component='SearchInput'] [data-search-input]", "component": "SearchInput" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 32, "selector": ".controls.filterbar [data-component='Chip']", "component": "Chip" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 34, "selector": ".controls.filterbar [data-component='Chip']", "component": "Chip" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 40, "selector": ".controls.filterbar [data-component='Chip']", "component": "Chip" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 42, "selector": "[data-component='ThemeToggle']", "component": "ThemeToggle" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 80, "selector": "[data-component='Modal'] [data-modal-dialog]", "component": "Modal" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 82, "selector": "[data-component='Modal'] [data-modal-content] .mhead .idm", "component": "Modal" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 84, "selector": "[data-component='Modal'] [data-modal-title]", "component": "Modal" },
+    { "file": "viewer/fixtures/selectors.mjs", "line": 86, "selector": "[data-component='Modal'] [data-modal-close]", "component": "Modal" },
+    { "file": "viewer/app/src/App.tsx", "line": 267, "selector": "[data-search-input]", "component": "SearchInput" },
+    { "file": "viewer/fixtures/run.mjs", "line": 347, "selector": "[data-markdown-content] a", "component": "MarkdownViewer" },
+    { "file": "viewer/fixtures/run.mjs", "line": 348, "selector": "[data-markdown-content] pre code", "component": "MarkdownViewer" }
+  ]
+}

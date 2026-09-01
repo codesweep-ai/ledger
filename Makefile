@@ -60,7 +60,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean
 
 .DEFAULT_GOAL := help
 
@@ -184,6 +184,19 @@ $(VIEWER): $(VIEWER_SRC)
 # npm runs in viewer/, which is where the manifest and the ESM package scope are.
 viewer-build:
 	cd viewer && npm ci && npm run typecheck && npm run build
+
+## fixtures: run the viewer's behavioural oracle (viewer/fixtures; not in check)
+# Not part of `make check`: the campaign orchestrator runs it explicitly. Needs
+# node_modules and a Chromium in LEDGER_FIXTURES_BROWSER or CHROME_BIN.
+fixtures: build-go
+	cd viewer && npm run fixtures -- $(FIXTURES_ARGS)
+
+## record-fixtures: rewrite viewer/fixtures/expectations.json from a live run
+# Named record-* because it overwrites a committed file (see `make conventions`).
+# Changing a frozen value needs the reviewer's sign-off, which the runner asks
+# for as APPROVE=<id> REASON="<text>" and records in the row it rewrites.
+record-fixtures: build-go
+	cd viewer && npm run fixtures -- --record $(if $(APPROVE),--approve $(APPROVE) --reason "$(REASON)") $(FIXTURES_ARGS)
 
 ## coverage: merge every tier present under $(COVERDIR) and print the report
 coverage:
