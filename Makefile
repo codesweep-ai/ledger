@@ -1,8 +1,9 @@
 # cs-ledger — build/test/install.
 # `make build` produces bin/cs-ledger (version-stamped, CGO_ENABLED=0).
 # `make check` is the full local gate: formatting, vet, the Go suite, the
-# viewer's JavaScript suite, the coverage gate and the linters. Building needs Go
-# alone; the gate also needs node (test-js) and cs-lint (prose, refs, oss, surface).
+# viewer build, the coverage gate and the linters. Building needs Go alone when
+# the committed viewer is current; viewer changes need Node and npm, and the
+# gate also needs cs-lint (prose, refs, oss, surface).
 
 GORELEASER ?= goreleaser
 CS_LINT  ?= go tool cs-lint
@@ -29,7 +30,14 @@ GO_FILES := $(shell git ls-files '*.go')
 # The embedded files are listed because //go:embed makes them compile-time
 # inputs; add to the list when a new one is embedded.
 GIT_DIR    := $(shell git rev-parse --git-dir 2>/dev/null)
-EMBED_DEPS := MANUAL.md GUIDE.md templates/ledger-agents.md $(shell find viewer -type f)
+# The viewer is a Vite/React app built into one self-contained file, and that
+# file is the only viewer artifact //go:embed reads. Naming it rather than all
+# of viewer/ keeps the fixture suite and its vendored axe-core out of the
+# binary's prerequisites, where a change to either rebuilt it for nothing.
+VIEWER     := viewer/index.html
+VIEWER_SRC := $(shell find viewer/app -type f 2>/dev/null) \
+              viewer/vite.config.ts viewer/tsconfig.json viewer/package.json viewer/package-lock.json
+EMBED_DEPS := MANUAL.md GUIDE.md templates/ledger-agents.md $(VIEWER)
 # //go:embed inputs deliberately left out of $(EMBED_DEPS). Nothing belongs here
 # yet; `make embed-check` allows exactly this list and nothing else.
 EMBED_EXEMPT :=
@@ -52,7 +60,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build install uninstall test test-js coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface ledger lint deadcode actionlint snapshot release release-check clean
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface ledger lint deadcode actionlint snapshot release release-check clean
 
 .DEFAULT_GOAL := help
 
@@ -67,11 +75,14 @@ help:
 ## it. `make build install`, and an `install` after a build, then copy what is
 ## already there instead of building the same binary a second time.
 ##
+## $(VIEWER) is a prerequisite through $(EMBED_DEPS) and has a rule of its own,
+## so a viewer source change rebuilds the page and then the binary that embeds
+## it, in that order, without either being asked for by name.
+##
 ## --skip=before, because .goreleaser.yaml's before hooks are `go mod tidy`,
-## `go vet ./...`, `go test ./...` and `make test-js`: release gates that
-## `make check` runs in its own right, and that made every build pay for the
-## whole suite and rewrite go.mod as a side effect. `make snapshot` and
-## `make release` still run them.
+## `go vet ./...` and `go test ./...`: release gates that `make check` runs in
+## its own right, and that made every build pay for the whole suite and rewrite
+## go.mod as a side effect. `make snapshot` and `make release` still run them.
 build: $(BIN)
 
 $(BIN): $(BUILD_DEPS)
@@ -146,18 +157,33 @@ install: build
 uninstall:
 	rm -f $(PREFIX)/bin/cs-ledger
 
-## test: Go suite (validation, render, black-box CLI) + viewer-asset JS suite
+## test: Go suite (validation, rendering and black-box CLI)
 # -count=1 disables the test cache. The suite shells out to a built binary and
 # compares against embedded assets, so a change to GUIDE.md or viewer/ leaves the
 # cached result green while the gate it stands for has started failing.
-test:
+test: viewer
 	@scripts/coverage.sh reset unit
 	CS_COVERDIR=$(COVER_ABS)/unit go test $(COVERFLAGS) ./... -count=1 -args -test.gocoverdir=$(COVER_ABS)/unit
-	$(MAKE) test-js
 
-## test-js: the viewer-asset suite (markdown renderer in viewer/viewer.js)
-test-js:
-	node test/run.mjs
+## viewer: rebuild the committed viewer when its sources move
+##
+## A phony alias for $(VIEWER), so a tree whose viewer is current does no npm
+## work at all. Where npm is absent it says so and leaves the committed file
+## alone, which is what lets a Go-only clone build: the viewer is committed
+## precisely so that building the binary never requires Node.
+viewer: $(VIEWER)
+
+$(VIEWER): $(VIEWER_SRC)
+	@if command -v npm >/dev/null 2>&1; then \
+		$(MAKE) viewer-build; \
+	else \
+		echo "viewer: SKIP (npm not found; using committed $(VIEWER))"; \
+	fi
+
+## viewer-build: restore dependencies, typecheck and build the single-file viewer
+# npm runs in viewer/, which is where the manifest and the ESM package scope are.
+viewer-build:
+	cd viewer && npm ci && npm run typecheck && npm run build
 
 ## coverage: merge every tier present under $(COVERDIR) and print the report
 coverage:
@@ -265,6 +291,31 @@ ledger: build
 	./bin/cs-ledger check ledger
 	./bin/cs-ledger check fixtures/sandbox/ledger
 
+
+## viewer-check: the committed viewer is what viewer/app builds
+##
+## It rebuilds through viewer-build rather than asking anybody to run npm, then
+## asserts that the rebuild changed nothing. On the clean checkout CI runs, a
+## difference means the commit carries a bundle its own sources do not produce.
+## In a tree with viewer edits in flight it means the same thing one commit
+## early: the rebuilt file has to go in with them, and it is already rebuilt.
+##
+## It rebuilds unconditionally rather than depending on $(VIEWER), because a
+## clone's timestamps are its checkout order and this gate exists precisely
+## where timestamps cannot be trusted. npm is required, unlike in $(VIEWER)'s
+## own rule, which skips so a Go-only clone still builds. That skip is what
+## this gate stops from reaching a commit.
+viewer-check:
+	@command -v npm >/dev/null 2>&1 || { echo "viewer-check: npm is required to rebuild the viewer" >&2; exit 1; }
+	@$(MAKE) --no-print-directory viewer-build
+	@if git diff --quiet -- $(VIEWER); then \
+		echo "viewer: $(VIEWER) is what viewer/app builds"; \
+	else \
+		echo "$(VIEWER) was stale. It has been rebuilt from viewer/app;" >&2; \
+		echo "commit it alongside the viewer change that moved it." >&2; \
+		exit 1; \
+	fi
+
 ## check: the full local gate — fmt-check, vet, the linters, and the tests
 check: fmt-check tidy-check embed-check vet lint deadcode test coverage-check prose refs oss surface
 
@@ -284,6 +335,8 @@ endef
 ## it cannot reproduce it names on the way out: a run that skipped a gate must
 ## never read as a run that ran them all.
 ci:
+	$(call say,viewer)
+	@$(MAKE) --no-print-directory viewer-check
 	$(call say,the gate a contributor runs before pushing)
 	@$(MAKE) --no-print-directory check
 	$(call say,actionlint)

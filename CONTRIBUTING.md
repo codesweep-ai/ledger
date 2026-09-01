@@ -64,10 +64,19 @@ release reaches you when you ask for it, not on an unrelated pull request.
 `goreleaser` is the one program still expected on the PATH. `make ci` validates the release
 manifest with it, and `make build` falls back to `go build` where it is absent.
 
-The viewer's assets live in `viewer/` as real files and are embedded into the binary at build
-time. To iterate on them without recompiling, render with
-`bin/cs-ledger render ledger --assets ./viewer`. Those renders are dev-stamped and the freshness
-check refuses them, so a page built this way cannot reach a commit by accident.
+The viewer is a React application under `viewer/app/`, built against the pinned
+`@codesweep-ai/ui` package into the single self-contained `viewer/index.html` the Go binary embeds.
+That file is committed, so building the binary needs Go alone; changing the viewer needs Node
+22.13 or newer with npm, which is the floor `@codesweep-ai/ui` sets. The viewer's `package.json`
+sits beside its source in `viewer/`, so npm runs there, and `make` does that for you:
+
+```bash
+make viewer-build
+```
+
+`make build` rebuilds the viewer on its own when its sources have moved, so this is the explicit
+form rather than an extra step. Re-render the page with `bin/cs-ledger render ledger` afterwards:
+the viewer's bytes are part of what `toolVersion` pins.
 
 This repository keeps a **ledger** of open issues in `ledger/`. Read
 [`ledger/AGENTS.md`](ledger/AGENTS.md) before you start work, and follow it as you go. A commit

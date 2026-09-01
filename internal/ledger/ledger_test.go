@@ -157,15 +157,6 @@ func mustNotMatch(t *testing.T, s, pattern string) {
 	}
 }
 
-func testAssets(t *testing.T) *ViewerAssets {
-	t.Helper()
-	a, err := LoadAssets(root.Assets, "viewer")
-	if err != nil {
-		t.Fatal(err)
-	}
-	return a
-}
-
 // ---- validation ----
 
 func TestValidCorpusZeroErrors(t *testing.T) {
@@ -547,7 +538,7 @@ func TestValidQueuePassesAndRenders(t *testing.T) {
 		t.Fatalf("expected zero errors, got: %s", strings.Join(res.Errors, "; "))
 	}
 	mustMatch(t, strings.Join(res.Warnings, "\n"), `TST-004 is already in progress`)
-	html := RenderHTML(LoadLedger(dir), testAssets(t))
+	html := RenderHTML(LoadLedger(dir), root.Assets)
 	mustMatch(t, html, `top-leverage fix`)
 	mustMatch(t, html, `"queue":\{`)
 }
@@ -582,15 +573,15 @@ func TestAbsentQueueRendersNull(t *testing.T) {
 	if res := checkDir(t, dir); len(res.Errors) != 0 {
 		t.Fatalf("expected zero errors, got: %s", strings.Join(res.Errors, "; "))
 	}
-	mustMatch(t, RenderHTML(LoadLedger(dir), testAssets(t)), `"queue":null`)
+	mustMatch(t, RenderHTML(LoadLedger(dir), root.Assets), `"queue":null`)
 }
 
 // ---- render ----
 
 func TestRenderDeterministic(t *testing.T) {
 	dir := validCorpus(t)
-	a := RenderHTML(LoadLedger(dir), testAssets(t))
-	b := RenderHTML(LoadLedger(dir), testAssets(t))
+	a := RenderHTML(LoadLedger(dir), root.Assets)
+	b := RenderHTML(LoadLedger(dir), root.Assets)
 	if a != b {
 		t.Fatal("render not deterministic")
 	}
@@ -598,7 +589,7 @@ func TestRenderDeterministic(t *testing.T) {
 
 func TestRenderEmbedsDataNoTimestamps(t *testing.T) {
 	dir := validCorpus(t)
-	html := RenderHTML(LoadLedger(dir), testAssets(t))
+	html := RenderHTML(LoadLedger(dir), root.Assets)
 	mustMatch(t, html, `ledger-data`)
 	mustMatch(t, html, `TST-002`)
 	mustMatch(t, html, `test-project`)
@@ -611,7 +602,7 @@ func TestScriptBreakoutEscaped(t *testing.T) {
 			"details": "evil </script><script>alert(1)</script> and `backticks` ${too}",
 		}),
 	}, nil, "")
-	html := RenderHTML(LoadLedger(dir), testAssets(t))
+	html := RenderHTML(LoadLedger(dir), root.Assets)
 	mustNotMatch(t, html, `evil </script>`)
 	mustMatch(t, html, `evil \\u003c/script`)
 }
@@ -788,22 +779,6 @@ func TestRenderMovesThePin(t *testing.T) {
 		t.Fatalf("check after render: %v\n%s", err, out)
 	}
 	mustMatch(t, mustRun(t, "check", dir), `ledger.html fresh`)
-}
-
-// A dev-stamped page is not committable, so dev mode must not move the pin or
-// rewrite the docs on the strength of it.
-func TestDevRenderLeavesThePinAndDocsAlone(t *testing.T) {
-	dir := validCorpus(t)
-	pinAt(t, dir, "9.9.9")
-
-	if out, err := run(t, "render", dir, "--assets", "../../viewer"); err != nil {
-		t.Fatalf("dev render: %v\n%s", err, out)
-	}
-	cfg, _ := os.ReadFile(filepath.Join(dir, "ledger.json"))
-	mustMatch(t, string(cfg), `"toolVersion":"9\.9\.9"`)
-	if _, err := os.Stat(filepath.Join(dir, "GUIDE.md")); !os.IsNotExist(err) {
-		t.Fatal("dev render should not materialize the guide")
-	}
 }
 
 // A verb the tool does not have fails loudly, so a stale script cannot appear
@@ -1005,22 +980,6 @@ func TestRenderMaterializesAMissingGuide(t *testing.T) {
 	}
 }
 
-func TestDevStampRefusedByCheck(t *testing.T) {
-	dir := validCorpus(t)
-	// dev-mode render from the checked-out viewer/ directory
-	assetsDir, _ := filepath.Abs(filepath.Join("..", "..", "viewer"))
-	if out, err := run(t, "render", dir, "--assets", assetsDir); err != nil {
-		t.Fatalf("dev render: %v\n%s", err, out)
-	}
-	html, _ := os.ReadFile(filepath.Join(dir, "ledger.html"))
-	mustMatch(t, string(html), regexp.QuoteMeta(DevStamp))
-	out, err := run(t, "check", dir)
-	if err == nil {
-		t.Fatal("check should refuse dev-stamped ledger.html")
-	}
-	mustMatch(t, out, `rendered in dev mode`)
-}
-
 func TestCommitUrlTemplate(t *testing.T) {
 	dir := validCorpus(t)
 	cfgPath := filepath.Join(dir, "ledger.json")
@@ -1044,13 +1003,13 @@ func TestCommitUrlTemplate(t *testing.T) {
 	if res := checkDir(t, dir); len(res.Errors) != 0 {
 		t.Fatalf("valid template should pass: %s", strings.Join(res.Errors, "; "))
 	}
-	html := RenderHTML(LoadLedger(dir), testAssets(t))
+	html := RenderHTML(LoadLedger(dir), root.Assets)
 	mustMatch(t, html, `"commitUrlTemplate":"https://github.com/org/repo/commit/\{sha\}"`)
 	// absent template: payload carries null, viewer keeps plain text
 	cfg := testConfig
 	if err := os.WriteFile(cfgPath, []byte(cfg), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	html = RenderHTML(LoadLedger(dir), testAssets(t))
+	html = RenderHTML(LoadLedger(dir), root.Assets)
 	mustMatch(t, html, `"commitUrlTemplate":null`)
 }

@@ -9,9 +9,7 @@
 // MANUAL.md, are there. Everything the tool actually does lives under
 // internal/.
 //
-// The files in viewer/ are the single source of truth for the interactive
-// viewer; dev iteration edits them directly (cs-ledger render --assets ./viewer)
-// and release builds bake them in here.
+// The built viewer is committed as one self-contained file and baked in here.
 package ledger
 
 import (
@@ -19,7 +17,7 @@ import (
 	"strings"
 )
 
-//go:embed viewer
+//go:embed viewer/index.html
 var Assets embed.FS
 
 // ProjectMarker separates the generated part of a materialized guide from the

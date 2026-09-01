@@ -1,9 +1,7 @@
 // Command cs-ledger validates and renders ledger/ directories.
 //
-// Verbs: check, render, manual, guide, init, version. The viewer
-// assets, the man page and the operating guide are embedded at build time;
-// --assets <dir> overrides the viewer assets from disk for design iteration
-// (dev mode — output is dev-stamped and check refuses it as committable).
+// Verbs: check, render, manual, guide, init, version. The viewer, the man page
+// and the operating guide are embedded at build time.
 package main
 
 import (
@@ -13,7 +11,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
-	"strings"
 
 	root "github.com/codesweep-ai/ledger"
 	"github.com/codesweep-ai/ledger/internal/ledger"
@@ -51,10 +48,6 @@ verbs:
   guide    print the guide to keeping a ledger (GUIDE.md)
   init     scaffold a new ledger/ dir  (--project NAME --prefix AB[2-6])
   version  print tool + renderer versions
-
-flags:
-  --assets DIR   dev mode: load viewer assets from DIR instead of the embedded
-                 copy; output is dev-stamped and not committable
 
 ledgerDir defaults to "ledger".
 Agents: run 'cs-ledger guide' before touching a ledger. It is the operating
@@ -103,7 +96,6 @@ func main() {
 	}
 
 	fs := flag.NewFlagSet("cs-ledger", flag.ExitOnError)
-	assetsDir := fs.String("assets", "", "load viewer assets from this directory (dev mode)")
 	project := fs.String("project", "", "init: project name")
 	prefix := fs.String("prefix", "", "init: record id prefix (^[A-Z]{2,6}$)")
 	fs.Usage = usage
@@ -124,15 +116,8 @@ func main() {
 		os.Exit(2)
 	}
 
-	dev := *assetsDir != ""
-	assets, err := loadAssets(*assetsDir)
-	if err != nil {
-		fail("cannot load viewer assets: " + err.Error())
-	}
-	assets.Dev = dev
-
 	if verb == "init" {
-		doInit(dir, *project, *prefix, assets)
+		doInit(dir, *project, *prefix)
 		return
 	}
 
@@ -158,35 +143,26 @@ func main() {
 		if tr.ConfigError != "" {
 			fail("cannot render without a valid ledger.json")
 		}
-		// A dev-stamped page is not committable, so it must not move the pin or
-		// rewrite the docs. Dev mode writes the page and nothing else.
-		if !dev {
-			if skew || !pinned {
-				tr.Config.Set("toolVersion", ojson.S(ledger.RendererVersion))
-				if err := os.WriteFile(filepath.Join(dir, "ledger.json"), []byte(tr.Config.StringifyIndent()+"\n"), 0o644); err != nil {
-					fail("write ledger.json failed: " + err.Error())
-				}
-				tr = ledger.LoadLedger(dir) // reload so the render sees the new pin
+		if skew || !pinned {
+			tr.Config.Set("toolVersion", ojson.S(ledger.RendererVersion))
+			if err := os.WriteFile(filepath.Join(dir, "ledger.json"), []byte(tr.Config.StringifyIndent()+"\n"), 0o644); err != nil {
+				fail("write ledger.json failed: " + err.Error())
 			}
-			materializeDocs(dir, guidePath)
+			tr = ledger.LoadLedger(dir) // reload so the render sees the new pin
 		}
-		html := ledger.RenderHTML(tr, assets)
+		materializeDocs(dir, guidePath)
+		html := ledger.RenderHTML(tr, root.Assets)
 		if err := os.WriteFile(outPath, []byte(html), 0o644); err != nil {
 			fail("write failed: " + err.Error())
 		}
-		devNote := ""
-		if dev {
-			devNote = " [dev-stamped — not committable]"
-		}
-		fmt.Printf("wrote %s (%d bytes, %d issues, %d drafts)%s\n", outPath, len(html), len(tr.Records), len(tr.Drafts), devNote)
-		if !dev && skew {
+		fmt.Printf("wrote %s (%d bytes, %d issues, %d drafts)\n", outPath, len(html), len(tr.Records), len(tr.Drafts))
+		if skew {
 			fmt.Printf("toolVersion %s -> %s\n", pin, ledger.RendererVersion)
 		}
 		return
 	}
 
-	// check — always gates against the embedded (release) assets. Collect the
-	// page and guide failures before reporting anything: they are errors, and an
+	// Collect the page and guide failures before reporting anything: they are errors, and an
 	// error printed after the warnings block reads as one more warning.
 	errors := res.Errors
 	warnings := res.Warnings
@@ -203,11 +179,9 @@ func main() {
 		switch {
 		case err != nil:
 			errors = append(errors, "ledger.html: missing — run: cs-ledger render")
-		case strings.Contains(string(committed), ledger.DevStamp):
-			errors = append(errors, "ledger.html: rendered in dev mode (--assets) — re-render with the release binary before committing")
 		case skew:
 			// Handled as a warning above.
-		case string(committed) != ledger.RenderHTML(tr, releaseAssets()):
+		case string(committed) != ledger.RenderHTML(tr, root.Assets):
 			errors = append(errors, "ledger.html: STALE — records changed without re-render. Run: cs-ledger render")
 		}
 		// guide-sync gate: the generated half of a materialized guide must match
@@ -255,7 +229,7 @@ func materializeDocs(dir, guidePath string) {
 	}
 }
 
-func doInit(dir, project, prefix string, assets *ledger.ViewerAssets) {
+func doInit(dir, project, prefix string) {
 	if project == "" || prefix == "" {
 		fail("init requires --project and --prefix")
 	}
@@ -287,25 +261,10 @@ func doInit(dir, project, prefix string, assets *ledger.ViewerAssets) {
 		report("validation errors", res.Errors)
 		fail("init produced an invalid ledger — this is a bug")
 	}
-	html := ledger.RenderHTML(tr, assets)
+	html := ledger.RenderHTML(tr, root.Assets)
 	if err := os.WriteFile(filepath.Join(dir, "ledger.html"), []byte(html), 0o644); err != nil {
 		fail(err.Error())
 	}
 	fmt.Printf("initialized %s (project %s, prefix %s, toolVersion %s)\n", dir, project, prefix, ledger.RendererVersion)
 	fmt.Printf("next: read %s/GUIDE.md — %s/AGENTS.md routes agents to it\n", dir, dir)
-}
-
-func loadAssets(dir string) (*ledger.ViewerAssets, error) {
-	if dir != "" {
-		return ledger.LoadAssets(os.DirFS(dir), ".")
-	}
-	return releaseAssets(), nil
-}
-
-func releaseAssets() *ledger.ViewerAssets {
-	a, err := ledger.LoadAssets(root.Assets, "viewer")
-	if err != nil {
-		panic("embedded assets missing: " + err.Error())
-	}
-	return a
 }

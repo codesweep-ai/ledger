@@ -4,6 +4,6 @@
   "schemaVersion": "issue.v1",
   "staleAfterDays": 14,
   "description": "Single-file issue ledger + viewer for agent-managed repos: agents write JSON records with evidence, humans read this generated page. This is the ledger tracking its own repo.",
-  "toolVersion": "0.3.3",
+  "toolVersion": "0.6.1",
   "commitUrlTemplate": "https://github.com/codesweep-ai/ledger/commit/{sha}"
 }

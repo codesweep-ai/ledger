@@ -272,8 +272,8 @@ the cause is render code or an embedded viewer asset.
 generated part of a materialized `GUIDE.md`. Where the guide or the router is absent, `render`
 **MUST** write it, so a ledger scaffolded by an older binary picks it up.
 
-**R44.** `render --assets` **MUST** write the page alone, leaving `toolVersion` and the documents as they
-were, because a dev-stamped page certifies nothing.
+**R44.** `render` **MUST** use the viewer assets embedded in the running binary. The page and
+`toolVersion` therefore identify one renderer build.
 
 **R45.** A ledger with no recorded version **MUST** be accepted, because R40 makes `toolVersion` optional.
 
@@ -297,10 +297,10 @@ target repository needs no vendored files.
 **R48.** `render` **MUST** write the page even when records fail validation, and **MUST** report the failures.
 `check` fails on them separately.
 
-**R49.** `render --assets DIR` **MUST** load viewer assets from disk and **MUST** mark its output as
-dev-stamped.
+**R49.** `render` **MUST** accept only its optional ledger-directory argument.
 
-**R50.** `check` **MUST** reject a dev-stamped page, so only a release binary's render is committable.
+**R50.** `render` **MUST** have a single output path, so no page needs a mark saying it is not
+committable.
 
 **R51.** `check` **MUST** reject a materialized `GUIDE.md` whose generated part differs from the binary's
 copy, and **MUST NOT** compare what follows the project marker.
@@ -327,16 +327,14 @@ roadmap direction never reads as defect backlog.
 
 **R56.** The page **MUST** offer a light and a dark theme.
 
-**R57.** Styling **MUST** go through the pinned design tokens rather than through a component framework or
-a build step.
+**R57.** Styling **MUST** go through the pinned design tokens.
 
 **R58.** A view **MUST** be reachable by a `?view=` parameter, and a record by a `#<id>` fragment.
 
-The full `@codesweep-ai/ui` package is React and Tailwind behind a private registry, which a
-no-build artifact cannot use. So the project keeps a pinned copy of that design system's
-`tokens.css` and `base.css` under `ui/codesweep-ui/`, adapts it in `viewer/`, and embeds the
-result. The token version appears in the page footer next to the renderer version, and moving it is
-a release followed by `cs-ledger render`.
+The tokens come from `@codesweep-ai/ui`, a published package pinned to one exact version, and the
+viewer is a React application built against it. The build is what keeps R55 true: it inlines the
+framework into the page rather than leaving it to be fetched. The package version appears in the
+page footer beside the renderer version, and moving it is a re-pin followed by `cs-ledger render`.
 
 Four views are defined. **brief** is the landing view: the masthead, a today-anchored trend of
 daily found and resolved counts, the top of the queue with its rationales, and a derived block of

@@ -2,7 +2,6 @@ package ledger
 
 import (
 	"io/fs"
-	"path"
 	"strconv"
 	"strings"
 
@@ -15,52 +14,15 @@ import (
 // STALE). 0.3.0: first cs-ledger release — derived-data block, the earlier
 // JavaScript renderer retired. 0.3.1: evidence-sha links via
 // commitUrlTemplate. 0.3.2: viewer stylesheet comments, which are
-// embedded verbatim and so change the page's bytes. 0.3.3: viewer
-// JavaScript comments, embedded the same way.
-const RendererVersion = "0.3.3"
-const UITokensVersion = "1.12.0"
-
-// DevStamp marks HTML rendered from --assets (dev mode); check refuses it.
-const DevStamp = "v" + RendererVersion + "-dev"
-
-// ViewerAssets holds the viewer files inlined into the rendered page.
-// Dev marks assets loaded from disk (--assets): the output gets dev-stamped
-// so it can never satisfy the freshness gate.
-type ViewerAssets struct {
-	Tokens    string
-	Base      string
-	CSS       string
-	ThemeInit string
-	JS        string
-	Dev       bool
-}
-
-// LoadAssets reads the five viewer files from fsys under root (e.g. the
-// embedded copy with root "viewer", or an --assets dev directory with ".").
-func LoadAssets(fsys fs.FS, root string) (*ViewerAssets, error) {
-	read := func(name string) (string, error) {
-		b, err := fs.ReadFile(fsys, path.Join(root, name))
-		return string(b), err
-	}
-	a := &ViewerAssets{}
-	var err error
-	if a.Tokens, err = read("tokens.css"); err != nil {
-		return nil, err
-	}
-	if a.Base, err = read("base.css"); err != nil {
-		return nil, err
-	}
-	if a.CSS, err = read("viewer.css"); err != nil {
-		return nil, err
-	}
-	if a.ThemeInit, err = read("theme-init.js"); err != nil {
-		return nil, err
-	}
-	if a.JS, err = read("viewer.js"); err != nil {
-		return nil, err
-	}
-	return a, nil
-}
+// embedded verbatim and so change the page's bytes. 0.4.0 replaces the
+// hand-written viewer with the built @codesweep-ai/ui React application.
+// 0.5.0 adopts the 0.2.0 component set and its compact Markdown entry.
+// 0.6.0 takes @codesweep-ai/ui from the registry rather than a committed
+// tarball. 0.6.1 re-pins it to the build that stamps its own version in UTC:
+// the package's src/ did not move, so the bundle is byte-identical and only
+// the version this page reports about itself changes.
+const RendererVersion = "0.6.1"
+const UITokensVersion = "0.2.1-dev.20260901200135.3160175"
 
 func escAttr(s string) string {
 	r := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", `"`, "&quot;")
@@ -69,7 +31,7 @@ func escAttr(s string) string {
 
 // RenderHTML builds the whole page: the viewer assets, the record data and
 // the derived block, in one deterministic pass over the tracker.
-func RenderHTML(tr *Tracker, assets *ViewerAssets) string {
+func RenderHTML(tr *Tracker, assets fs.FS) string {
 	cfg := tr.Config
 	project := "unknown-project"
 	if p, ok := cfg.Get("project").StrVal(); ok {
@@ -152,8 +114,7 @@ func RenderHTML(tr *Tracker, assets *ViewerAssets) string {
 	if d, ok := cfg.Get("description").StrVal(); ok && strings.TrimSpace(d) != "" {
 		description = ojson.S(strings.TrimSpace(d))
 	}
-	type link struct{ label, url string }
-	var links []link
+	var links []*ojson.Value
 	if ls := cfg.Get("links"); ls != nil && ls.Kind == ojson.Array {
 		for _, l := range ls.Arr {
 			if l == nil || l.Kind != ojson.Object {
@@ -167,7 +128,7 @@ func RenderHTML(tr *Tracker, assets *ViewerAssets) string {
 			if schemeRe.MatchString(url) && !httpRe.MatchString(url) {
 				continue
 			}
-			links = append(links, link{label, url})
+			links = append(links, ojson.O(ojson.Kv("label", ojson.S(label)), ojson.Kv("url", ojson.S(url))))
 		}
 	}
 
@@ -182,96 +143,21 @@ func RenderHTML(tr *Tracker, assets *ViewerAssets) string {
 		ojson.Kv("drafts", &ojson.Value{Kind: ojson.Array, Arr: drafts}),
 		ojson.Kv("queue", queue),
 		ojson.Kv("description", description),
+		ojson.Kv("links", &ojson.Value{Kind: ojson.Array, Arr: links}),
 		ojson.Kv("commitUrlTemplate", commitTpl),
+		ojson.Kv("rendererVersion", ojson.S(RendererVersion)),
+		ojson.Kv("uiVersion", ojson.S(UITokensVersion)),
+		ojson.Kv("lastActivity", ojson.S(lastDate)),
 		ojson.Kv("derived", buildDerived(recordEntries, draftEntries, queue)),
 	)
-	json := strings.ReplaceAll(payload.String(), "<", `\u003c`)
-
-	masthead := ""
-	if description.Kind == ojson.String || len(links) > 0 {
-		masthead = `<div class="masthead">`
-		if description.Kind == ojson.String {
-			masthead += `<div class="bdesc">` + escAttr(description.Str) + `</div>`
-		}
-		if len(links) > 0 {
-			masthead += `<div class="mastlinks">`
-			var mastheadSb196 strings.Builder
-			for _, l := range links {
-				mastheadSb196.WriteString(`<a class="plink" href="` + escAttr(l.url) + `">` + escAttr(l.label) + `</a>`)
-			}
-			masthead += mastheadSb196.String()
-			masthead += `</div>`
-		}
-		masthead += `</div>`
+	data := payload.String()
+	data = strings.ReplaceAll(data, "<", `\u003c`)
+	template, err := fs.ReadFile(assets, "viewer/index.html")
+	if err != nil {
+		panic("embedded viewer missing: " + err.Error())
 	}
-
-	lastActivity := ""
-	if lastDate != "" {
-		lastActivity = " · last activity " + lastDate
-	}
-	versionWord := "v" + RendererVersion
-	if assets.Dev {
-		versionWord = DevStamp
-	}
-
-	lines := []string{
-		`<!doctype html>`,
-		`<html lang="en" data-theme="dark">`,
-		`<head>`,
-		`<meta charset="utf-8">`,
-		`<meta name="viewport" content="width=device-width, initial-scale=1">`,
-		`<title>` + escAttr(project) + ` · ledger</title>`,
-		`<script>` + assets.ThemeInit + `</scr` + `ipt>`,
-		`<style>`,
-		assets.Tokens,
-		assets.Base,
-		assets.CSS,
-		`</style>`,
-		`</head>`,
-		`<body>`,
-		`<header class="hdr">`,
-		`<span class="brandbar"></span>`,
-		`<span class="htitle"><span class="proj">` + escAttr(project) + `</span> · ledger</span>`,
-		`<span class="hspace"></span>`,
-		`<button id="themeBtn" class="tbtn">theme</button>`,
-		`</header>`,
-		`<main>`,
-		`<div class="controls viewbar"><span class="chipset" id="viewChips"><span class="cl">view</span>`,
-		`<button class="chip on" id="viewBrief">brief</button>`,
-		`<button class="chip" id="viewBoard">board</button>`,
-		`<button class="chip" id="viewList">list</button>`,
-		`<button class="chip" id="viewActivity">activity</button></span>`,
-		`<button id="helpBtn" class="chip aux" title="how to read this ledger">?</button></div>`,
-		masthead,
-		`<div class="controls filterbar">`,
-		`<input id="q" class="search" type="search" placeholder="search id, title, details&hellip;">`,
-		`<button id="cycStatus" class="chip cyc" title="click to cycle">status · all</button>`,
-		`<button id="cycType" class="chip cyc" title="click to cycle">type · all</button>`,
-		`<button id="cycSev" class="chip cyc" title="click to cycle">sev · all</button>`,
-		`<button id="staleBtn" class="chip aux">stale only</button>`,
-		`<button id="resetChip" class="chip aux" disabled>reset</button>`,
-		`<span class="arrange listonly">`,
-		`<button id="cycGroup" class="chip cyc2" title="click to cycle">group · status</button>`,
-		`<button id="cycSort" class="chip cyc2" title="click to cycle">sort · id</button></span>`,
-		`<button id="newBtn" class="chip aux" hidden>new since last visit</button>`,
-		`</div>`,
-		`<div id="groups"></div>`,
-		`<footer class="foot">rendered by cs-ledger ` + versionWord +
-			` · @codesweep-ai/ui tokens v` + UITokensVersion +
-			` · ` + itoa(len(records)) + ` issues · ` + itoa(len(drafts)) + ` drafts` +
-			lastActivity + `</footer>`,
-		`</main>`,
-		`<div id="modal" class="modalwrap" hidden><div class="modalcard"><button id="modalx" class="modalx" title="close (Esc)">&times;</button><div id="modalbody"></div></div></div>`,
-		`<div id="ctip"></div>`,
-		`<script id="ledger-data" type="application/json">` + json + `</scr` + `ipt>`,
-		`<script>`,
-		assets.JS,
-		`</scr` + `ipt>`,
-		`</body>`,
-		`</html>`,
-		``,
-	}
-	return strings.Join(lines, "\n")
+	html := strings.ReplaceAll(string(template), "__LEDGER_TITLE__", escAttr(project))
+	return strings.ReplaceAll(html, "__LEDGER_DATA__", data)
 }
 
 func itoa(n int) string { return strconv.Itoa(n) }

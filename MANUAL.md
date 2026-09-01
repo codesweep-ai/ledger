@@ -8,7 +8,7 @@
 
 ```
 cs-ledger check   [LEDGERDIR]
-cs-ledger render  [LEDGERDIR] [--assets DIR]
+cs-ledger render  [LEDGERDIR]
 cs-ledger init    [LEDGERDIR] --project NAME --prefix ABC
 cs-ledger manual
 cs-ledger guide
@@ -53,10 +53,9 @@ Errors fail the run. Warnings print and pass, because they flag judgement calls 
 data. A link to a record that does not exist yet is a warning; a `closed` record with no evidence
 is an error.
 
-Two more states fail. One is a page rendered in dev mode with `--assets`, which would put an
-unreproducible page into a commit. The other is a materialized `GUIDE.md` whose generated half no
-longer matches the copy inside the binary. Whatever sits below the `<!-- LEDGER:PROJECT -->`
-marker belongs to the project, and `check` leaves it alone.
+A materialized `GUIDE.md` whose generated half no longer matches the copy inside the binary also
+fails. Whatever sits below the `<!-- LEDGER:PROJECT -->` marker belongs to the project, and
+`check` leaves it alone.
 
 A `closed` record cites the commit that resolved it, and `check` resolves that citation. Every sha
 in `evidence.commits` and `evidence.integrated` has to be lower-case hexadecimal of at least seven
@@ -79,7 +78,7 @@ comparison. Run `cs-ledger render` to bring both to yours.
 ### render
 
 ```
-cs-ledger render [LEDGERDIR] [--assets DIR]
+cs-ledger render [LEDGERDIR]
 ```
 
 The one command that writes. It rewrites `LEDGERDIR/ledger.html`, records this binary's renderer
@@ -89,12 +88,6 @@ it twice changes nothing the second time.
 Validation errors do not stop a render. They print, and `check` fails on them afterwards, so you
 can look at a page whose records are still being fixed. A `ledger.json` the tool cannot read does
 stop it, because there is nothing to render without one.
-
-`--assets DIR` loads the viewer's CSS and JavaScript from disk instead of from inside the binary,
-so you can iterate on the viewer without recompiling. The page it writes carries a dev stamp and
-`check` refuses it, which keeps a hand-built page out of a commit. Dev mode writes the page alone,
-leaving `toolVersion` and the documents as they were, because a dev-stamped page must not certify
-anything.
 
 ### init
 
@@ -144,7 +137,7 @@ Prints three versions: the tool's own, the renderer's, and the pinned design tok
 
 ```console
 $ cs-ledger version
-cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.26.2, renderer 0.3.3, ui tokens 1.12.0)
+cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.27.0, renderer 0.6.1, ui tokens 0.2.1-dev.20260901200135.3160175)
 ```
 
 The first field is a `git describe` of the build, so yours will read differently. The renderer
@@ -165,7 +158,6 @@ prints the same text on stderr and exits 2.
 
 | Option | Applies to | Meaning |
 |---|---|---|
-| `--assets DIR` | render | Load viewer assets from `DIR`. The output is dev-stamped and not committable. |
 | `--project NAME` | init | The project name shown on the rendered page. Required. |
 | `--prefix ABC` | init | The record ID prefix, matching `^[A-Z]{2,6}$`. Required. |
 
@@ -195,11 +187,6 @@ prints the same text on stderr and exits 2.
 
 The committed page is not what these records render to. Run `cs-ledger render` and commit the page
 with the records.
-
-**`ledger.html: rendered in dev mode (--assets)`**
-
-The page came from viewer files on disk rather than from the binary. Render again without
-`--assets`.
 
 **`ledger.html was rendered by X and this binary renders Y`**
 
@@ -255,8 +242,8 @@ severity and say why in a note.
 - `check` is the gate to run before any commit that touches the ledger. Its messages name the file
   and the rule, so they can be acted on without reading the source.
 - `render` writes only inside the ledger directory: the page, `ledger.json` and the two documents.
-  It reads nothing outside that directory, apart from an `--assets` directory you name and the
-  commit objects of the repository holding the ledger, and it reaches no network.
+  It reads nothing outside that directory, apart from the commit objects of the repository holding
+  the ledger, and it reaches no network.
 - Close a record on a sha that exists. `check` resolves every sha a record cites, so a predicted one
   fails the gate rather than sitting in the ledger as a claim nobody rechecks.
 - Never edit `ledger.html`. It is generated, and `check` compares it byte for byte against a fresh
@@ -281,13 +268,6 @@ Check a ledger that is not at the default path:
 
 ```bash
 cs-ledger check fixtures/sandbox/ledger
-```
-
-Iterate on the viewer without recompiling, then produce a committable page:
-
-```bash
-cs-ledger render ledger --assets ./viewer   # dev-stamped; check refuses it
-cs-ledger render ledger                     # from the embedded assets
 ```
 
 Move a ledger onto a newer binary:

@@ -1,0 +1,157 @@
+
+/* ledger viewer — styled exclusively through @codesweep-ai/ui tokens */
+:root, :root[data-theme="light"] {
+  /* chart series: validated blue/amber pair (dataviz palette validator, both
+     themes' card surfaces). Expressed as design-system tokens — cat-1-mid
+     re-themes itself; the amber needs a different step per theme. */
+  --chart-found: var(--color-cat-1-mid);
+  --chart-fixed: var(--color-cat-3-dark);
+}
+:root[data-theme="light"] {
+  --chart-fixed: var(--color-cat-3-mid);
+}
+/* Root scrollbar stability now comes from the design system's base.css
+   (v1.12.0); inner scrollers below carry their own gutters. */
+html { scroll-padding-top: 84px; }
+/* One column, one grammar: the narrow (brief-width) presentation is the ledger's
+   only layout at every viewport; the wide fork it used to have is gone. */
+main { flex: 1 1 0%; min-height: 0; overflow-y: auto; }
+.page { max-width: 760px; margin: 0 auto; padding: var(--space-4) var(--space-5) var(--space-6); }
+.viewbar { border-bottom: none; padding-bottom: 0; margin-bottom: var(--space-1); }
+.masthead { margin-bottom: var(--space-4); }
+.mastlinks { display: flex; gap: var(--space-3); margin-top: var(--space-1); }
+body.briefmode .filterbar { display: none !important; }
+.cyc { min-width: 108px; text-align: center; }
+.arrange { flex-basis: 100%; display: flex; justify-content: flex-start; gap: var(--space-2); }
+.cyc2 { text-align: center; background: var(--color-neutral-bg); }
+#cycGroup { min-width: 142px; }
+#cycSort { min-width: 118px; }
+#cycStatus { min-width: 122px; }
+.lg { font-size: var(--font-size-xs); color: var(--muted); white-space: nowrap; }
+.lg i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; }
+.lg .swf { background: var(--chart-found); }
+.lg .swx { background: var(--chart-fixed); }
+.controls {
+  background: var(--bg);
+  display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center;
+  padding: var(--space-2) 0; border-bottom: 1px solid var(--border); margin-bottom: var(--space-3);
+}
+.ledger-search { min-width: var(--input-min-width); flex: 1; }
+.chipset { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.chipset .cl { font-size: var(--font-size-label); color: var(--muted); text-transform: uppercase; letter-spacing: var(--letter-spacing-wide); margin-right: 2px; }
+.aux { border-style: dashed; }
+.grp { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: var(--space-4); overflow: clip; }
+.grp > header {
+  display: flex; justify-content: space-between; padding: var(--space-2) var(--space-3);
+  cursor: pointer; font-weight: var(--font-weight-semibold);
+  background: linear-gradient(var(--color-bg-subtle), var(--color-bg-subtle)) var(--card);
+  user-select: none;
+  position: sticky; top: 0; z-index: 1;
+}
+.grp > header .cnt { color: var(--muted); font-weight: var(--font-weight-regular); }
+.grp.ideas { border-style: dashed; }
+.grp.ideas > header { color: var(--muted); }
+.idm { font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--muted); min-width: 64px; flex-shrink: 0; }
+.ttl { min-width: 0; }
+.mono { font-family: var(--font-family-mono); }
+.detail {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md);
+  margin: 0 var(--space-3) var(--space-3); padding: var(--space-3) var(--space-4) var(--space-4);
+}
+.dlbl {
+  font-size: var(--font-size-label); font-weight: var(--font-weight-semibold); color: var(--muted);
+  text-transform: uppercase; letter-spacing: var(--letter-spacing-wide); margin: var(--space-3) 0 var(--space-1);
+}
+.detail .dlbl:first-child { margin-top: 0; }
+.detail .prose { font-size: var(--font-size-sm); line-height: var(--line-height-relaxed); max-width: none; }
+.detail [data-markdown-content] { font-size: var(--font-size-sm); line-height: var(--line-height-relaxed); max-width: none; }
+.detail [data-markdown-paragraph], .detail [data-markdown-list] { margin-bottom: var(--space-2); }
+.note { border-left: 2px solid var(--border); padding-left: var(--space-3); margin: var(--space-2) 0; }
+.note .d { font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--muted); margin-bottom: 2px; }
+.evd { font-size: var(--font-size-sm); display: flex; flex-direction: column; gap: 2px; }
+.linksrow { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.dmeta { margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--muted); }
+[data-markdown-blockquote] { border-left: 3px solid var(--border); padding-left: var(--space-3); color: var(--muted); margin: var(--space-2) 0; }
+.empty { text-align: center; color: var(--muted); padding: var(--space-6); }
+.plink { color: var(--color-link); font-size: var(--font-size-xs); }
+.ledger-modal.intro [data-modal-dialog] {
+  border-color: var(--color-accent);
+  background: linear-gradient(var(--color-accent-bg), var(--color-accent-bg)), var(--card);
+}
+.introdesc { font-size: var(--font-size-sm); margin: var(--space-2) 0 0; }
+.introbody .gent { padding: 0 var(--space-2); }
+.gent { margin: var(--space-2) 0 0; }
+.gterm { font-weight: 600; font-size: var(--font-size-sm); }
+.gdef { color: var(--muted); font-size: var(--font-size-xs); margin-top: 1px; }
+.introfoot { color: var(--muted); font-size: var(--font-size-xs); margin: var(--space-4) 0 0; border-top: 1px solid var(--border); padding-top: var(--space-2); }
+.newb {
+  background: var(--color-accent); color: var(--color-btn-primary-text);
+  border-radius: var(--radius-xs); padding: 0 4px; font-size: 10px;
+  text-transform: uppercase; letter-spacing: var(--letter-spacing-wide); flex-shrink: 0;
+}
+.qstale { color: var(--color-warning); }
+.actrow { display: flex; gap: var(--space-2); align-items: baseline; padding: var(--space-1) var(--space-3); cursor: pointer; border-top: 1px solid var(--border); }
+.actrow:hover { background: var(--color-row-hover); }
+/* Activity kind badge. flex-shrink:0 keeps StatusBadge's label out of its own
+   ellipsis when the row's title competes for width; min-width is the widest
+   label ("roadmap", measured 87px at 10.8px/600) rounded up, so every badge is
+   one width and the id column starts at one x. */
+.actk { min-width: 6rem; flex-shrink: 0; justify-content: center; }
+.actrow .ttl { flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.stack .cards { max-height: none; overflow-y: visible; }
+.boardmode .listonly { display: none; }
+/* Board lane headers pin while the page scrolls past a long lane, as the base
+   did with `.lane > header` and as list groups do with `.grp > header`. The
+   sticky box is Card's documented `[data-card-header]` hook (ui aa391a6);
+   `overflow: clip` keeps the card's rounded corners without making it a scroll
+   container, which is what stops sticky from ever engaging. */
+.lane { overflow: clip; }
+.lane [data-card-header] { position: sticky; top: 0; z-index: 1; }
+.lane-header { display: flex; flex: 1; justify-content: space-between; width: 100%; cursor: pointer; user-select: none; }
+.lane-header .cnt { color: var(--muted); font-weight: var(--font-weight-regular); }
+.lane.ideas { border-style: dashed; }
+.lane.ideas .lane-header { color: var(--muted); }
+.cards { gap: var(--space-2); padding: var(--space-2); max-height: 72vh; overflow-y: auto; scrollbar-gutter: stable; }
+.listcards { max-height: none; overflow-y: visible; }
+.bcard { background: var(--bg); }
+.bcard.idea .bttl { color: var(--muted); }
+.bhead { display: flex; gap: var(--space-2); align-items: baseline; }
+.bttl { font-size: var(--font-size-sm); margin-top: 2px; }
+.bwhy { color: var(--muted); font-size: var(--font-size-xs); border-left: 2px solid var(--color-accent); padding-left: 6px; margin-top: var(--space-1); }
+.rank {
+  background: var(--color-accent); color: var(--color-btn-primary-text);
+  border-radius: 50%; width: 16px; height: 16px; line-height: 16px; text-align: center;
+  font-size: 10px; font-weight: var(--font-weight-bold); flex-shrink: 0; align-self: center;
+}
+.bmeta { color: var(--muted); font-size: var(--font-size-xs); margin-top: var(--space-1); }
+.laneempty { text-align: center; color: var(--muted); font-size: var(--font-size-xs); padding: var(--space-3); }
+.mhead { display: flex; gap: var(--space-2); align-items: baseline; flex-wrap: wrap; }
+.mhead .mmeta { margin-left: auto; color: var(--muted); font-size: var(--font-size-xs); }
+.ledger-modal .detail { margin: var(--space-3) 0 0; }
+/* ---- brief (landing) view: glanceable blocks, phone-first ---- */
+.brief { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-4); }
+.bdesc { font-size: var(--font-size-lg); line-height: var(--line-height-relaxed); }
+.bblock { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); }
+.bhead2 {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3);
+  font-size: var(--font-size-label); font-weight: var(--font-weight-semibold); color: var(--muted);
+  text-transform: uppercase; letter-spacing: var(--letter-spacing-wide); margin-bottom: var(--space-2);
+}
+.bhead2 .cnt { text-transform: none; letter-spacing: normal; font-weight: var(--font-weight-regular); }
+.brief .actrow { padding-left: 0; padding-right: 0; }
+.brief .bcard { background: var(--color-bg-subtle); }
+.bviews { display: flex; gap: var(--space-2); justify-content: center; }
+.barwrap { overflow-x: scroll; max-width: 448px; margin-left: auto; }
+.barwrap svg { display: block; margin-left: auto; }
+.barf { fill: var(--chart-found); }
+.barx { fill: var(--chart-fixed); }
+.basel { stroke: var(--border); }
+.bhead2 .cnt .lg { margin-right: var(--space-2); }
+
+/* ---- phone: stack, don't shrink ---- */
+@media (max-width: 720px) {
+  .idm { min-width: 0; }
+  main { padding: var(--space-3); }
+  .bdesc { font-size: var(--font-size-md); }
+}

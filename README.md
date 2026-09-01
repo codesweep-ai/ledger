@@ -130,16 +130,11 @@ make build                                    # bin/cs-ledger
 make check                                    # gofmt, vet, Go suite, viewer suite, docs
 bin/cs-ledger check ledger                    # this repo's own ledger
 bin/cs-ledger check fixtures/sandbox/ledger
-bin/cs-ledger render ledger --assets ./viewer # iterate on the viewer, no recompile
+make viewer-build                             # rebuild viewer/index.html
 ```
 
-`viewer/` holds the viewer's real CSS and JavaScript, embedded into the binary at build time.
-`--assets` reads them from disk instead, which is how you iterate on the design. Those renders are
-dev-stamped and `check` refuses them, so only a release binary's output is committable.
-
-`ui/codesweep-ui/` is a pinned copy of the design system's tokens, and `viewer/` carries the
-adaptation the no-build page ships. The viewer is styled through those tokens alone, with no React,
-no Tailwind and no build step.
+`viewer/app/` holds the Vite and React source. Its build uses the committed `@codesweep-ai/ui`
+package and writes one self-contained `viewer/index.html`, which the Go binary embeds.
 
 ## Docs
 

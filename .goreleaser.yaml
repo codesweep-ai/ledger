@@ -17,7 +17,6 @@ before:
     - go mod tidy
     - go vet ./...
     - go test ./...
-    - make test-js
 
 builds:
   - id: cs-ledger
