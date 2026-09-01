@@ -60,7 +60,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface ledger lint deadcode actionlint snapshot release release-check clean
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean
 
 .DEFAULT_GOAL := help
 
@@ -292,6 +292,13 @@ ledger: build
 	./bin/cs-ledger check fixtures/sandbox/ledger
 
 
+## conventions: the house rules a @codesweep-ai/ui consumer must keep — the pin
+## agrees across the specifiers, the lockfiles and the install, and a target
+## that re-records committed files is named record-*. The script is vendored
+## byte-identical into ledger, tracer and campaign; keep the copies identical.
+conventions:
+	@go run scripts/consumer-conventions.go
+
 ## viewer-check: the committed viewer is what viewer/app builds
 ##
 ## It rebuilds through viewer-build rather than asking anybody to run npm, then
@@ -317,7 +324,7 @@ viewer-check:
 	fi
 
 ## check: the full local gate — fmt-check, vet, the linters, and the tests
-check: fmt-check tidy-check embed-check vet lint deadcode test coverage-check prose refs oss surface
+check: fmt-check tidy-check embed-check vet lint deadcode test coverage-check conventions prose refs oss surface
 
 # say prints a heading above each gate, so a long run reads as a list rather
 # than as a wall. Bold where a terminal is reading it and plain where a pipe
