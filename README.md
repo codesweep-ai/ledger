@@ -126,15 +126,19 @@ prove it is current, by rendering again and comparing bytes. It also makes a mer
 ## Working on ledger itself
 
 ```bash
-make build                                    # bin/cs-ledger
-make check                                    # gofmt, vet, Go suite, viewer suite, docs
+make build                                    # bin/cs-ledger, Go alone
+make check                                    # gofmt, vet, Go suite, coverage, linters
+make ci                                       # every gate CI runs; needs npm
 bin/cs-ledger check ledger                    # this repo's own ledger
 bin/cs-ledger check fixtures/sandbox/ledger
-make viewer-build                             # rebuild viewer/index.html
+make viewer-build                             # rebuild viewer/index.html; needs npm
 ```
 
-`viewer/app/` holds the Vite and React source. Its build uses the committed `@codesweep-ai/ui`
-package and writes one self-contained `viewer/index.html`, which the Go binary embeds.
+`viewer/app/` holds the Vite and React source. It builds against `@codesweep-ai/ui`, an npm
+dependency pinned to one exact version, and writes a self-contained `viewer/index.html` that the
+Go binary embeds. That file is committed, so building the tool needs Go alone. Node 22.13 or
+newer with npm is needed only to change the viewer, and by `make ci`, which rebuilds it to prove
+the committed copy is current.
 
 ## Docs
 

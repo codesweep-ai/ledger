@@ -133,11 +133,11 @@ and `guide` when you need to know what to write in a record.
 
 ### version
 
-Prints three versions: the tool's own, the renderer's, and the pinned design tokens'.
+Prints three versions: the tool's own, the renderer's, and the pinned `@codesweep-ai/ui` build.
 
 ```console
 $ cs-ledger version
-cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.27.0, renderer 0.6.1, ui tokens 0.2.1-dev.20260901200135.3160175)
+cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.27.0, renderer 0.6.1, @codesweep-ai/ui 0.2.1-dev.20260901200135.3160175)
 ```
 
 The first field is a `git describe` of the build, so yours will read differently. The renderer

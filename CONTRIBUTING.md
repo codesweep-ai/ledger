@@ -61,12 +61,14 @@ cache on first use: `golangci-lint`, `deadcode`, `actionlint` and `cs-lint`. `ma
 Moving a linter pin is an edit to `go.mod`, or to `go.golangci.mod` for `golangci-lint`. A linter
 release reaches you when you ask for it, not on an unrelated pull request.
 
-`goreleaser` is the one program still expected on the PATH. `make ci` validates the release
-manifest with it, and `make build` falls back to `go build` where it is absent.
+Two programs are expected on the PATH, and only `make ci` requires them. `goreleaser` validates
+the release manifest, and `make build` falls back to `go build` where it is absent. Rebuilding the
+viewer needs npm, and `make ci` fails without it rather than pass on a bundle it could not check.
+`make check` needs neither.
 
 The viewer is a React application under `viewer/app/`, built against the pinned
 `@codesweep-ai/ui` package into the single self-contained `viewer/index.html` the Go binary embeds.
-That file is committed, so building the binary needs Go alone; changing the viewer needs Node
+That file is committed, so building the binary needs Go alone. Changing the viewer needs Node
 22.13 or newer with npm, which is the floor `@codesweep-ai/ui` sets. The viewer's `package.json`
 sits beside its source in `viewer/`, so npm runs there, and `make` does that for you:
 

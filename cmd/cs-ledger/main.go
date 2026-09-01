@@ -81,8 +81,8 @@ func main() {
 
 	switch verb {
 	case "version", "--version":
-		fmt.Printf("cs-ledger %s (%s/%s, %s, renderer %s, ui tokens %s)\n",
-			buildVersion(), runtime.GOOS, runtime.GOARCH, runtime.Version(), ledger.RendererVersion, ledger.UITokensVersion)
+		fmt.Printf("cs-ledger %s (%s/%s, %s, renderer %s, @codesweep-ai/ui %s)\n",
+			buildVersion(), runtime.GOOS, runtime.GOARCH, runtime.Version(), ledger.RendererVersion, ledger.UIVersion)
 		return
 	case "manual":
 		fmt.Print(root.ManualMD)

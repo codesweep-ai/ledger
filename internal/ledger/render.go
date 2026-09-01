@@ -22,7 +22,7 @@ import (
 // the package's src/ did not move, so the bundle is byte-identical and only
 // the version this page reports about itself changes.
 const RendererVersion = "0.6.1"
-const UITokensVersion = "0.2.1-dev.20260901200135.3160175"
+const UIVersion = "0.2.1-dev.20260901200135.3160175"
 
 func escAttr(s string) string {
 	r := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", `"`, "&quot;")
@@ -146,7 +146,7 @@ func RenderHTML(tr *Tracker, assets fs.FS) string {
 		ojson.Kv("links", &ojson.Value{Kind: ojson.Array, Arr: links}),
 		ojson.Kv("commitUrlTemplate", commitTpl),
 		ojson.Kv("rendererVersion", ojson.S(RendererVersion)),
-		ojson.Kv("uiVersion", ojson.S(UITokensVersion)),
+		ojson.Kv("uiVersion", ojson.S(UIVersion)),
 		ojson.Kv("lastActivity", ojson.S(lastDate)),
 		ojson.Kv("derived", buildDerived(recordEntries, draftEntries, queue)),
 	)

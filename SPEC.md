@@ -327,14 +327,16 @@ roadmap direction never reads as defect backlog.
 
 **R56.** The page **MUST** offer a light and a dark theme.
 
-**R57.** Styling **MUST** go through the pinned design tokens.
+**R57.** Styling **MUST** go through the pinned `@codesweep-ai/ui` components and design tokens.
 
 **R58.** A view **MUST** be reachable by a `?view=` parameter, and a record by a `#<id>` fragment.
 
-The tokens come from `@codesweep-ai/ui`, a published package pinned to one exact version, and the
-viewer is a React application built against it. The build is what keeps R55 true: it inlines the
-framework into the page rather than leaving it to be fetched. The package version appears in the
-page footer beside the renderer version, and moving it is a re-pin followed by `cs-ledger render`.
+The components and tokens come from `@codesweep-ai/ui`, a published package pinned to one exact
+version, and the viewer is a React application built against it. The build is what keeps R55 true:
+it inlines the framework into the page rather than leaving it to be fetched. The viewer adds its
+own layout rules, and they take every value from the tokens rather than hardcode one. The package
+version appears in the page footer beside the renderer version, and moving it is a re-pin followed
+by `cs-ledger render`.
 
 Four views are defined. **brief** is the landing view: the masthead, a today-anchored trend of
 daily found and resolved counts, the top of the queue with its rationales, and a derived block of

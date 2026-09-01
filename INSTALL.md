@@ -44,8 +44,9 @@ version it prints beside that is the one a ledger records, and it is correct eit
 
 ### Or build from source
 
-Needs **Go 1.27+** and nothing else. The version is stamped from `git describe`, so build from a
-clone rather than from a source tarball:
+Needs **Go 1.27+** and nothing else. The viewer is a React application, but its built page is
+committed and embedded, so no Node and no npm are involved in building the tool. The version is
+stamped from `git describe`, so build from a clone rather than from a source tarball:
 
 ```bash
 git clone https://github.com/codesweep-ai/ledger && cd ledger
@@ -56,7 +57,7 @@ make install       # -> ~/.local/bin/cs-ledger  (override with PREFIX=)
 However you got it, check what you installed and read what it does:
 
 ```bash
-cs-ledger version       # the build, the renderer version, and the UI token version
+cs-ledger version       # the build, the renderer, and the pinned @codesweep-ai/ui
 cs-ledger manual | less # the full reference, carried inside the binary
 ```
 

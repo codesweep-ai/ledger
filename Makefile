@@ -1,9 +1,10 @@
 # cs-ledger — build/test/install.
 # `make build` produces bin/cs-ledger (version-stamped, CGO_ENABLED=0).
 # `make check` is the full local gate: formatting, vet, the Go suite, the
-# viewer build, the coverage gate and the linters. Building needs Go alone when
-# the committed viewer is current; viewer changes need Node and npm, and the
-# gate also needs cs-lint (prose, refs, oss, surface).
+# coverage gate and the linters. `make ci` adds every gate CI runs.
+# Building needs Go alone, because the built viewer is committed. Changing the
+# viewer needs Node and npm, and so does `make ci`, which rebuilds the viewer to
+# prove the committed copy is current. The linters are pinned Go tools.
 
 GORELEASER ?= goreleaser
 CS_LINT  ?= go tool cs-lint
