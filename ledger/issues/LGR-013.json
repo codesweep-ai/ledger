@@ -1,0 +1,29 @@
+{
+  "id": "LGR-013",
+  "title": "A hyphen reads as a token boundary, so a UUID tail is warned about as a missing commit",
+  "type": "defect",
+  "severity": "low",
+  "status": "open",
+  "foundBy": "session agent, fixing a real broken citation in cs-vcr's ledger and meeting three false ones beside it",
+  "opened": "2026-09-09",
+  "resolved": null,
+  "stint": null,
+  "evidence": {
+    "commits": [],
+    "integrated": [],
+    "verified": null
+  },
+  "resolution": null,
+  "details": "`shasIn` in `internal/ledger/commits.go` refuses a hexadecimal run that sits inside a longer word, and `isWordByte` decides what a word is. It counts `_`, the digits and the letters, and it does not count `-`. So a hyphen ends a token, and any hex run following one is read as standing on its own.\n\nTwo shapes in ordinary prose are hyphen-joined and are not shas. The tail of a UUID is one: `msg_01a02023-b134-76d0-b0fe-06cf1a749449` yields `06cf1a749449`. A name built from a short hash is the other: `dev-97a3d923` and `csrocfw-97a3d923` both yield `97a3d923`.\n\n`looksLikeSha` catches neither. Both carry a digit and a letter, which is all it asks. cs-vcr's ledger warns about three tokens of these two shapes, in `VCR-012` and `VCR-015`. Both records are about the values themselves. Rewording the text would remove the evidence each record makes its case with.\n\nA UUID is recognisable: `8-4-4-4-12` lower-case hexadecimal, and the run this trips on is always its last group. A hash-suffixed name is harder, because it cannot be told from a real sha written after a hyphen. So the narrower fix is to count `-` as a word byte only where the run to its left is itself hexadecimal of a UUID group's length.\n\nLeaving it costs a warning that cannot be cleared and is correct to ignore. That is the state which teaches a reader to ignore the warnings beside it.",
+  "notes": [
+    {
+      "date": "2026-09-09",
+      "text": "A third shape turned up while this was being written. A note correcting a wrong citation has to name the wrong sha to explain itself, and the checker then warns about that too. `VCR-014` now carries one. Whether a record may quote a sha that is genuinely absent is a question about the rule, not about the regex. It is recorded here rather than fixed with the rest."
+    },
+    {
+      "date": "2026-09-09",
+      "text": "This record demonstrates the defect. Quoting the two tokens makes `check` warn about them here as well, so the warning count rises by filing it."
+    }
+  ],
+  "links": []
+}
