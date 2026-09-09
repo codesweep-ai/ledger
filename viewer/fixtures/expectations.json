@@ -1,6 +1,6 @@
 {
   "meta": {
-    "recordedAt": "2026-09-01",
+    "recordedAt": "2026-09-09",
     "clock": "2026-08-21T12:00:00Z",
     "viewport": {
       "width": 1280,
@@ -2231,10 +2231,10 @@
       "id": "LF-42",
       "name": "ledger.html size (own)",
       "value": {
-        "bytes": 298547,
-        "gzipBytes": 89206,
-        "scriptBytes": 226632,
-        "styleBytes": 52772,
+        "bytes": 307251,
+        "gzipBytes": 91779,
+        "scriptBytes": 233471,
+        "styleBytes": 54637,
         "dataBytes": 18696,
         "records": 12,
         "withinBudget": true
@@ -2253,10 +2253,10 @@
       "id": "LF-43",
       "name": "ledger.html size (sandbox)",
       "value": {
-        "bytes": 304707,
-        "gzipBytes": 91952,
-        "scriptBytes": 226632,
-        "styleBytes": 52772,
+        "bytes": 313411,
+        "gzipBytes": 94516,
+        "scriptBytes": 233471,
+        "styleBytes": 54637,
         "dataBytes": 24855,
         "records": 15,
         "withinBudget": true

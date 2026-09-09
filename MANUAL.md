@@ -137,7 +137,7 @@ Prints three versions: the tool's own, the renderer's, and the pinned `@codeswee
 
 ```console
 $ cs-ledger version
-cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.27.0, renderer 0.6.1, @codesweep-ai/ui 0.2.1-dev.20260901200135.3160175)
+cs-ledger v1-complete-110-g7ea68dc (linux/amd64, go1.27.0, renderer 0.7.0, @codesweep-ai/ui 0.3.1-dev.20260909170256.1638d27)
 ```
 
 The first field is a `git describe` of the build, so yours will read differently. The renderer

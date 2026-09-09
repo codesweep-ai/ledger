@@ -20,9 +20,12 @@ import (
 // 0.6.0 takes @codesweep-ai/ui from the registry rather than a committed
 // tarball. 0.6.1 re-pins it to the build that stamps its own version in UTC:
 // the package's src/ did not move, so the bundle is byte-identical and only
-// the version this page reports about itself changes.
-const RendererVersion = "0.6.1"
-const UIVersion = "0.2.1-dev.20260901200135.3160175"
+// the version this page reports about itself changes. 0.7.0 adopts the 0.3.0
+// component set: Tooltip is composed into several components, a component's
+// stylesheet now imports the sheets of what it renders, and four markdown
+// parser fixes change the bytes of a rendered record.
+const RendererVersion = "0.7.0"
+const UIVersion = "0.3.1-dev.20260909170256.1638d27"
 
 func escAttr(s string) string {
 	r := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", `"`, "&quot;")
