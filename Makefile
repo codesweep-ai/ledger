@@ -61,7 +61,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-local npm-publish
 
 .DEFAULT_GOAL := help
 
@@ -412,6 +412,33 @@ release:
 release-check:
 	$(GORELEASER) check
 
+# The snapshot version is a placeholder, because npm refuses a version that is
+# not semver and goreleaser's snapshot name is a commit description.
+NPM_SNAPSHOT_VERSION ?= 0.0.0-snapshot.0
+
+## npm-build: package the binaries in dist/ as npm packages, into npm/dist
+npm-build:
+	node npm/build.mjs
+
+## npm-snapshot: build every target, package it for npm, and show what would publish
+##
+## `goreleaser build` rather than the `snapshot` target, because the npm
+## packages are made of binaries and nothing else. The release pipeline also
+## archives, catalogues and signs, and depending on that here would make a
+## laptop without those tools unable to check its own packaging.
+npm-snapshot:
+	$(GORELEASER) build --snapshot --clean --skip=before
+	@CS_LEDGER_NPM_VERSION='$(NPM_SNAPSHOT_VERSION)' node npm/build.mjs
+	@./npm/publish.sh --dry-run
+
+## npm-local: publish to a registry on this machine, and print where to browse it
+npm-local:
+	./npm/local-registry.sh
+
+## npm-publish: publish npm/dist to the registry (platform packages first)
+npm-publish:
+	./npm/publish.sh
+
 ## clean: remove build output
 clean:
-	rm -rf bin dist $(COVERDIR)
+	rm -rf bin dist npm/dist $(COVERDIR)

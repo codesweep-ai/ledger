@@ -24,3 +24,9 @@
 # it would override the go.mod pins for anyone who cloned this.
 go.work
 go.work.sum
+
+# The npm packaging's output, generated from dist/ by npm/build.mjs.
+/npm/dist/
+
+# The throwaway registry npm/local-registry.sh runs to try the packages out.
+/npm/.local-registry/

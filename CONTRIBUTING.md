@@ -168,6 +168,38 @@ That listing is the authority. Where this section and the linter disagree, the l
 Turning a check off is a waiver: write it under `allow` in [`.cs-lint.yaml`](.cs-lint.yaml) with the
 reason, which is printed with the finding.
 
+## Publishing to npm
+
+Every release also goes to npm as five packages: four carry the binary, one per
+platform goreleaser builds, and the wrapper picks the right one at run time.
+Only the wrapper is written by hand, under `npm/cs-ledger/`. The other four are
+generated from goreleaser's output, and nothing under `npm/dist/` is committed.
+
+```bash
+make npm-snapshot   # build every target, package it, and show what would publish
+make npm-build      # package whatever dist/ already holds
+make npm-local      # publish to a registry on this machine, and print its address
+make npm-publish    # platform packages first, then the wrapper
+```
+
+Keep that order in `npm/publish.sh`. The wrapper depends on packages that must
+already exist when it is published. Publish it first, and every install between
+the two commands resolves a binary the registry does not have.
+
+`make npm-local` is how to try a package before publishing it. It starts a
+registry and publishes to it, replacing what the last run published, so it can
+be run after every change. `npm/local-registry.sh stop` ends it.
+
+Four variables belong to this packaging rather than to the tool, which is why
+[`MANUAL.md`](MANUAL.md) does not carry them:
+
+| Variable | Effect |
+|---|---|
+| `CS_LEDGER_BINARY` | The binary the npm wrapper runs, so the packaging can be tried against a local build. |
+| `CS_LEDGER_NPM_VERSION` | The version the generated packages carry. A tagged release supplies its own. |
+| `CS_LEDGER_NPM_TAG` | The channel a prerelease is published to, `next` unless it says otherwise. |
+| `CS_LEDGER_REGISTRY_PORT` | The port the registry on this machine listens on, 4873 unless it says otherwise. |
+
 ## Which document does a change belong in?
 
 | If you are writing | It goes in |

@@ -45,6 +45,8 @@ Build the tool from a clone and put a ledger in a repository that has none.
 ```bash
 git clone https://github.com/codesweep-ai/ledger && cd ledger
 make install                                        # ~/.local/bin/cs-ledger
+# or, in a project with a package.json:
+#   npm install --save-dev @codesweep-ai/cs-ledger
 cd ~/my-service
 cs-ledger init ledger --project my-service --prefix MYS
 ```

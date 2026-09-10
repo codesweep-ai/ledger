@@ -42,6 +42,28 @@ go install github.com/codesweep-ai/ledger/cmd/cs-ledger@latest
 This route stamps no version, so `cs-ledger version` reports `dev` for the tool. The renderer
 version it prints beside that is the one a ledger records, and it is correct either way.
 
+### Or with npm
+
+Take this route in a project that already has a `package.json`. No Go toolchain is involved: the
+binary is packaged for npm and installs like any other dev dependency.
+
+```bash
+npm install --save-dev @codesweep-ai/cs-ledger
+npx cs-ledger check
+```
+
+What installs is a wrapper over four packages, one per platform. Each declares the operating system
+and architecture it holds a binary for. npm installs the one this machine can run and skips the
+other three, so a checkout downloads a single binary.
+
+A release takes the `latest` tag. Every commit on `main` also goes out under the `dev` tag,
+versioned by the commit it came from. A project pins that when it wants a fix before the next
+release:
+
+```bash
+npm install --save-dev @codesweep-ai/cs-ledger@dev
+```
+
 ### Or build from source
 
 Needs **Go 1.27+** and nothing else. The viewer is a React application, but its built page is

@@ -45,6 +45,10 @@ docs:
     # six-word sentence and reports a length that is not real.
     lowercaseStarters:
       - cs-ledger
+      # The package manager and its runner, which the install routes name at the
+      # start of a sentence because that is how they are written everywhere.
+      - npm
+      - npx
 
     projectVerbs: []
 
