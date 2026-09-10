@@ -1,0 +1,96 @@
+# A one-shot publish, to bring the five package names into existence.
+#
+# DELETE THIS FILE once it has run and trusted publishing is configured. It is
+# the only thing in this repository that reads a stored npm credential, and it
+# exists because npm has no way to avoid one for a package that does not yet
+# exist: "the package you're configuring must already exist on the npm
+# registry". A trusted publisher is attached to a package, so there has to be a
+# package to attach it to.
+#
+# npm.yml does the same work on every push and stores nothing. It fails until
+# the names exist, which is what this file fixes.
+#
+# The sequence:
+#
+#   1. On npmjs.com, make a granular access token with read-and-write access to
+#      the @codesweep-ai scope. Give it the shortest expiry offered, and tick
+#      "bypass 2FA" if publishing 2FA is on for the account.
+#   2. Add it to this repository as the secret NPM_BOOTSTRAP_TOKEN.
+#   3. Run this workflow from the Actions tab.
+#   4. Configure trusted publishing for each of the five packages, either on
+#      npmjs.com under Settings > Trusted publishing, or with the CLI:
+#
+#        for p in cs-ledger cs-ledger-{linux,darwin}-{x64,arm64}; do
+#          npm trust github "@codesweep-ai/$p" \
+#            --repo codesweep-ai/ledger --file npm.yml --allow-publish
+#        done
+#
+#   5. Revoke the token, delete the secret, and delete this file.
+#
+# After that npm.yml publishes on every push with no credential at all.
+name: npm-bootstrap
+
+# Dispatch only. Nothing about this should happen because somebody pushed.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Show what would publish, without publishing it
+        type: boolean
+        default: true
+
+permissions:
+  contents: read # this workflow reads the repository and writes nothing to it
+  id-token: write # provenance, which npm mints even when the auth is a token
+
+concurrency:
+  group: npm-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: create the packages
+    # A cloud-hosted runner, which provenance requires.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: check the token is there
+        run: |
+          if [ -z "${{ secrets.NPM_BOOTSTRAP_TOKEN }}" ]; then
+            echo "npm-bootstrap: NPM_BOOTSTRAP_TOKEN is not set on this repository." >&2
+            echo "Read the header of this file for what it wants and why." >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the version is the commit, so the history has to be here
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          registry-url: https://registry.npmjs.org
+
+      # Every platform, because the wrapper depends on all four and a partial
+      # set publishes a package that fails at run time on whatever is missing.
+      - uses: goreleaser/goreleaser-action@v7
+        with:
+          version: "~> v2"
+          args: build --snapshot --clean
+
+      - name: package
+        run: node npm/build.mjs --dev
+
+      # The same script npm.yml runs. It asks for provenance whenever it is in
+      # Actions, and npm mints that from the run's OIDC identity whether the
+      # publish authenticated with a token or without one.
+      - name: publish
+        run: ./npm/publish.sh ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+          CS_LEDGER_NPM_TAG: dev
