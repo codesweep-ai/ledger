@@ -200,6 +200,21 @@ Four variables belong to this packaging rather than to the tool, which is why
 | `CS_LEDGER_NPM_TAG` | The channel a prerelease is published to, `next` unless it says otherwise. |
 | `CS_LEDGER_REGISTRY_PORT` | The port the registry on this machine listens on, 4873 unless it says otherwise. |
 
+### Images of the packages
+
+The `publish images` workflow pushes each commit on main and on this
+repository's pull requests to `ghcr.io/codesweep-ai/npm/ledger:<version>`. Each
+image carries the last 20 versions of the five packages. `fetch` copies every
+tarball in the newest one into a directory, using podman or docker:
+
+```bash
+node npm/npm-images.mjs fetch --data ./data @codesweep-ai/ledger
+```
+
+Point `overrides` at the tarballs with `file:` specs. A direct dependency needs
+the `file:` spec itself, because npm refuses to override one. The script is
+shared with lint and ui, so change all three together.
+
 ## Which document does a change belong in?
 
 | If you are writing | It goes in |
