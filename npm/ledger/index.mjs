@@ -24,10 +24,10 @@ const require = createRequire(import.meta.url);
 // the owner that published it, so a fork's build finds its own binaries.
 const SCOPE = require("./package.json").name.split("/")[0];
 const PACKAGES = {
-  "darwin arm64": `${SCOPE}/cs-ledger-darwin-arm64`,
-  "darwin x64": `${SCOPE}/cs-ledger-darwin-x64`,
-  "linux arm64": `${SCOPE}/cs-ledger-linux-arm64`,
-  "linux x64": `${SCOPE}/cs-ledger-linux-x64`,
+  "darwin arm64": `${SCOPE}/ledger-darwin-arm64`,
+  "darwin x64": `${SCOPE}/ledger-darwin-x64`,
+  "linux arm64": `${SCOPE}/ledger-linux-arm64`,
+  "linux x64": `${SCOPE}/ledger-linux-x64`,
 };
 
 // Raised when this platform has no build. Distinct from the class below,

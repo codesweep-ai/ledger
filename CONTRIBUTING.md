@@ -172,7 +172,7 @@ reason, which is printed with the finding.
 
 Every release also goes to npm as five packages: four carry the binary, one per
 platform goreleaser builds, and the wrapper picks the right one at run time.
-Only the wrapper is written by hand, under `npm/cs-ledger/`. The other four are
+Only the wrapper is written by hand, under `npm/ledger/`. The other four are
 generated from goreleaser's output, and nothing under `npm/dist/` is committed.
 
 ```bash

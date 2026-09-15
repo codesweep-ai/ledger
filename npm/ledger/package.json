@@ -1,5 +1,5 @@
 {
-  "name": "@codesweep-ai/cs-ledger",
+  "name": "@codesweep-ai/ledger",
   "version": "0.0.0",
   "description": "Structured issue tracking for agent-managed repositories: AI agents write JSON records, humans read a generated ledger.html.",
   "license": "Apache-2.0",
@@ -10,7 +10,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/codesweep-ai/ledger.git",
-    "directory": "npm/cs-ledger"
+    "directory": "npm/ledger"
   },
   "homepage": "https://github.com/codesweep-ai/ledger#readme",
   "bugs": {
@@ -40,9 +40,9 @@
     "NOTICE"
   ],
   "optionalDependencies": {
-    "@codesweep-ai/cs-ledger-darwin-arm64": "0.0.0",
-    "@codesweep-ai/cs-ledger-darwin-x64": "0.0.0",
-    "@codesweep-ai/cs-ledger-linux-arm64": "0.0.0",
-    "@codesweep-ai/cs-ledger-linux-x64": "0.0.0"
+    "@codesweep-ai/ledger-darwin-arm64": "0.0.0",
+    "@codesweep-ai/ledger-darwin-x64": "0.0.0",
+    "@codesweep-ai/ledger-linux-arm64": "0.0.0",
+    "@codesweep-ai/ledger-linux-x64": "0.0.0"
   }
 }

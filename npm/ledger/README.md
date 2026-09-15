@@ -1,4 +1,4 @@
-# @codesweep-ai/cs-ledger
+# @codesweep-ai/ledger
 
 > **Structured issue tracking for agent-managed repositories: AI agents write JSON records, humans read a generated ledger.html.**
 
@@ -21,7 +21,7 @@ The tool is written in Go, and packaged here for npm projects.
 ## Quickstart
 
 ```bash
-npm install --save-dev @codesweep-ai/cs-ledger
+npm install --save-dev @codesweep-ai/ledger
 
 cd ~/code/my-project
 cs-ledger init --project my-project --prefix MYP

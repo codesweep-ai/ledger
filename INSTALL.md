@@ -48,7 +48,7 @@ Take this route in a project that already has a `package.json`. No Go toolchain 
 binary is packaged for npm and installs like any other dev dependency.
 
 ```bash
-npm install --save-dev @codesweep-ai/cs-ledger
+npm install --save-dev @codesweep-ai/ledger
 npx cs-ledger check
 ```
 
@@ -61,7 +61,7 @@ versioned by the commit it came from. A project pins that when it wants a fix be
 release:
 
 ```bash
-npm install --save-dev @codesweep-ai/cs-ledger@dev
+npm install --save-dev @codesweep-ai/ledger@dev
 ```
 
 ### Or build from source
