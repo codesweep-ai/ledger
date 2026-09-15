@@ -212,11 +212,11 @@ Four variables belong to this packaging rather than to the tool, which is why
 
 ### Images of the packages
 
-The `publish images` workflow pushes each commit on main and on this
-repository's pull requests to `ghcr.io/codesweep-ai/npm/ledger:<version>`. It
-runs as the last job of `ci`, once every other job has passed. Each
-image carries the last 20 versions of the five packages. `fetch` copies every
-tarball in the newest one into a directory, using podman or docker:
+The `publish images` workflow pushes each commit on main that passes `ci` to
+`ghcr.io/codesweep-ai/npm/ledger:<version>`, starting when `ci` finishes. Pull
+requests get no image. Each image carries the last 20 versions of the five
+packages. `fetch` copies every tarball in the newest one into a directory, using
+podman or docker:
 
 ```bash
 node npm/npm-images.mjs fetch --data ./data @codesweep-ai/ledger
