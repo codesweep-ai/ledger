@@ -92,6 +92,7 @@ echo "==> packaging"
 node npm/build.mjs --dev
 
 version="$(node -p "require('./npm/dist/cs-ledger/package.json').version")"
+wrapper="$(node -p "require('./npm/dist/cs-ledger/package.json').name")"
 
 # A version cannot be published twice, and a script meant to be run after every
 # change would stop at the second run. Dropping the previous copy first is what
@@ -108,9 +109,9 @@ NPM_CONFIG_USERCONFIG="$NPMRC" CS_LEDGER_NPM_TAG=dev ./npm/publish.sh > "$STATE/
 
 cat <<EOF
 
-Published @codesweep-ai/cs-ledger@$version to the registry on this machine.
+Published $wrapper@$version to the registry on this machine.
 
-  Browse   $URL/-/web/detail/@codesweep-ai/cs-ledger
-  Install  NPM_CONFIG_USERCONFIG=$PWD/$NPMRC npm install @codesweep-ai/cs-ledger@dev
+  Browse   $URL/-/web/detail/$wrapper
+  Install  NPM_CONFIG_USERCONFIG=$PWD/$NPMRC npm install $wrapper@dev
   Stop     npm/local-registry.sh stop
 EOF
