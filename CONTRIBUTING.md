@@ -189,6 +189,13 @@ the two commands resolves a binary the registry does not have.
 Running `npm/publish.sh` again is safe. It skips each package the registry
 already has from this commit, and stops on one it has from another commit.
 
+The `npm` workflow publishes each commit on main that passes `ci` to the `dev`
+channel. In a fork, or a copy under another owner, it publishes nothing on its
+own, because the packages there take that owner's scope. That owner runs it by
+hand, once each package names it as a trusted publisher. A trusted publisher can
+only be added to a package that exists, so the first publish runs
+`npm/publish.sh` from a machine logged in to npm.
+
 `make npm-local` is how to try a package before publishing it. It starts a
 registry and publishes to it, replacing what the last run published, so it can
 be run after every change. `npm/local-registry.sh stop` ends it.
