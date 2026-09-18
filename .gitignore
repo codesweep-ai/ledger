@@ -28,5 +28,6 @@ go.work.sum
 # The npm packaging's output, generated from dist/ by npm/build.mjs.
 /npm/dist/
 
-# The throwaway registry npm/local-registry.sh runs to try the packages out.
+# What `make npm-local` keeps between runs: the tarballs it serves, the build
+# log, the server's pid and log, and the npmrc it writes.
 /npm/.local-registry/

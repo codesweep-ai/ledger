@@ -61,7 +61,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-local npm-publish
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-local npm-publish images-snapshot
 
 .DEFAULT_GOAL := help
 
@@ -431,13 +431,17 @@ npm-snapshot:
 	@CS_LEDGER_NPM_VERSION='$(NPM_SNAPSHOT_VERSION)' node npm/build.mjs
 	@./npm/publish.sh --dry-run
 
-## npm-local: publish to a registry on this machine, and print where to browse it
+## npm-local: serve a dev build from this machine, and print how to install it
 npm-local:
 	./npm/local-registry.sh
 
 ## npm-publish: publish npm/dist to the registry (platform packages first)
 npm-publish:
 	./npm/publish.sh
+
+## images-snapshot: build the image of every package in npm/dist, and push nothing
+images-snapshot:
+	NPMREVS="$$(go tool -n cs-npmrevs)" ./npm/publish-images.sh --dry-run npm/dist/ledger-*/ npm/dist/ledger
 
 ## clean: remove build output
 clean:
