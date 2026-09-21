@@ -35,6 +35,14 @@ GIT_DIR    := $(shell git rev-parse --git-dir 2>/dev/null)
 # file is the only viewer artifact //go:embed reads. Naming it rather than all
 # of viewer/ keeps the fixture suite and its vendored axe-core out of the
 # binary's prerequisites, where a change to either rebuilt it for nothing.
+VIEWER_DIR   := viewer
+# The npm command, and the script every install runs through. That script puts
+# cs-npmrevs in front of npmjs.com: @codesweep-ai/ui publishes an image of every
+# build it makes, and a version that has not been released reaches npm only that
+# way. The script says how it picks the registry.
+NPM          ?= npm
+WITH_NPMREVS := $(abspath scripts/with-npmrevs.sh)
+
 VIEWER     := viewer/index.html
 VIEWER_SRC := $(shell find viewer/app -type f 2>/dev/null) \
               viewer/vite.config.ts viewer/tsconfig.json viewer/package.json viewer/package-lock.json
@@ -175,7 +183,7 @@ test: viewer
 viewer: $(VIEWER)
 
 $(VIEWER): $(VIEWER_SRC)
-	@if command -v npm >/dev/null 2>&1; then \
+	@if command -v $(NPM) >/dev/null 2>&1; then \
 		$(MAKE) viewer-build; \
 	else \
 		echo "viewer: SKIP (npm not found; using committed $(VIEWER))"; \
@@ -184,20 +192,21 @@ $(VIEWER): $(VIEWER_SRC)
 ## viewer-build: restore dependencies, typecheck and build the single-file viewer
 # npm runs in viewer/, which is where the manifest and the ESM package scope are.
 viewer-build:
-	cd viewer && npm ci && npm run typecheck && npm run build
+	cd $(VIEWER_DIR) && $(WITH_NPMREVS) $(NPM) ci
+	cd $(VIEWER_DIR) && $(NPM) run typecheck && $(NPM) run build
 
 ## fixtures: run the viewer's behavioural oracle (viewer/fixtures; not in check)
 # Not part of `make check`: the campaign orchestrator runs it explicitly. Needs
 # node_modules and a Chromium in LEDGER_FIXTURES_BROWSER or CHROME_BIN.
 fixtures: build-go
-	cd viewer && npm run fixtures -- $(FIXTURES_ARGS)
+	cd $(VIEWER_DIR) && $(NPM) run fixtures -- $(FIXTURES_ARGS)
 
 ## record-fixtures: rewrite viewer/fixtures/expectations.json from a live run
 # Named record-* because it overwrites a committed file (see `make conventions`).
 # Changing a frozen value needs the reviewer's sign-off, which the runner asks
 # for as APPROVE=<id> REASON="<text>" and records in the row it rewrites.
 record-fixtures: build-go
-	cd viewer && npm run fixtures -- --record $(if $(APPROVE),--approve $(APPROVE) --reason "$(REASON)") $(FIXTURES_ARGS)
+	cd $(VIEWER_DIR) && $(NPM) run fixtures -- --record $(if $(APPROVE),--approve $(APPROVE) --reason "$(REASON)") $(FIXTURES_ARGS)
 
 ## coverage: merge every tier present under $(COVERDIR) and print the report
 coverage:
@@ -327,7 +336,7 @@ conventions:
 ## own rule, which skips so a Go-only clone still builds. That skip is what
 ## this gate stops from reaching a commit.
 viewer-check:
-	@command -v npm >/dev/null 2>&1 || { echo "viewer-check: npm is required to rebuild the viewer" >&2; exit 1; }
+	@command -v $(NPM) >/dev/null 2>&1 || { echo "viewer-check: npm is required to rebuild the viewer" >&2; exit 1; }
 	@$(MAKE) --no-print-directory viewer-build
 	@if git diff --quiet -- $(VIEWER); then \
 		echo "viewer: $(VIEWER) is what viewer/app builds"; \

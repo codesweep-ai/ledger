@@ -69,12 +69,18 @@ viewer needs npm, and `make ci` fails without it rather than pass on a bundle it
 The viewer is a React application under `viewer/app/`, built against the pinned
 `@codesweep-ai/ui` package into the single self-contained `viewer/index.html` the Go binary embeds.
 That file is committed, so building the binary needs Go alone. Changing the viewer needs Node
-22.13 or newer with npm, which is the floor `@codesweep-ai/ui` sets. The viewer's `package.json`
+22.13 or newer with npm, which is the floor `@codesweep-ai/ui` sets, so `node` and `npm` both on
+your PATH. The viewer's `package.json`
 sits beside its source in `viewer/`, so npm runs there, and `make` does that for you:
 
 ```bash
 make viewer-build
 ```
+
+The install runs through `scripts/with-npmrevs.sh`, which puts cs-npmrevs in front of npmjs.com.
+`@codesweep-ai/ui` publishes an image of every build, and a version that has not been released
+reaches npm only that way. The tool is pinned in `go.mod`, the images are public, and every other
+package still comes from npmjs.com.
 
 `make build` rebuilds the viewer on its own when its sources have moved, so this is the explicit
 form rather than an extra step. Re-render the page with `bin/cs-ledger render ledger` afterwards:
