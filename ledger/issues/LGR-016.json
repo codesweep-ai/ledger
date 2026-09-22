@@ -3,14 +3,22 @@
   "title": "The fixture model's test fails whenever a record in this ledger is in progress",
   "type": "defect",
   "severity": "high",
-  "status": "in-progress",
+  "status": "closed",
   "foundBy": "session agent, when marking LGR-015 in progress turned `make fixtures-model` red",
   "opened": "2026-09-22",
-  "resolved": null,
+  "resolved": "2026-09-22",
   "stint": "pilot2-tier2",
-  "evidence": { "commits": [], "integrated": [], "verified": null },
-  "resolution": null,
+  "evidence": {
+    "commits": [
+      "fcb5ec6"
+    ],
+    "integrated": [],
+    "verified": "At 5778f33, with LGR-015 in progress, `make fixtures-model` failed 1 of 4 tests. The list's first card was that real record, where the test expected its synthetic LGR-999. With the fixed test, `make fixtures-model` passes 4 of 4 with LGR-015 and LGR-016 in progress. It passes 4 of 4 again with both set back to open and the page re-rendered. `make ci` passed at 692eb2b."
+  },
+  "resolution": "The test's synthetic record in progress now takes the id LGR-000, which sorts before every real record. Its card therefore leads the In progress group whatever this ledger has in progress. The model and the rows are unchanged.",
   "details": "`make fixtures-model` fails 1 of its 4 tests as soon as any record in `ledger/` is in progress. The failing test adds a synthetic in-progress record, LGR-999, to this ledger's records and expects its card to be the first one the list opens. The model sorts the In progress group by id, so any real record in progress sorts before LGR-999 and is opened instead.\n\n`make ci` and the CI workflow both run the test, so starting work on a record turns the build red. Filing and starting work are exactly the changes the derived rows from LGR-012 exist to tolerate. To reproduce, set any record's status to `in-progress` and run `make fixtures-model`.",
   "notes": [],
-  "links": ["LGR-012"]
+  "links": [
+    "LGR-012"
+  ]
 }

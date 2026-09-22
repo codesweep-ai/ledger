@@ -3,14 +3,27 @@
   "title": "An approval to re-record one fixture row rewrites every row that differs",
   "type": "defect",
   "severity": "med",
-  "status": "in-progress",
+  "status": "closed",
   "foundBy": "deps-maintenance pilot2 campaign, whose role definitions had to forbid running `record-fixtures` on a member's own judgement; item 5 of the owner's pilot2 improvements list",
   "opened": "2026-09-22",
-  "resolved": null,
+  "resolved": "2026-09-22",
   "stint": "pilot2-tier2",
-  "evidence": { "commits": [], "integrated": [], "verified": null },
-  "resolution": null,
+  "evidence": {
+    "commits": [
+      "692eb2b"
+    ],
+    "integrated": [],
+    "verified": "At 692eb2b, `node --test viewer/fixtures/scope.test.mjs` passes 5 of 5, and 3 of the 5 fail when `outsideApproval` covers every row, as the old runner did. In a scratch copy with LF-25 and LF-44 made to differ, a bare `make record-fixtures APPROVE=LGR-015 REASON=...` at a04c179 rewrote both rows and reported both approved. At 692eb2b the same command refuses, names both rows and writes nothing. It prints `make record-fixtures APPROVE=LGR-015 REASON='records grew' FIXTURES_ARGS=\"--only LF-25,LF-44\"`. With `--only LF-25` it records LF-25 alone, and LF-44 keeps its differing value. With `--record-all` it records both and says so. Without an approval, its refusal now prints the `--only` line. `make fixtures` returns PASS 29, DONE 18, FAIL 0, and `make ci` passed."
+  },
+  "resolution": "An approval is per row. `--record` refuses a gated change to any row that `--only` does not name, lists those rows with the line to paste, and writes nothing. `--record-all` is the explicit act that applies one approval to every row.",
   "details": "`make record-fixtures APPROVE=<id> REASON=<text>` with no `FIXTURES_ARGS` re-records every measured row, and writes each gated `keep` row whose value differs under that one approval. `viewer/fixtures/run.mjs` checks that an approval was given, never which rows it was given for.\n\nBoth deps-maintenance pilots ran with seven `keep` rows failing for an unrelated reason: the own ledger had grown from 12 records to 14. An approval meant for one row would have rewritten all eight. The seven frozen values would then be gone, each carrying an approval block that looks legitimate, and nothing would notice.\n\nTo reproduce, make two rows differ from `viewer/fixtures/expectations.json` and run `make record-fixtures APPROVE=x REASON=y`. Both rows are rewritten, and the output lists both as approved.",
-  "notes": [],
-  "links": ["LGR-012"]
+  "notes": [
+    {
+      "date": "2026-09-22",
+      "text": "The gate covers gated rows only. On an unchanged tree, a bare approved run still rewrites the progress values of five `must-change` rows, LF-27, 28, 34, 37 and 42, whose axe counts grow with this ledger. The contract leaves those values ungated, and this record does not change that."
+    }
+  ],
+  "links": [
+    "LGR-012"
+  ]
 }
