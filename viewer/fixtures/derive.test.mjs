@@ -46,16 +46,18 @@ test("a derived row freezes only what its probe does not derive", () => {
 
 // The point of deriving: the ledger moving is not the viewer moving. Filing a
 // record and starting work on another both change what the own rows expect.
+// LGR-000 sorts before every real id, so its card leads the In progress group
+// whatever this ledger has in progress when the test runs.
 test("a filed record and a record in progress move the expectation with them", () => {
   const board = rows[derivedRows.find((r) => r.derive.probe === "structure/board").id].value;
   const before = expected("structure/board", own, board);
-  const filed = { id: "LGR-999", title: "A record filed after the rows were frozen", type: "defect", severity: "high", status: "in-progress", foundBy: "test", opened: "2026-09-30", resolved: null, stint: "test", evidence: { commits: [], integrated: [], verified: null }, resolution: null, details: "", notes: [], links: [] };
-  const grown = { ...own, data: { ...own.data, records: [...own.data.records, filed], derived: { ...own.data.derived, lastActivity: { ...own.data.derived.lastActivity, "LGR-999": "2026-09-30" } } } };
+  const filed = { id: "LGR-000", title: "A record filed after the rows were frozen", type: "defect", severity: "high", status: "in-progress", foundBy: "test", opened: "2026-09-30", resolved: null, stint: "test", evidence: { commits: [], integrated: [], verified: null }, resolution: null, details: "", notes: [], links: [] };
+  const grown = { ...own, data: { ...own.data, records: [...own.data.records, filed], derived: { ...own.data.derived, lastActivity: { ...own.data.derived.lastActivity, "LGR-000": "2026-09-30" } } } };
   const after = expected("structure/board", grown, board);
   assert.equal(after.records, before.records + 1);
-  assert.ok(after.ids.includes("LGR-999") && after.severityLabels.includes("high") && after.statusLabels.includes("in progress"));
+  assert.ok(after.ids.includes("LGR-000") && after.severityLabels.includes("high") && after.statusLabels.includes("in progress"));
   assert.deepEqual(after.toolbar, before.toolbar, "the frozen toolbar does not move with the corpus");
   const open = expected("open", grown, frozenPart("open", { detailOpens: true, idMatches: true, escapeCloses: true, hashOpensDetail: true }));
-  assert.equal(open.clicked, "LGR-999", "the In progress group comes first in the list, so its card is the first one clicked");
+  assert.equal(open.clicked, "LGR-000", "the In progress group comes first in the list and sorts by id, so its card is the first one clicked");
   assert.equal(expected("status", grown).afterClick2.label, "status · in prog");
 });
