@@ -64,6 +64,12 @@ jobs:
           include-hidden-files: true
           retention-days: 7
 
+      # The viewer oracle's own-ledger rows derive their counts from a model of
+      # the viewer. This holds the model to the frozen sandbox rows, with Node
+      # and no browser (viewer/fixtures/README.md).
+      - name: fixture model
+        run: make fixtures-model
+
       - name: build
         run: make build
 

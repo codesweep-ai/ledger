@@ -69,7 +69,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-pack npm-local npm-publish images-snapshot
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures fixtures-model record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-pack npm-local npm-publish images-snapshot
 
 .DEFAULT_GOAL := help
 
@@ -200,6 +200,13 @@ viewer-build:
 # node_modules and a Chromium in LEDGER_FIXTURES_BROWSER or CHROME_BIN.
 fixtures: build-go
 	cd $(VIEWER_DIR) && $(NPM) run fixtures -- $(FIXTURES_ARGS)
+
+## fixtures-model: hold the oracle's model of the viewer to the frozen sandbox rows
+# The own-ledger rows derive their counts through viewer/fixtures/derive.mjs.
+# This checks that model against the frozen sandbox values with Node alone, so
+# a wrong model fails in CI rather than on the next machine with a Chromium.
+fixtures-model:
+	node --test $(VIEWER_DIR)/fixtures/derive.test.mjs
 
 ## record-fixtures: rewrite viewer/fixtures/expectations.json from a live run
 # Named record-* because it overwrites a committed file (see `make conventions`).
@@ -369,6 +376,8 @@ ci:
 	@$(MAKE) --no-print-directory viewer-check
 	$(call say,the gate a contributor runs before pushing)
 	@$(MAKE) --no-print-directory check
+	$(call say,fixture model)
+	@$(MAKE) --no-print-directory fixtures-model
 	$(call say,actionlint)
 	@$(MAKE) --no-print-directory actionlint
 	$(call say,build)

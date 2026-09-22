@@ -276,6 +276,23 @@ Say what it costs: skip the bump and two binaries claim the same version while r
 bytes. `check` reports that as a stale page rather than as version skew, and sends the reader after
 the wrong problem. Nothing catches a forgotten bump for you.
 
+## The viewer oracle
+
+`make fixtures` drives the rendered viewer in a headless Chromium and compares what it measures
+with `viewer/fixtures/expectations.json`. It renders two ledgers: this repository's own `ledger/`,
+and the frozen copy in `fixtures/sandbox/ledger`.
+
+The rows against the own ledger compute the record counts, ids, lanes and orders from its records.
+Filing a record, or starting work on one, therefore leaves the oracle green. The controls and the
+behaviour stay frozen. The model in `viewer/fixtures/derive.mjs` does the computing, and each own
+row holds it to the sandbox row that measures the same thing. `make fixtures-model` runs that check
+without a browser, and `make ci` runs it.
+
+`make fixtures` itself stays out of `make ci`, because it needs a Chromium. Run it with `CHROME_BIN`
+pointing at one when a change moves the viewer, the `@codesweep-ai/ui` pin or the renderer. A frozen
+value moves only through `make record-fixtures` with `APPROVE` and `REASON`, and
+[`viewer/fixtures/README.md`](viewer/fixtures/README.md) says what each row freezes.
+
 ## AI-assisted contributions
 
 An agent wrote most of this repository, and you are welcome to use one. The standard is the same

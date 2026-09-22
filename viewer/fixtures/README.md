@@ -50,10 +50,10 @@ Exit status is 0 when every `keep` check matches (and, with `--strict`, no
 serious or critical axe violation remains) and 1 otherwise. A ledger the runner
 cannot find is reported as `SKIP` and fails the run unless `--allow-skip`.
 
-Inputs: the repo's own `ledger/` (11 records) and `fixtures/sandbox/ledger`
-(15 records). **Both are carried by this repo**, so the suite runs in any clone
-and in CI. Each is copied to a temp directory before `cs-ledger render` runs, so
-the sources are never touched.
+Inputs: the repo's own `ledger/`, which grows as records are filed, and the
+frozen `fixtures/sandbox/ledger` (15 records). **Both are carried by this
+repo**, so the suite runs in any clone and in CI. Each is copied to a temp
+directory before `cs-ledger render` runs, so the sources are never touched.
 
 ## What is measured
 
@@ -98,8 +98,8 @@ today's DOM, one commented entry per role, and it is the only place the DOM is
 named. When the markup changes, point the role at the new element; the runner
 then re-measures the same behaviour.
 
-A viewer developer **must not** edit `expectations.json` or the check
-definitions in `run.mjs`. Re-recording (`--record`) is for the oracle's author,
+A viewer developer **must not** edit `expectations.json`, the check
+definitions in `run.mjs` or the model in `derive.mjs`. Re-recording (`--record`) is for the oracle's author,
 after a reviewer has agreed that a behaviour genuinely changed; the diff of
 `expectations.json` is what gets reviewed. `--record` keeps each check's
 `status`, `target` and `note` and replaces only `value`.
@@ -108,11 +108,33 @@ Labels that are part of a check's value (`status · open`, `sort · activity`,
 lane names such as `Closed / retired`) are behaviour too: a control that reads
 differently is a change a reader sees.
 
+### Rows derived from the own ledger
+
+The own ledger gains a record whenever one is filed, and its records change
+status as work starts and ends. A row that froze its counts would fail on every
+such change. So the `keep` rows against it, LF-01 to LF-04 and LF-09 to LF-16,
+carry `derive: { probe, twin }`. The runner computes what the records decide
+from the records the page was rendered from: the counts, the id sets, the
+lanes and groups, the orders and the first card. The rest of the row stays
+frozen in `value`: the toolbar, the view switcher, the behavioural booleans.
+`DERIVED` in `derive.mjs` names the fields each probe computes, and `*` means
+the whole value.
+
+`derive.mjs` is a model of the viewer's filters, lanes, groups and sorts. The
+runner trusts it only while it reproduces the frozen sandbox `twin` of each
+derived row, and fails the row with the twin's id otherwise. A viewer change
+that moves a sandbox row therefore moves the model, in the same review.
+`--record` writes only the frozen part of a derived row, and refuses where the
+viewer and the model disagree. `make fixtures-model` runs the same comparison
+with `node --test` and no browser.
+
 ## Files
 
 | file | role |
 |---|---|
 | `run.mjs` | the runner: render, drive, measure, compare, report |
 | `selectors.mjs` | role → DOM map (the one file a viewer developer edits) |
+| `derive.mjs` | what the own ledger's records decide the page must show |
+| `derive.test.mjs` | holds `derive.mjs` to the frozen sandbox rows, without a browser |
 | `expectations.json` | frozen values and targets, with the measurement conditions under `meta` |
 | `vendor/axe-core/` | `axe.min.js` 4.13.0 and its MPL-2.0 licence, so the guest needs no extra install |

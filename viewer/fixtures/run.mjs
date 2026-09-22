@@ -28,6 +28,15 @@
 // with an `origin` field whose id is the --approve id, or the member name
 // ("ledger") when no flags are given — never a placeholder.
 //
+// Rows against this repo's own ledger derive what depends on its records (the
+// counts, the ids, the lanes, the orders) from the records the page was rendered
+// from, through the model in derive.mjs, and freeze the rest. The ledger gains a
+// record every time somebody files one, so a frozen count would measure the
+// corpus rather than the viewer. Each such row names a frozen sandbox twin, and
+// fails when the model, applied to the sandbox corpus, disagrees with the twin.
+// --record never writes a derived value: where the viewer and the model
+// disagree it refuses, because the model is what has to change.
+//
 // Exit status: 0 when every `keep` check matches (and, with --strict, no serious or
 // critical axe violation remains); 1 otherwise.
 
@@ -39,6 +48,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import puppeteer from "puppeteer-core";
+import { expected as derivedValue, frozenPart, pageData } from "./derive.mjs";
 import { focusRoles, selectors } from "./selectors.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -64,7 +74,8 @@ if ((opts.approve === undefined) !== (opts.reason === undefined)) {
 }
 if (opts.approve !== undefined && !opts.record) console.error("fixtures: note: --approve/--reason have no effect without --record");
 if (flag("--help") || flag("-h")) {
-  console.log(readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 27).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
+  const lines = readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1);
+  console.log(lines.slice(0, lines.findIndex((l) => !l.startsWith("//"))).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
   process.exit(0);
 }
 
@@ -123,8 +134,9 @@ function render(name) {
   execFileSync(opts.bin, ["render", copy], { stdio: opts.verbose ? "inherit" : "pipe" });
   const file = path.join(copy, "ledger.html");
   const html = readFileSync(file, "utf8");
-  const data = JSON.parse(html.match(/<script id=["']ledger-data["'][^>]*>([\s\S]*?)<\/script>/)[1].replace(/\\u003c/g, "<"));
-  return { name, file, html, url: pathToFileURL(file).href, records: data.records.length, drafts: data.drafts.length, project: data.project };
+  const data = pageData(html);
+  const prefix = html.match(/"id":"([A-Z]{2,6})-\d{3}"/)?.[1] ?? "XX";
+  return { name, file, html, data, prefix, url: pathToFileURL(file).href, records: data.records.length, drafts: data.drafts.length, project: data.project };
 }
 
 // ---- page helpers -------------------------------------------------------------
@@ -395,6 +407,11 @@ for (const L of ["own", "sandbox"]) {
   I.reset = def(`reset → count returns to all, search cleared (${L})`, "keep");
   I.open = def(`click first card → detail shows its id + title; Escape closes; #hash deep link opens (${L})`, "keep");
 }
+// The own rows derive their record-dependent fields (derive.mjs), each held to its sandbox twin.
+const derives = (id, probe, twin) => Object.assign(CHECKS.find((c) => c.id === id), { derive: { probe, twin } });
+for (const v of VIEWS) derives(ids.structure[`own/${v}`], `structure/${v}`, ids.structure[`sandbox/${v}`]);
+const PROBES = { searchWait: "search:wait", searchSac: "search:SAC-06", searchOwn: "search:own", status: "status", severity: "severity", sort: "sort", reset: "reset", open: "open" };
+for (const [key, probe] of Object.entries(PROBES)) derives(ids.interactions.own[key], probe, ids.interactions.sandbox[key]);
 ids.theme = def("theme toggle cycles light → dark → system and persists in localStorage ledger-theme across reload (sandbox)", "keep");
 for (const L of ["own", "sandbox"]) for (const v of VIEWS) { ids.axe[`${L}/${v}`] = def(`axe ${L}/${v} violations by rule (light + dark)`, "must-change", { target: { seriousOrCriticalNodes: 0 }, note: "Baseline = today's violations; the target is zero serious/critical nodes in both themes. Run with --strict to fail on any." }); judges[ids.axe[`${L}/${v}`]] = (live) => seriousNodes(live) === 0; }
 for (const L of ["own", "sandbox"]) {
@@ -419,8 +436,8 @@ const live = {}; const skipped = [];
 const skip = (idList, why) => { for (const id of idList) { skipped.push({ id, why }); } };
 const browser = await puppeteer.launch({ executablePath, headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu", "--disable-dev-shm-usage"] });
 const t0 = Date.now();
+const rendered = {};
 try {
-  const rendered = {};
   for (const name of Object.keys(LEDGERS)) { rendered[name] = render(name); if (!rendered[name]) console.error(`fixtures: ${name} ledger not found (${LEDGERS[name].dir}) — its checks are skipped`); }
   const axeFile = axePath();
   const run = async (id, fn) => { if (!wanted(id)) return; try { live[id] = await fn(); } catch (e) { live[id] = { error: String(e?.message ?? e) }; } if (opts.verbose) console.error(`${id} ${JSON.stringify(live[id]).slice(0, 300)}`); };
@@ -432,7 +449,7 @@ try {
     const all = [...byLedger(ids.structure), ...Object.values(ids.interactions[L]), ...byLedger(ids.axe), ...Object.values(ids.keyboard[L]), ids.size[L], ids.network[L], ...(L === "sandbox" ? [ids.theme] : []), ...(L === "own" ? [ids.mdHighlight] : [])];
     if (!ledger) { skip(all, `${L} ledger missing`); continue; }
     for (const v of VIEWS) await run(ids.structure[`${L}/${v}`], () => withPage((p) => structure(p, ledger, v)));
-    const prefix = `${ledger.html.match(/"id":"([A-Z]{2,6})-\d{3}"/)?.[1] ?? "XX"}-00`;
+    const prefix = `${ledger.prefix}-00`;
     const I = ids.interactions[L];
     if (Object.values(I).some(wanted)) {
       const r = await withPage((p) => interactions(p, ledger, prefix));
@@ -465,6 +482,17 @@ function diff(a, b) {
   return `${brief(a)} ≠ ${brief(b)}`;
 }
 const expectedById = Object.fromEntries((expected.checks ?? []).map((c) => [c.id, c]));
+// A derived row's expectation: its frozen fields, completed from the own corpus.
+// The model is trusted only while it reproduces the row's frozen sandbox twin.
+function derivedExpectation(row) {
+  const corpus = (name) => rendered[name] && { data: rendered[name].data, clock: CLOCK, prefix: rendered[name].prefix };
+  const own = corpus("own"), sandbox = corpus("sandbox"), twin = expectedById[row.derive.twin], { probe } = row.derive;
+  if (!own || !sandbox) return { error: "derived from the own ledger and held to the sandbox one, so both must render" };
+  if (!twin || twin.status !== "keep" || twin.derive) return { error: `twin ${row.derive.twin} is not a frozen keep row` };
+  const anchor = derivedValue(probe, sandbox, frozenPart(probe, twin.value));
+  if (canon(anchor) !== canon(twin.value)) return { error: `derive.mjs disagrees with the frozen sandbox twin ${twin.id}: ${diff(anchor, twin.value)}` };
+  return { value: derivedValue(probe, own, row.value) };
+}
 const rows = []; let failures = 0, strictFailures = 0;
 for (const check of CHECKS) {
   if (!wanted(check.id)) continue;
@@ -476,7 +504,11 @@ for (const check of CHECKS) {
   else if (opts.record && !expectedById[check.id]) { result = "NEW"; detail = "recorded"; }
   else if (!exp) { result = "FAIL"; detail = "no expectation recorded"; failures++; }
   else if (value === undefined || value?.error) { result = "FAIL"; detail = value?.error ?? "not measured"; failures++; }
-  else if (exp.status === "keep") { if (canon(value) === canon(exp.value)) result = "PASS"; else { result = "FAIL"; failures++; detail = diff(value, exp.value); } }
+  else if (exp.status === "keep") {
+    const want = exp.derive ? derivedExpectation(exp) : { value: exp.value };
+    if (want.error) { result = "FAIL"; failures++; detail = want.error; }
+    else if (canon(value) === canon(want.value)) result = "PASS"; else { result = "FAIL"; failures++; detail = diff(value, want.value); }
+  }
   else { const done = judges[check.id]?.(value) ?? false; result = done ? "DONE" : "OPEN"; const moved = exp.value !== undefined && canon(value) !== canon(exp.value); detail = `target ${brief(exp.target, 50)}${moved ? " · changed from baseline" : " · unchanged"}`; if (check.id.startsWith("LF") && ids.axe && Object.values(ids.axe).includes(check.id)) { const s = seriousNodes(value), b = exp.value ? seriousNodes(exp.value) : s; detail = `serious/critical nodes ${s} (baseline ${b}, Δ${s - b})`; if (opts.strict && s > 0) { strictFailures++; result = "FAIL"; } } }
   rows.push({ id: check.id, status: exp?.status ?? check.status, result, name: check.name, live: brief(value), detail });
 }
@@ -499,6 +531,7 @@ if (opts.record) {
   const wouldWrite = [];  // every row whose written content differs from the file
   const created = [];     // new rows: not an approved write, but disclosed
   const impossible = [];  // neither measured nor carried forward — an error, never a blank
+  const disagree = [];    // derived rows where the viewer and derive.mjs disagree
   for (const c of CHECKS) {
     if (!wanted(c.id)) continue;
     const prev = expectedById[c.id];
@@ -506,6 +539,7 @@ if (opts.record) {
     const measuredOk = v !== undefined && !v?.error;
     if (!prev) {
       if (!measuredOk) { impossible.push(c.id); continue; }
+      if (c.derive) { impossible.push(`${c.id} (a derived row needs a frozen part to start from)`); continue; }
       const e = { id: c.id, name: c.name, value: v, status: c.status };
       if (c.target) e.target = c.target;
       if (c.note) e.note = c.note;
@@ -520,7 +554,21 @@ if (opts.record) {
     // and only as the contract allows.
     const e = { ...prev, name: c.name, status: prev.status ?? c.status };
     const rowGated = [];
-    if (measuredOk && canon(v) !== canon(prev.value)) {
+    if (!c.derive && prev.derive) { delete e.derive; rowGated.push({ kind: "derivation change", previous: prev.derive, measured: undefined }); }
+    if (c.derive) {
+      // Only the frozen part is written. A derived field is never recorded: the
+      // viewer disagreeing with the model means the model has to change.
+      if (canon(c.derive) !== canon(prev.derive)) { e.derive = c.derive; rowGated.push({ kind: "derivation change", previous: prev.derive, measured: c.derive }); }
+      if (measuredOk) {
+        const frozen = frozenPart(c.derive.probe, v);
+        const want = derivedExpectation({ ...e, value: frozen });
+        if (want.error || canon(v) !== canon(want.value)) { disagree.push(`${c.id}: ${want.error ?? diff(v, want.value)}`); continue; }
+        if (canon(frozen) !== canon(prev.value)) {
+          if (frozen === undefined) delete e.value; else e.value = frozen;
+          rowGated.push({ kind: "keep value change", previous: prev.value, measured: frozen });
+        }
+      }
+    } else if (measuredOk && canon(v) !== canon(prev.value)) {
       e.value = v;
       if (e.status === "keep") rowGated.push({ kind: "keep value change", previous: prev.value, measured: v });
       else wouldWrite.push(`${c.id} (must-change value: progress measurement)`);
@@ -539,6 +587,11 @@ if (opts.record) {
       }
     }
     proposed.push(e);
+  }
+  if (disagree.length) {
+    console.error("fixtures: --record REFUSED — the viewer and derive.mjs disagree on derived rows. A derived value is never recorded; change the model under review. NOTHING was written.");
+    for (const d of disagree) console.error(`fixtures:   ${d}`);
+    process.exit(1);
   }
   if (impossible.length) {
     console.error(`fixtures: --record error: ${impossible.join(", ")} — not measured and no prior expectation to carry forward; a row is never written from nothing. NOTHING was written.`);
