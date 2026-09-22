@@ -69,7 +69,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-local npm-publish images-snapshot
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-pack npm-local npm-publish images-snapshot
 
 .DEFAULT_GOAL := help
 
@@ -155,8 +155,8 @@ repin:
 	@GOWORK=off go mod tidy
 	@$(MAKE) versions
 
-## install: copy bin/cs-ledger into $(PREFIX)/bin (default ~/.local/bin)
-install: build
+## install: copy bin/cs-ledger into $(PREFIX)/bin (default ~/.local/bin), and pack its npm packages for later builds
+install: build npm-pack
 	@mkdir -p $(PREFIX)/bin
 	install -m 0755 $(BIN) $(PREFIX)/bin/cs-ledger
 	@echo "installed $(PREFIX)/bin/cs-ledger ($(VERSION))"
@@ -439,6 +439,18 @@ npm-snapshot:
 	$(GORELEASER) build --snapshot --clean --skip=before
 	@CS_LEDGER_NPM_VERSION='$(NPM_SNAPSHOT_VERSION)' node npm/build.mjs
 	@./npm/publish.sh --dry-run
+
+## npm-pack: package a dev build into cs-npmrevs's data directory, for a later build to install
+##
+## `make install` runs it too, so every install leaves its packages where a
+## later build installing through cs-npmrevs finds them. A machine without
+## goreleaser, node or npm skips it, and installs the binary all the same.
+npm-pack: build
+	@if command -v $(GORELEASER) >/dev/null 2>&1 && command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then \
+		./npm/local-registry.sh pack; \
+	else \
+		echo "npm-pack: SKIP (needs goreleaser, node and npm)"; \
+	fi
 
 ## npm-local: serve a dev build from this machine, and print how to install it
 npm-local:
