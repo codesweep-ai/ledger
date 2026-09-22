@@ -291,7 +291,9 @@ without a browser, and `make ci` runs it.
 `make fixtures` itself stays out of `make ci`, because it needs a Chromium. Run it with `CHROME_BIN`
 pointing at one when a change moves the viewer, the `@codesweep-ai/ui` pin or the renderer. A frozen
 value moves only through `make record-fixtures` with `APPROVE` and `REASON`, and
-[`viewer/fixtures/README.md`](viewer/fixtures/README.md) says what each row freezes.
+[`viewer/fixtures/README.md`](viewer/fixtures/README.md) says what each row freezes. The approval
+is per row: `FIXTURES_ARGS="--only LF-02,LF-03"` names the rows it covers, and the runner refuses a
+frozen change to any other.
 
 ## AI-assisted contributions
 

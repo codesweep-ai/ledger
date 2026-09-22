@@ -13,7 +13,7 @@
 //   node viewer/fixtures/run.mjs [--strict] [--json out.json] [--only LF-01,LF-09]
 //                                [--ledger sandbox=/path/to/ledger] [--bin ./bin/cs-ledger]
 //                                [--keep] [--allow-skip] [--verbose]
-//                                [--record [--approve <dispatch-id> --reason "<text>"]]
+//                                [--record [--approve <dispatch-id> --reason "<text>"] [--record-all]]
 //
 // --record rewrites expectations.json from what was just measured. Frozen-value
 // contract (per the campaign's frozen-values document): a change to a `keep`
@@ -27,6 +27,12 @@
 // an error, never a blank. A new row is not an approved write but is disclosed
 // with an `origin` field whose id is the --approve id, or the member name
 // ("ledger") when no flags are given — never a placeholder.
+//
+// An approval is per row. --only names the rows the reviewer signed off, and a
+// gated change to any row it does not name is refused: the runner lists those
+// rows, writes nothing, and prints the --only line to paste. Without --only an
+// approval names no row. --record-all is the explicit act that applies one
+// approval to every row, for a deliberate full re-record.
 //
 // Rows against this repo's own ledger derive what depends on its records (the
 // counts, the ids, the lanes, the orders) from the records the page was rendered
@@ -49,6 +55,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import puppeteer from "puppeteer-core";
 import { expected as derivedValue, frozenPart, pageData } from "./derive.mjs";
+import { approveLine, onlyArgs, outsideApproval } from "./scope.mjs";
 import { focusRoles, selectors } from "./selectors.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -61,7 +68,7 @@ const argv = process.argv.slice(2);
 const flag = (name) => argv.includes(name);
 const opt = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : undefined; };
 const opts = {
-  strict: flag("--strict"), record: flag("--record"), keep: flag("--keep"), allowSkip: flag("--allow-skip"),
+  strict: flag("--strict"), record: flag("--record"), recordAll: flag("--record-all"), keep: flag("--keep"), allowSkip: flag("--allow-skip"),
   verbose: flag("--verbose"), json: opt("--json"), only: (opt("--only") ?? "").split(",").filter(Boolean),
   approve: opt("--approve"), reason: opt("--reason"),
   bin: opt("--bin") ?? process.env.LEDGER_FIXTURES_BIN ?? path.join(REPO, "bin", "cs-ledger"),
@@ -73,6 +80,7 @@ if ((opts.approve === undefined) !== (opts.reason === undefined)) {
   process.exit(2);
 }
 if (opts.approve !== undefined && !opts.record) console.error("fixtures: note: --approve/--reason have no effect without --record");
+if (opts.recordAll && !opts.record) console.error("fixtures: note: --record-all has no effect without --record");
 if (flag("--help") || flag("-h")) {
   const lines = readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1);
   console.log(lines.slice(0, lines.findIndex((l) => !l.startsWith("//"))).map((l) => l.replace(/^\/\/ ?/, "")).join("\n"));
@@ -597,15 +605,26 @@ if (opts.record) {
     console.error(`fixtures: --record error: ${impossible.join(", ")} — not measured and no prior expectation to carry forward; a row is never written from nothing. NOTHING was written.`);
     process.exit(1);
   }
+  const gatedIds = gated.map((g) => g.id);
   if (gated.length && !approval) {
     console.error("fixtures: --record REFUSED — gated frozen value(s) would change and no --approve/--reason was given. NOTHING was written.");
     for (const g of gated) console.error(`fixtures:   gated: ${g.id} — ${g.kind}: ${brief(g.previous, 60)} → ${brief(g.measured, 60)}`);
     console.error(`fixtures: rows this write would have written (${wouldWrite.length} changed of ${proposed.length}):`);
     for (const wrow of wouldWrite) console.error(`fixtures:   ${wrow}`);
-    console.error("fixtures: authorise this exact write with:");
-    console.error(`fixtures:   node viewer/fixtures/run.mjs --record --approve <dispatch-id> --reason "<why this change is authorised>"`);
+    console.error("fixtures: an approval is per row. Authorise the rows the reviewer signed off, here all of them, with:");
+    console.error(`fixtures:   ${approveLine(opts.recordAll ? "--record-all" : onlyArgs(gatedIds), null)}`);
     process.exit(1);
   }
+  const outside = outsideApproval(gatedIds, opts.only, opts.recordAll);
+  if (outside.length) {
+    console.error(`fixtures: --record REFUSED — an approval is per row, and ${outside.length} gated row(s) would change that --only does not name. NOTHING was written.`);
+    for (const g of gated.filter((g) => outside.includes(g.id))) console.error(`fixtures:   gated: ${g.id} — ${g.kind}: ${brief(g.previous, 60)} → ${brief(g.measured, 60)}`);
+    console.error("fixtures: name only the rows the reviewer signed off. To approve all of these:");
+    console.error(`fixtures:   ${approveLine(onlyArgs([...opts.only, ...gatedIds]), approval)}`);
+    console.error("fixtures: or re-record every row on purpose with FIXTURES_ARGS=--record-all.");
+    process.exit(1);
+  }
+  if (opts.recordAll && gated.length) console.log(`fixtures: --record-all — approval ${approval.id} applied to every gated row rather than to named ones`);
   // Rows outside --only, or no longer in the catalogue, pass through verbatim.
   const catalogue = new Set(CHECKS.map((c) => c.id));
   const keep = (expected.checks ?? []).filter((c) => !wanted(c.id) || !catalogue.has(c.id));

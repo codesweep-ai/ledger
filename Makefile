@@ -205,13 +205,17 @@ fixtures: build-go
 # The own-ledger rows derive their counts through viewer/fixtures/derive.mjs.
 # This checks that model against the frozen sandbox values with Node alone, so
 # a wrong model fails in CI rather than on the next machine with a Chromium.
+# It also holds record-fixtures to approving only the rows --only names.
 fixtures-model:
-	node --test $(VIEWER_DIR)/fixtures/derive.test.mjs
+	node --test $(VIEWER_DIR)/fixtures/derive.test.mjs $(VIEWER_DIR)/fixtures/scope.test.mjs
 
 ## record-fixtures: rewrite viewer/fixtures/expectations.json from a live run
 # Named record-* because it overwrites a committed file (see `make conventions`).
 # Changing a frozen value needs the reviewer's sign-off, which the runner asks
-# for as APPROVE=<id> REASON="<text>" and records in the row it rewrites.
+# for as APPROVE=<id> REASON="<text>" and records in the row it rewrites. The
+# sign-off is per row: FIXTURES_ARGS="--only LF-02,LF-03" names the rows, and
+# the runner refuses a frozen change to any other. FIXTURES_ARGS=--record-all
+# applies it to every row, for a deliberate full re-record.
 record-fixtures: build-go
 	cd $(VIEWER_DIR) && $(NPM) run fixtures -- --record $(if $(APPROVE),--approve $(APPROVE) --reason "$(REASON)") $(FIXTURES_ARGS)
 
