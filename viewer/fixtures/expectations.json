@@ -1,6 +1,6 @@
 {
   "meta": {
-    "recordedAt": "2026-09-09",
+    "recordedAt": "2026-09-22",
     "clock": "2026-08-21T12:00:00Z",
     "viewport": {
       "width": 1280,
@@ -61,12 +61,13 @@
           "light": "light",
           "dark": "dark"
         },
-        "records": 4,
+        "records": 5,
         "ids": [
           "LGR-001",
           "LGR-009",
           "LGR-010",
-          "LGR-012"
+          "LGR-012",
+          "LGR-013"
         ],
         "severityLabels": [
           "low",
@@ -95,20 +96,21 @@
         "lanes": [
           {
             "label": "Open",
-            "count": 4
+            "count": 5
           },
           {
             "label": "Closed / retired",
-            "count": 8
+            "count": 9
           }
         ],
         "darkDiffers": {
-          "records": 4,
+          "records": 5,
           "ids": [
             "LGR-001",
             "LGR-009",
             "LGR-010",
-            "LGR-012"
+            "LGR-012",
+            "LGR-013"
           ],
           "severityLabels": [
             "low",
@@ -132,17 +134,17 @@
             "sev · all",
             "stale only",
             "reset",
-            "new since last visit (2)"
+            "new since last visit (4)"
           ],
           "search": true,
           "lanes": [
             {
               "label": "Open",
-              "count": 4
+              "count": 5
             },
             {
               "label": "Closed / retired",
-              "count": 8
+              "count": 9
             }
           ]
         }
@@ -154,55 +156,9 @@
         "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
       },
       "approval": {
-        "id": "host",
-        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "id": "LGR-012",
+        "reason": "records grew from 12 to 14",
         "previous": {
-          "themes": {
-            "light": "light",
-            "dark": "dark"
-          },
-          "records": 3,
-          "ids": [
-            "LGR-001",
-            "LGR-009",
-            "LGR-010"
-          ],
-          "severityLabels": [
-            "low",
-            "med"
-          ],
-          "statusLabels": [
-            "Closed / retired",
-            "Open"
-          ],
-          "viewSwitch": [
-            "brief",
-            "board",
-            "list",
-            "activity",
-            "?"
-          ],
-          "toolbar": [
-            "[search] search id, title, details…",
-            "status · all",
-            "type · all",
-            "sev · all",
-            "stale only",
-            "reset"
-          ],
-          "search": true,
-          "lanes": [
-            {
-              "label": "Open",
-              "count": 3
-            },
-            {
-              "label": "Closed / retired",
-              "count": 7
-            }
-          ]
-        },
-        "measured": {
           "themes": {
             "light": "light",
             "dark": "dark"
@@ -292,6 +248,99 @@
               }
             ]
           }
+        },
+        "measured": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 5,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012",
+            "LGR-013"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed / retired",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset"
+          ],
+          "search": true,
+          "lanes": [
+            {
+              "label": "Open",
+              "count": 5
+            },
+            {
+              "label": "Closed / retired",
+              "count": 9
+            }
+          ],
+          "darkDiffers": {
+            "records": 5,
+            "ids": [
+              "LGR-001",
+              "LGR-009",
+              "LGR-010",
+              "LGR-012",
+              "LGR-013"
+            ],
+            "severityLabels": [
+              "low",
+              "med"
+            ],
+            "statusLabels": [
+              "Closed / retired",
+              "Open"
+            ],
+            "viewSwitch": [
+              "brief",
+              "board",
+              "list",
+              "activity",
+              "?"
+            ],
+            "toolbar": [
+              "[search] search id, title, details…",
+              "status · all",
+              "type · all",
+              "sev · all",
+              "stale only",
+              "reset",
+              "new since last visit (4)"
+            ],
+            "search": true,
+            "lanes": [
+              {
+                "label": "Open",
+                "count": 5
+              },
+              {
+                "label": "Closed / retired",
+                "count": 9
+              }
+            ]
+          }
         }
       }
     },
@@ -303,12 +352,13 @@
           "light": "light",
           "dark": "dark"
         },
-        "records": 4,
+        "records": 5,
         "ids": [
           "LGR-001",
           "LGR-009",
           "LGR-010",
-          "LGR-012"
+          "LGR-012",
+          "LGR-013"
         ],
         "severityLabels": [
           "low",
@@ -339,20 +389,21 @@
         "groups": [
           {
             "label": "Open",
-            "count": 4
+            "count": 5
           },
           {
             "label": "Closed",
-            "count": 8
+            "count": 9
           }
         ],
         "darkDiffers": {
-          "records": 4,
+          "records": 5,
           "ids": [
             "LGR-001",
             "LGR-009",
             "LGR-010",
-            "LGR-012"
+            "LGR-012",
+            "LGR-013"
           ],
           "severityLabels": [
             "low",
@@ -378,17 +429,17 @@
             "reset",
             "group · status",
             "sort · id",
-            "new since last visit (2)"
+            "new since last visit (4)"
           ],
           "search": true,
           "groups": [
             {
               "label": "Open",
-              "count": 4
+              "count": 5
             },
             {
               "label": "Closed",
-              "count": 8
+              "count": 9
             }
           ]
         }
@@ -400,57 +451,9 @@
         "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
       },
       "approval": {
-        "id": "host",
-        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "id": "LGR-012",
+        "reason": "records grew from 12 to 14",
         "previous": {
-          "themes": {
-            "light": "light",
-            "dark": "dark"
-          },
-          "records": 3,
-          "ids": [
-            "LGR-001",
-            "LGR-009",
-            "LGR-010"
-          ],
-          "severityLabels": [
-            "low",
-            "med"
-          ],
-          "statusLabels": [
-            "Closed",
-            "Open"
-          ],
-          "viewSwitch": [
-            "brief",
-            "board",
-            "list",
-            "activity",
-            "?"
-          ],
-          "toolbar": [
-            "[search] search id, title, details…",
-            "status · all",
-            "type · all",
-            "sev · all",
-            "stale only",
-            "reset",
-            "group · status",
-            "sort · id"
-          ],
-          "search": true,
-          "groups": [
-            {
-              "label": "Open",
-              "count": 3
-            },
-            {
-              "label": "Closed",
-              "count": 7
-            }
-          ]
-        },
-        "measured": {
           "themes": {
             "light": "light",
             "dark": "dark"
@@ -544,6 +547,103 @@
               }
             ]
           }
+        },
+        "measured": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 5,
+          "ids": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012",
+            "LGR-013"
+          ],
+          "severityLabels": [
+            "low",
+            "med"
+          ],
+          "statusLabels": [
+            "Closed",
+            "Open"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset",
+            "group · status",
+            "sort · id"
+          ],
+          "search": true,
+          "groups": [
+            {
+              "label": "Open",
+              "count": 5
+            },
+            {
+              "label": "Closed",
+              "count": 9
+            }
+          ],
+          "darkDiffers": {
+            "records": 5,
+            "ids": [
+              "LGR-001",
+              "LGR-009",
+              "LGR-010",
+              "LGR-012",
+              "LGR-013"
+            ],
+            "severityLabels": [
+              "low",
+              "med"
+            ],
+            "statusLabels": [
+              "Closed",
+              "Open"
+            ],
+            "viewSwitch": [
+              "brief",
+              "board",
+              "list",
+              "activity",
+              "?"
+            ],
+            "toolbar": [
+              "[search] search id, title, details…",
+              "status · all",
+              "type · all",
+              "sev · all",
+              "stale only",
+              "reset",
+              "group · status",
+              "sort · id",
+              "new since last visit (4)"
+            ],
+            "search": true,
+            "groups": [
+              {
+                "label": "Open",
+                "count": 5
+              },
+              {
+                "label": "Closed",
+                "count": 9
+              }
+            ]
+          }
         }
       }
     },
@@ -555,7 +655,7 @@
           "light": "light",
           "dark": "dark"
         },
-        "records": 25,
+        "records": 30,
         "ids": [
           "LGR-001",
           "LGR-002",
@@ -568,7 +668,9 @@
           "LGR-009",
           "LGR-010",
           "LGR-011",
-          "LGR-012"
+          "LGR-012",
+          "LGR-013",
+          "LGR-014"
         ],
         "severityLabels": [],
         "statusLabels": [
@@ -594,7 +696,7 @@
         ],
         "search": true,
         "darkDiffers": {
-          "records": 25,
+          "records": 30,
           "ids": [
             "LGR-001",
             "LGR-002",
@@ -607,7 +709,9 @@
             "LGR-009",
             "LGR-010",
             "LGR-011",
-            "LGR-012"
+            "LGR-012",
+            "LGR-013",
+            "LGR-014"
           ],
           "severityLabels": [],
           "statusLabels": [
@@ -630,7 +734,7 @@
             "sev · all",
             "stale only",
             "reset",
-            "new since last visit (2)"
+            "new since last visit (4)"
           ],
           "search": true
         }
@@ -642,94 +746,9 @@
         "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
       },
       "approval": {
-        "id": "host",
-        "reason": "Appending LGR-012's note added a dated event, which moved the own activity count. This is the fault LGR-012 records, demonstrated by the record itself.",
+        "id": "LGR-012",
+        "reason": "records grew from 12 to 14",
         "previous": {
-          "themes": {
-            "light": "light",
-            "dark": "dark"
-          },
-          "records": 24,
-          "ids": [
-            "LGR-001",
-            "LGR-002",
-            "LGR-003",
-            "LGR-004",
-            "LGR-005",
-            "LGR-006",
-            "LGR-007",
-            "LGR-008",
-            "LGR-009",
-            "LGR-010",
-            "LGR-011",
-            "LGR-012"
-          ],
-          "severityLabels": [],
-          "statusLabels": [
-            "Activity — newest first",
-            "closed",
-            "note",
-            "opened"
-          ],
-          "viewSwitch": [
-            "brief",
-            "board",
-            "list",
-            "activity",
-            "?"
-          ],
-          "toolbar": [
-            "[search] search id, title, details…",
-            "status · all",
-            "type · all",
-            "sev · all",
-            "stale only",
-            "reset"
-          ],
-          "search": true,
-          "darkDiffers": {
-            "records": 24,
-            "ids": [
-              "LGR-001",
-              "LGR-002",
-              "LGR-003",
-              "LGR-004",
-              "LGR-005",
-              "LGR-006",
-              "LGR-007",
-              "LGR-008",
-              "LGR-009",
-              "LGR-010",
-              "LGR-011",
-              "LGR-012"
-            ],
-            "severityLabels": [],
-            "statusLabels": [
-              "Activity — newest first",
-              "closed",
-              "note",
-              "opened"
-            ],
-            "viewSwitch": [
-              "brief",
-              "board",
-              "list",
-              "activity",
-              "?"
-            ],
-            "toolbar": [
-              "[search] search id, title, details…",
-              "status · all",
-              "type · all",
-              "sev · all",
-              "stale only",
-              "reset",
-              "new since last visit (2)"
-            ],
-            "search": true
-          }
-        },
-        "measured": {
           "themes": {
             "light": "light",
             "dark": "dark"
@@ -810,6 +829,95 @@
               "stale only",
               "reset",
               "new since last visit (2)"
+            ],
+            "search": true
+          }
+        },
+        "measured": {
+          "themes": {
+            "light": "light",
+            "dark": "dark"
+          },
+          "records": 30,
+          "ids": [
+            "LGR-001",
+            "LGR-002",
+            "LGR-003",
+            "LGR-004",
+            "LGR-005",
+            "LGR-006",
+            "LGR-007",
+            "LGR-008",
+            "LGR-009",
+            "LGR-010",
+            "LGR-011",
+            "LGR-012",
+            "LGR-013",
+            "LGR-014"
+          ],
+          "severityLabels": [],
+          "statusLabels": [
+            "Activity — newest first",
+            "closed",
+            "note",
+            "opened"
+          ],
+          "viewSwitch": [
+            "brief",
+            "board",
+            "list",
+            "activity",
+            "?"
+          ],
+          "toolbar": [
+            "[search] search id, title, details…",
+            "status · all",
+            "type · all",
+            "sev · all",
+            "stale only",
+            "reset"
+          ],
+          "search": true,
+          "darkDiffers": {
+            "records": 30,
+            "ids": [
+              "LGR-001",
+              "LGR-002",
+              "LGR-003",
+              "LGR-004",
+              "LGR-005",
+              "LGR-006",
+              "LGR-007",
+              "LGR-008",
+              "LGR-009",
+              "LGR-010",
+              "LGR-011",
+              "LGR-012",
+              "LGR-013",
+              "LGR-014"
+            ],
+            "severityLabels": [],
+            "statusLabels": [
+              "Activity — newest first",
+              "closed",
+              "note",
+              "opened"
+            ],
+            "viewSwitch": [
+              "brief",
+              "board",
+              "list",
+              "activity",
+              "?"
+            ],
+            "toolbar": [
+              "[search] search id, title, details…",
+              "status · all",
+              "type · all",
+              "sev · all",
+              "stale only",
+              "reset",
+              "new since last visit (4)"
             ],
             "search": true
           }
@@ -1314,14 +1422,14 @@
       "id": "LF-12",
       "name": "status cycle → label + count after 1 and 2 clicks (own, list, all groups expanded)",
       "value": {
-        "all": 12,
+        "all": 14,
         "afterClick1": {
           "label": "status · open",
-          "count": 4
+          "count": 5
         },
         "afterClick2": {
           "label": "status · closed",
-          "count": 8
+          "count": 9
         }
       },
       "status": "keep",
@@ -1330,20 +1438,9 @@
         "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
       },
       "approval": {
-        "id": "host",
-        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "id": "LGR-012",
+        "reason": "records grew from 12 to 14",
         "previous": {
-          "all": 10,
-          "afterClick1": {
-            "label": "status · open",
-            "count": 3
-          },
-          "afterClick2": {
-            "label": "status · closed",
-            "count": 7
-          }
-        },
-        "measured": {
           "all": 12,
           "afterClick1": {
             "label": "status · open",
@@ -1353,6 +1450,17 @@
             "label": "status · closed",
             "count": 8
           }
+        },
+        "measured": {
+          "all": 14,
+          "afterClick1": {
+            "label": "status · open",
+            "count": 5
+          },
+          "afterClick2": {
+            "label": "status · closed",
+            "count": 9
+          }
         }
       }
     },
@@ -1360,7 +1468,7 @@
       "id": "LF-13",
       "name": "severity cycle → label + count after 1 and 2 clicks (own)",
       "value": {
-        "all": 12,
+        "all": 14,
         "afterClick1": {
           "label": "sev · crit",
           "count": 0
@@ -1376,21 +1484,21 @@
         "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
       },
       "approval": {
-        "id": "host",
-        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "id": "LGR-012",
+        "reason": "records grew from 12 to 14",
         "previous": {
-          "all": 10,
+          "all": 12,
           "afterClick1": {
             "label": "sev · crit",
             "count": 0
           },
           "afterClick2": {
             "label": "sev · high+",
-            "count": 0
+            "count": 1
           }
         },
         "measured": {
-          "all": 12,
+          "all": 14,
           "afterClick1": {
             "label": "sev · crit",
             "count": 0
@@ -1411,16 +1519,16 @@
           "LGR-009",
           "LGR-010",
           "LGR-012",
-          "LGR-011"
+          "LGR-013"
         ],
         "afterClick1": {
           "label": "sort · activity",
           "first5": [
+            "LGR-013",
             "LGR-012",
             "LGR-009",
             "LGR-010",
-            "LGR-001",
-            "LGR-011"
+            "LGR-001"
           ]
         },
         "afterClick2": {
@@ -1430,7 +1538,7 @@
             "LGR-012",
             "LGR-001",
             "LGR-010",
-            "LGR-011"
+            "LGR-013"
           ]
         },
         "afterClick3": {
@@ -1440,7 +1548,7 @@
             "LGR-009",
             "LGR-010",
             "LGR-012",
-            "LGR-011"
+            "LGR-013"
           ]
         }
       },
@@ -1450,48 +1558,9 @@
         "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
       },
       "approval": {
-        "id": "host",
-        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "id": "LGR-012",
+        "reason": "records grew from 12 to 14",
         "previous": {
-          "id": [
-            "LGR-001",
-            "LGR-009",
-            "LGR-010",
-            "LGR-008",
-            "LGR-007"
-          ],
-          "afterClick1": {
-            "label": "sort · activity",
-            "first5": [
-              "LGR-009",
-              "LGR-010",
-              "LGR-001",
-              "LGR-002",
-              "LGR-003"
-            ]
-          },
-          "afterClick2": {
-            "label": "sort · severity",
-            "first5": [
-              "LGR-009",
-              "LGR-001",
-              "LGR-010",
-              "LGR-002",
-              "LGR-003"
-            ]
-          },
-          "afterClick3": {
-            "label": "sort · id",
-            "first5": [
-              "LGR-001",
-              "LGR-009",
-              "LGR-010",
-              "LGR-008",
-              "LGR-007"
-            ]
-          }
-        },
-        "measured": {
           "id": [
             "LGR-001",
             "LGR-009",
@@ -1527,6 +1596,45 @@
               "LGR-010",
               "LGR-012",
               "LGR-011"
+            ]
+          }
+        },
+        "measured": {
+          "id": [
+            "LGR-001",
+            "LGR-009",
+            "LGR-010",
+            "LGR-012",
+            "LGR-013"
+          ],
+          "afterClick1": {
+            "label": "sort · activity",
+            "first5": [
+              "LGR-013",
+              "LGR-012",
+              "LGR-009",
+              "LGR-010",
+              "LGR-001"
+            ]
+          },
+          "afterClick2": {
+            "label": "sort · severity",
+            "first5": [
+              "LGR-009",
+              "LGR-012",
+              "LGR-001",
+              "LGR-010",
+              "LGR-013"
+            ]
+          },
+          "afterClick3": {
+            "label": "sort · id",
+            "first5": [
+              "LGR-001",
+              "LGR-009",
+              "LGR-010",
+              "LGR-012",
+              "LGR-013"
             ]
           }
         }
@@ -1537,7 +1645,7 @@
       "name": "reset → count returns to all, search cleared (own)",
       "value": {
         "beforeReset": 0,
-        "afterReset": 12,
+        "afterReset": 14,
         "equalsAll": true,
         "searchCleared": true
       },
@@ -1547,17 +1655,17 @@
         "reason": "Both corpora are now carried by the repo (own and the committed fixtures/sandbox/ledger); the external campaign ledger lookup is gone. Regenerated from scratch rather than merged, because the check set changed and ids are positional: a merge left one row holding a removed size check target under a network check name. The prior file carried no approval blocks, so no provenance was lost."
       },
       "approval": {
-        "id": "host",
-        "reason": "This repository's own ledger gained LGR-011 and LGR-012, and the ui pin moved to 0.2.1-dev.20260831063919.0d88493. The own-corpus rows froze literal record ids and counts, so they measured the corpus rather than the viewer; every one has a sandbox twin that passed unchanged. LGR-012 records the design fault.",
+        "id": "LGR-012",
+        "reason": "records grew from 12 to 14",
         "previous": {
           "beforeReset": 0,
-          "afterReset": 10,
+          "afterReset": 12,
           "equalsAll": true,
           "searchCleared": true
         },
         "measured": {
           "beforeReset": 0,
-          "afterReset": 12,
+          "afterReset": 14,
           "equalsAll": true,
           "searchCleared": true
         }
