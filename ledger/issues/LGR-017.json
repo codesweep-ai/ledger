@@ -3,15 +3,26 @@
   "title": "An approval still moves the baseline of every must-change row it does not name",
   "type": "defect",
   "severity": "med",
-  "status": "in-progress",
+  "status": "closed",
   "foundBy": "user report (host): \"Add the missing parts of SAC-056, item 3 and item 5\", after the note on LGR-015 that its rule covers gated rows only",
   "opened": "2026-09-22",
-  "resolved": null,
+  "resolved": "2026-09-22",
   "stint": "record-scope",
-  "evidence": { "commits": [], "integrated": [], "verified": null },
-  "resolution": null,
+  "evidence": {
+    "commits": [
+      "4987451"
+    ],
+    "integrated": [],
+    "verified": "At 4987451, `node --test viewer/fixtures/scope.test.mjs` passes 8 of 8, and `make fixtures-model` passes 12 of 12. With `refusal` covering gated rows alone, as before, 2 of the 8 fail. With `recordedAt` stamped on every run, 1 fails. Before the fix, with the runner as at 144b5d6, a bare `make record-fixtures APPROVE=LGR-017 REASON=before` exited 0 and rewrote LF-27, LF-28, LF-34, LF-37, LF-42 and `recordedAt`. At 4987451 the same command fails with exit 2, names those five baselines, prints the `--only` line and leaves `git status` clean. A run with `--only LF-25`, which changes no row, prints that nothing changed and leaves the file byte-identical. `--only LF-27` records LF-27 alone, and `--record-all` records all five. `make fixtures` returns PASS 29, DONE 18, FAIL 0."
+  },
+  "resolution": "An approval writes nothing it does not name. `--record` refuses a moved `must-change` baseline outside `--only` as it refuses a gated change, though a baseline needs naming rather than an approval block. A run that changes no row leaves `expectations.json` byte-identical.",
   "details": "A `must-change` row's `value` is the baseline its progress is measured from. The runner reports an axe row as `serious/critical nodes 3 (baseline 5, Δ-2)`, and any other row as changed from that baseline or unchanged. `--record` rewrites that baseline whenever a fresh measurement differs, and the per-row approval added for LGR-015 does not cover it. A bare `make record-fixtures APPROVE=<id> REASON=<text>` on an unchanged tree therefore rewrites LF-27, LF-28, LF-34, LF-37 and LF-42, whose axe counts grow with this ledger. The progress those rows had recorded then reads as zero, and nothing in the diff says why.\n\nThe same run also rewrites `meta.recordedAt` when no row changed, so a run that records nothing still leaves `viewer/fixtures/expectations.json` modified.\n\nTo reproduce, run `make record-fixtures APPROVE=x REASON=y` on a clean tree and read `git diff viewer/fixtures/expectations.json`.",
-  "notes": [],
+  "notes": [
+    {
+      "date": "2026-09-22",
+      "text": "A row the catalogue gains still needs no naming. It moves no recorded value, so it is disclosed with an `origin` field, as before."
+    }
+  ],
   "links": [
     "LGR-015"
   ]
