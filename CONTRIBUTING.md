@@ -56,7 +56,8 @@ while you work, and `make ci` is the one that has to pass.
 
 No linter needs installing. Every one the gates shell out to is pinned and built from the module
 cache on first use: `golangci-lint`, `deadcode`, `actionlint` and `cs-lint`. `make repin` moves the
-`cs-lint` pin to the branch tip, and `make versions` says which builds the gates used.
+`cs-lint` pin to the last commit its CI passed, and `make versions` says which builds the gates
+used.
 
 Moving a linter pin is an edit to `go.mod`, or to `go.golangci.mod` for `golangci-lint`. A linter
 release reaches you when you ask for it, not on an unrelated pull request.
