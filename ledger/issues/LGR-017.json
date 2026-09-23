@@ -1,0 +1,18 @@
+{
+  "id": "LGR-017",
+  "title": "An approval still moves the baseline of every must-change row it does not name",
+  "type": "defect",
+  "severity": "med",
+  "status": "in-progress",
+  "foundBy": "user report (host): \"Add the missing parts of SAC-056, item 3 and item 5\", after the note on LGR-015 that its rule covers gated rows only",
+  "opened": "2026-09-22",
+  "resolved": null,
+  "stint": "record-scope",
+  "evidence": { "commits": [], "integrated": [], "verified": null },
+  "resolution": null,
+  "details": "A `must-change` row's `value` is the baseline its progress is measured from. The runner reports an axe row as `serious/critical nodes 3 (baseline 5, Δ-2)`, and any other row as changed from that baseline or unchanged. `--record` rewrites that baseline whenever a fresh measurement differs, and the per-row approval added for LGR-015 does not cover it. A bare `make record-fixtures APPROVE=<id> REASON=<text>` on an unchanged tree therefore rewrites LF-27, LF-28, LF-34, LF-37 and LF-42, whose axe counts grow with this ledger. The progress those rows had recorded then reads as zero, and nothing in the diff says why.\n\nThe same run also rewrites `meta.recordedAt` when no row changed, so a run that records nothing still leaves `viewer/fixtures/expectations.json` modified.\n\nTo reproduce, run `make record-fixtures APPROVE=x REASON=y` on a clean tree and read `git diff viewer/fixtures/expectations.json`.",
+  "notes": [],
+  "links": [
+    "LGR-015"
+  ]
+}
