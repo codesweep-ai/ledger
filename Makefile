@@ -214,8 +214,9 @@ fixtures-model:
 # Changing a frozen value needs the reviewer's sign-off, which the runner asks
 # for as APPROVE=<id> REASON="<text>" and records in the row it rewrites. The
 # sign-off is per row: FIXTURES_ARGS="--only LF-02,LF-03" names the rows, and
-# the runner refuses a frozen change to any other. FIXTURES_ARGS=--record-all
-# applies it to every row, for a deliberate full re-record.
+# the runner refuses a change to any other, a must-change baseline included.
+# FIXTURES_ARGS=--record-all applies it to every row, for a deliberate full
+# re-record.
 record-fixtures: build-go
 	cd $(VIEWER_DIR) && $(NPM) run fixtures -- --record $(if $(APPROVE),--approve $(APPROVE) --reason "$(REASON)") $(FIXTURES_ARGS)
 

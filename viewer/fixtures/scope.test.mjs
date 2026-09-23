@@ -1,10 +1,10 @@
 // node --test viewer/fixtures/scope.test.mjs — the rule that an approval is per
 // row, without a browser. `make fixtures-model` runs it. run.mjs asks scope.mjs
-// which gated rows an approval leaves out, and refuses the write when any are.
+// which changed rows an approval leaves out, and refuses the write when any are.
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { approveLine, onlyArgs, outsideApproval } from "./scope.mjs";
+import { approveLine, expectationsText, onlyArgs, outsideApproval, refusal } from "./scope.mjs";
 
 // Both deps-maintenance pilots ran with these seven rows failing for a reason
 // nobody had approved: the own ledger had grown from 12 records to 14.
@@ -42,4 +42,33 @@ test("the refusal prints a line that approves exactly the rows it lists", () => 
     approveLine("--record-all", null),
     `make record-fixtures APPROVE=<dispatch-id> REASON="<why this change is authorised>" FIXTURES_ARGS="--record-all"`,
   );
+});
+
+// A bare approved run on an unchanged tree moved these five baselines, because
+// their axe counts grow with this repository's own ledger.
+const baselines = ["LF-27", "LF-28", "LF-34", "LF-37", "LF-42"];
+
+test("a moved must-change baseline needs naming like a gated change", () => {
+  const r = refusal({ gated: [], moved: baselines, only: [], recordAll: false, approval: { id: "LGR-017", reason: "axe counts grew" } });
+  assert.deepEqual(r.outside, baselines);
+  assert.equal(r.line, `make record-fixtures APPROVE=LGR-017 REASON='axe counts grew' FIXTURES_ARGS="--only LF-27,LF-28,LF-34,LF-37,LF-42"`);
+  assert.equal(refusal({ gated: [], moved: ["LF-27"], only: ["LF-27"], recordAll: false, approval: null }), null);
+  assert.equal(refusal({ gated: [], moved: baselines, only: [], recordAll: true, approval: null }), null);
+});
+
+test("a baseline refused without an approval asks for naming, not for one", () => {
+  assert.equal(refusal({ gated: [], moved: ["LF-27"], only: [], recordAll: false, approval: null }).line, `make record-fixtures FIXTURES_ARGS="--only LF-27"`);
+  assert.equal(
+    refusal({ gated: ["LF-09"], moved: ["LF-27"], only: [], recordAll: false, approval: null }).line,
+    `make record-fixtures APPROVE=<dispatch-id> REASON="<why this change is authorised>" FIXTURES_ARGS="--only LF-09,LF-27"`,
+  );
+});
+
+test("a run that changes no row leaves expectations.json byte-identical", () => {
+  const file = `${JSON.stringify({ meta: { recordedAt: "2026-09-01", clock: "c" }, checks: [{ id: "LF-01", value: 1 }] }, null, 2)}\n`;
+  const same = { meta: { recordedAt: undefined, clock: "c" }, checks: [{ id: "LF-01", value: 1 }] };
+  assert.equal(expectationsText(file, same, "2026-09-22"), null);
+  const moved = { meta: { recordedAt: undefined, clock: "c" }, checks: [{ id: "LF-01", value: 2 }] };
+  assert.equal(JSON.parse(expectationsText(file, moved, "2026-09-22")).meta.recordedAt, "2026-09-22");
+  assert.equal(JSON.parse(expectationsText(undefined, same, "2026-09-22")).meta.recordedAt, "2026-09-22");
 });

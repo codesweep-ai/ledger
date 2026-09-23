@@ -29,10 +29,14 @@
 // ("ledger") when no flags are given — never a placeholder.
 //
 // An approval is per row. --only names the rows the reviewer signed off, and a
-// gated change to any row it does not name is refused: the runner lists those
-// rows, writes nothing, and prints the --only line to paste. Without --only an
-// approval names no row. --record-all is the explicit act that applies one
-// approval to every row, for a deliberate full re-record.
+// change to any row it does not name is refused: the runner lists those rows,
+// writes nothing, and prints the --only line to paste. That covers a gated
+// change and a moved `must-change` baseline alike. A baseline is what the run
+// reports progress from, so moving it unnamed would erase recorded progress; it
+// needs naming but no --approve. Without --only an approval names no row.
+// --record-all is the explicit act that applies one approval to every row, for
+// a deliberate full re-record. A run that changes no row leaves
+// expectations.json byte-identical, recordedAt included.
 //
 // Rows against this repo's own ledger derive what depends on its records (the
 // counts, the ids, the lanes, the orders) from the records the page was rendered
@@ -55,7 +59,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import puppeteer from "puppeteer-core";
 import { expected as derivedValue, frozenPart, pageData } from "./derive.mjs";
-import { approveLine, onlyArgs, outsideApproval } from "./scope.mjs";
+import { approveLine, expectationsText, onlyArgs, refusal } from "./scope.mjs";
 import { focusRoles, selectors } from "./selectors.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -114,7 +118,8 @@ const LEDGERS = {
   sandbox: { dir: opts.ledgerOverrides.sandbox ?? path.join(REPO, "fixtures", "sandbox", "ledger"), label: "sandbox fixture" },
 };
 
-const expected = existsSync(EXPECTATIONS) ? JSON.parse(readFileSync(EXPECTATIONS, "utf8")) : { meta: {}, checks: [] };
+const expectedText = existsSync(EXPECTATIONS) ? readFileSync(EXPECTATIONS, "utf8") : undefined;
+const expected = expectedText !== undefined ? JSON.parse(expectedText) : { meta: {}, checks: [] };
 // The page's clock is frozen so "stale Nd" / "new since last visit" never drift.
 const CLOCK = expected.meta?.clock ?? "2026-08-21T12:00:00Z";
 
@@ -536,6 +541,7 @@ if (opts.record) {
   const approval = opts.approve !== undefined ? { id: opts.approve, reason: opts.reason } : null;
   const proposed = [];    // rows this write would contain (the wanted portion)
   const gated = [];       // { id, kind, previous, measured } — require --approve/--reason
+  const moved = [];       // { id, previous, measured } — must-change baselines: named, not approved
   const wouldWrite = [];  // every row whose written content differs from the file
   const created = [];     // new rows: not an approved write, but disclosed
   const impossible = [];  // neither measured nor carried forward — an error, never a blank
@@ -579,7 +585,7 @@ if (opts.record) {
     } else if (measuredOk && canon(v) !== canon(prev.value)) {
       e.value = v;
       if (e.status === "keep") rowGated.push({ kind: "keep value change", previous: prev.value, measured: v });
-      else wouldWrite.push(`${c.id} (must-change value: progress measurement)`);
+      else { moved.push({ id: c.id, previous: prev.value, measured: v }); wouldWrite.push(`${c.id} (must-change baseline)`); }
     }
     if (c.target && canon(c.target) !== canon(prev.target)) {
       e.target = c.target;
@@ -615,22 +621,25 @@ if (opts.record) {
     console.error(`fixtures:   ${approveLine(opts.recordAll ? "--record-all" : onlyArgs(gatedIds), null)}`);
     process.exit(1);
   }
-  const outside = outsideApproval(gatedIds, opts.only, opts.recordAll);
-  if (outside.length) {
-    console.error(`fixtures: --record REFUSED — an approval is per row, and ${outside.length} gated row(s) would change that --only does not name. NOTHING was written.`);
+  const refused = refusal({ gated: gatedIds, moved: moved.map((m) => m.id), only: opts.only, recordAll: opts.recordAll, approval });
+  if (refused) {
+    const { outside } = refused;
+    console.error(`fixtures: --record REFUSED — an approval is per row, and ${outside.length} row(s) would change that --only does not name. NOTHING was written.`);
     for (const g of gated.filter((g) => outside.includes(g.id))) console.error(`fixtures:   gated: ${g.id} — ${g.kind}: ${brief(g.previous, 60)} → ${brief(g.measured, 60)}`);
-    console.error("fixtures: name only the rows the reviewer signed off. To approve all of these:");
-    console.error(`fixtures:   ${approveLine(onlyArgs([...opts.only, ...gatedIds]), approval)}`);
+    for (const m of moved.filter((m) => outside.includes(m.id))) console.error(`fixtures:   baseline: ${m.id} — must-change baseline: ${brief(m.previous, 60)} → ${brief(m.measured, 60)}`);
+    console.error("fixtures: name only the rows the reviewer signed off. To record all of these:");
+    console.error(`fixtures:   ${refused.line}`);
     console.error("fixtures: or re-record every row on purpose with FIXTURES_ARGS=--record-all.");
     process.exit(1);
   }
-  if (opts.recordAll && gated.length) console.log(`fixtures: --record-all — approval ${approval.id} applied to every gated row rather than to named ones`);
+  if (opts.recordAll && (gated.length || moved.length)) console.log(`fixtures: --record-all — ${approval ? `approval ${approval.id} applied to` : "written for"} every changed row rather than named ones`);
   // Rows outside --only, or no longer in the catalogue, pass through verbatim.
   const catalogue = new Set(CHECKS.map((c) => c.id));
   const keep = (expected.checks ?? []).filter((c) => !wanted(c.id) || !catalogue.has(c.id));
-  const out = { meta: { ...(expected.meta ?? {}), recordedAt: new Date().toISOString().slice(0, 10), clock: CLOCK, viewport: VIEWPORT, sizeBudgetBytes: SIZE_BUDGET, axeTags: AXE_TAGS, note: "Values are measured facts about the viewer's behaviour. A viewer developer may edit selectors.mjs, never these values; re-record only with the reviewer's sign-off." }, checks: [...keep, ...proposed].sort((a, b) => a.id.localeCompare(b.id)) };
-  writeFileSync(EXPECTATIONS, `${JSON.stringify(out, null, 2)}\n`);
-  console.log(`recorded ${proposed.length} expectation(s) → ${path.relative(REPO, EXPECTATIONS)}`);
+  const out = { meta: { ...(expected.meta ?? {}), recordedAt: undefined, clock: CLOCK, viewport: VIEWPORT, sizeBudgetBytes: SIZE_BUDGET, axeTags: AXE_TAGS, note: "Values are measured facts about the viewer's behaviour. A viewer developer may edit selectors.mjs, never these values; re-record only with the reviewer's sign-off." }, checks: [...keep, ...proposed].sort((a, b) => a.id.localeCompare(b.id)) };
+  const text = expectationsText(expectedText, out, new Date().toISOString().slice(0, 10));
+  if (text === null) console.log(`fixtures: nothing changed — ${path.relative(REPO, EXPECTATIONS)} left as it was`);
+  else { writeFileSync(EXPECTATIONS, text); console.log(`recorded ${proposed.length} expectation(s) → ${path.relative(REPO, EXPECTATIONS)}`); }
   for (const e of created) console.log(`fixtures: new row ${e.id} created — origin: ${JSON.stringify(e.origin)} — list it in the reply`);
   for (const g of gated) console.log(`fixtures: approved ${g.id} — ${g.kind} — approval block recorded on the row`);
 }

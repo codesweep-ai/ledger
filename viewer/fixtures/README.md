@@ -106,11 +106,17 @@ after a reviewer has agreed that a behaviour genuinely changed; the diff of
 `status`, `target` and `note` and replaces only `value`.
 
 An approval is per row. `--only` names the rows the reviewer signed off, and
-`--record` refuses a frozen change to any row it does not name: it lists those
-rows, writes nothing, and prints the `--only` line to paste. Without `--only`,
-an approval names no row, so rows failing for an unrelated reason are never
+`--record` refuses a change to any row it does not name: it lists those rows,
+writes nothing, and prints the `--only` line to paste. Without `--only`, an
+approval names no row, so rows failing for an unrelated reason are never
 re-recorded along with the one that was approved. `--record-all` applies one
 approval to every row, for a deliberate full re-record.
+
+A `must-change` row's baseline is held to the same rule. The runner reports
+progress as the distance from it, so moving it silently would erase that
+progress. It needs naming, but no approval block, because moving it changes no
+promise. A run that changes no row leaves `expectations.json` byte-identical,
+its `recordedAt` date included.
 
 Labels that are part of a check's value (`status · open`, `sort · activity`,
 lane names such as `Closed / retired`) are behaviour too: a control that reads
@@ -144,7 +150,7 @@ with `node --test` and no browser.
 | `selectors.mjs` | role → DOM map (the one file a viewer developer edits) |
 | `derive.mjs` | what the own ledger's records decide the page must show |
 | `derive.test.mjs` | holds `derive.mjs` to the frozen sandbox rows, without a browser |
-| `scope.mjs` | which rows an approval covers: the ones `--only` names, or every row with `--record-all` |
+| `scope.mjs` | which rows an approval covers, the ones `--only` names or every row with `--record-all`, and whether a record run writes at all |
 | `scope.test.mjs` | holds `record-fixtures` to that rule, without a browser |
 | `expectations.json` | frozen values and targets, with the measurement conditions under `meta` |
 | `vendor/axe-core/` | `axe.min.js` 4.13.0 and its MPL-2.0 licence, so the guest needs no extra install |

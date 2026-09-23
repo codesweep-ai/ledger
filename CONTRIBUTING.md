@@ -293,7 +293,7 @@ pointing at one when a change moves the viewer, the `@codesweep-ai/ui` pin or th
 value moves only through `make record-fixtures` with `APPROVE` and `REASON`, and
 [`viewer/fixtures/README.md`](viewer/fixtures/README.md) says what each row freezes. The approval
 is per row: `FIXTURES_ARGS="--only LF-02,LF-03"` names the rows it covers, and the runner refuses a
-frozen change to any other.
+change to any other, a `must-change` row's baseline included.
 
 ## AI-assisted contributions
 
