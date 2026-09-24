@@ -94,6 +94,11 @@ This repository keeps a **ledger** of open issues in `ledger/`. Read
 that touches `ledger/` needs `cs-ledger render && cs-ledger check` to pass first, and
 `make ledger` runs the check half.
 
+A push to main that changes only `ledger/` builds nothing and publishes nothing to npm or as images.
+`ci` does not run for it: the `ledger` workflow runs `make ledger`, `make prose`, `make refs` and
+`make oss` instead, and the site republishes the ledger's page when it finishes. Such a commit is
+never a build a sibling pins.
+
 ## Tests
 
 Ship a test with your change. Where a behaviour genuinely cannot be observed in a test, say so in
