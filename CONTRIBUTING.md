@@ -56,8 +56,10 @@ while you work, and `make ci` is the one that has to pass.
 
 No linter needs installing. Every one the gates shell out to is pinned and built from the module
 cache on first use: `golangci-lint`, `deadcode`, `actionlint` and `cs-lint`. `make repin` moves the
-`cs-lint` pin to the last commit its CI built, and leaves it where lint names none. `make versions`
-says which builds the gates used.
+`cs-lint` pin to the last commit its CI built, and leaves it where lint names none. It moves the
+viewer's `@codesweep-ai/ui` pin the same way, through `scripts/repin-npm.mjs`, and then runs
+`make viewer-repin` to carry it through (see Versioning). `make versions` says which builds the
+gates used.
 
 Moving a linter pin is an edit to `go.mod`, or to `go.golangci.mod` for `golangci-lint`. A linter
 release reaches you when you ask for it, not on an unrelated pull request.
@@ -289,6 +291,16 @@ from `check` naming the renderer that wrote its page, and `cs-ledger render` bri
 Say what it costs: skip the bump and two binaries claim the same version while rendering different
 bytes. `check` reports that as a stale page rather than as version skew, and sends the reader after
 the wrong problem. Nothing catches a forgotten bump for you.
+
+The one bump made for you is the viewer's. The viewer's bytes are part of every page, so moving
+its `@codesweep-ai/ui` pin, or rebuilding it on refreshed npm packages, is a new renderer.
+`make viewer-repin` rebuilds the viewer, and `scripts/renderer-version.go` then sets `UIVersion` to
+the pin. Where the pin or the built viewer differs from HEAD's, it moves `RendererVersion` up a
+patch, with a line in its history saying why. The target then rebuilds the binary and renders both
+ledgers the repository carries. A bump made by hand first is left as it is, which is how a minor
+move, such as adopting a new component set, stays a person's call. `make repin` runs the target,
+and so does oss-repin once it has moved a pin in `viewer/package.json`. A test holds `UIVersion` to
+the pin, so a pin moved by hand without the rest fails `make test`.
 
 ## The viewer oracle
 

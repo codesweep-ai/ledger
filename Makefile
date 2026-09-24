@@ -69,7 +69,7 @@ COVERFLAGS := -covermode=atomic -coverpkg=./...
 # because `go test` overwrites that one in the test process with a directory of
 # its own, and does not fold what lands there back into the profile.
 
-.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check fixtures fixtures-model record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-pack npm-local npm-publish images-snapshot
+.PHONY: help tidy-check embed-check build build-go install uninstall test viewer viewer-build viewer-check viewer-repin fixtures fixtures-model record-fixtures coverage coverage-check ci coverage-baseline vet fmt fmt-check check prose refs oss surface conventions ledger lint deadcode actionlint snapshot release release-check clean npm-build npm-snapshot npm-pack npm-local npm-publish images-snapshot
 
 .DEFAULT_GOAL := help
 
@@ -150,6 +150,10 @@ versions:
 ## each commit is read from its repository, whatever the module proxy holds. Uses
 ## GOWORK=off so this edits the recorded pins even while a workspace is serving
 ## local checkouts.
+##
+## The @codesweep-ai pins in viewer/package.json move the same way, through
+## scripts/repin-npm.mjs, and viewer-repin then carries them into the renderer
+## and both pages. Where npm is absent they stay, and this says so.
 .PHONY: repin
 repin:
 	@tools="$$(go list tool 2>/dev/null | grep codesweep-ai || true)"; \
@@ -169,6 +173,15 @@ repin:
 	done; \
 	if [ -n "$$pins" ]; then GOWORK=off GOPROXY=direct go get -tool $$pins; fi
 	@GOWORK=off go mod tidy
+	@if command -v $(NPM) >/dev/null 2>&1; then \
+		node scripts/repin-npm.mjs $(VIEWER_DIR); \
+	else \
+		echo "$(VIEWER_DIR): SKIP (npm not found; its @codesweep-ai pins stay)"; \
+	fi
+# viewer-repin has a line of its own because make runs any recipe line that
+# names MAKE even under -n. The move above names none, so `make -n repin`
+# moves no pin.
+	@if command -v $(NPM) >/dev/null 2>&1; then $(MAKE) --no-print-directory viewer-repin; fi
 	@$(MAKE) versions
 
 ## install: copy bin/cs-ledger into $(PREFIX)/bin (default ~/.local/bin), and pack its npm packages for later builds
@@ -210,6 +223,23 @@ $(VIEWER): $(VIEWER_SRC)
 viewer-build:
 	cd $(VIEWER_DIR) && $(WITH_NPMREVS) $(NPM) ci
 	cd $(VIEWER_DIR) && $(NPM) run typecheck && $(NPM) run build
+
+## viewer-repin: carry a moved viewer pin into the renderer, the binary and both pages
+##
+## The viewer's bytes are part of every page cs-ledger renders, so a viewer
+## built on another @codesweep-ai/ui, or on other npm packages, is another
+## renderer (SPEC.md R41). This rebuilds the viewer, and
+## scripts/renderer-version.go then sets UIVersion to the pin and moves
+## RendererVersion up a patch where it has not moved yet. It rebuilds the binary
+## and renders this repository's ledger and the sandbox fixture with it, so
+## `make ledger` finds both fresh. `make repin` runs it, and so does oss-repin
+## once it has moved a pin in viewer/package.json.
+viewer-repin:
+	@$(MAKE) --no-print-directory viewer-build
+	@go run scripts/renderer-version.go
+	@$(MAKE) --no-print-directory build
+	./bin/cs-ledger render ledger
+	./bin/cs-ledger render fixtures/sandbox/ledger
 
 ## fixtures: run the viewer's behavioural oracle (viewer/fixtures; not in check)
 # Not part of `make check`: the campaign orchestrator runs it explicitly. Needs

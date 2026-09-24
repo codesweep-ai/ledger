@@ -1013,3 +1013,25 @@ func TestCommitUrlTemplate(t *testing.T) {
 	html = RenderHTML(LoadLedger(dir), root.Assets)
 	mustMatch(t, html, `"commitUrlTemplate":null`)
 }
+
+// UIVersion is the ui version the page's footer reports, so it has to be the
+// one the viewer is built against. `make viewer-repin` moves the two together;
+// this catches a pin moved by hand without it.
+func TestUIVersionIsTheViewersPin(t *testing.T) {
+	b, err := os.ReadFile(filepath.Join("..", "..", "viewer", "package.json"))
+	if errors.Is(err, os.ErrNotExist) {
+		t.Skip("viewer/package.json absent (vendored context)")
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	var pkg struct {
+		Dependencies map[string]string `json:"dependencies"`
+	}
+	if err := json.Unmarshal(b, &pkg); err != nil {
+		t.Fatal(err)
+	}
+	if pin := pkg.Dependencies["@codesweep-ai/ui"]; pin != UIVersion {
+		t.Errorf("viewer/package.json pins @codesweep-ai/ui %s, and UIVersion says %s. Run: make viewer-repin", pin, UIVersion)
+	}
+}
