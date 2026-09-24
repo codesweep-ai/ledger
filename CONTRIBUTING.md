@@ -56,8 +56,8 @@ while you work, and `make ci` is the one that has to pass.
 
 No linter needs installing. Every one the gates shell out to is pinned and built from the module
 cache on first use: `golangci-lint`, `deadcode`, `actionlint` and `cs-lint`. `make repin` moves the
-`cs-lint` pin to the last commit its CI passed, and `make versions` says which builds the gates
-used.
+`cs-lint` pin to the last commit its CI built, and leaves it where lint names none. `make versions`
+says which builds the gates used.
 
 Moving a linter pin is an edit to `go.mod`, or to `go.golangci.mod` for `golangci-lint`. A linter
 release reaches you when you ask for it, not on an unrelated pull request.
@@ -205,7 +205,9 @@ Running `npm/publish.sh` again is safe. It skips each package the registry
 already has from this commit, and stops on one it has from another commit.
 
 The `npm` workflow publishes each commit on main that passes `ci` to the `dev`
-channel. In a fork, or a copy under another owner, it publishes nothing on its
+channel. It builds the commit `ci` tested, and skips it once main's head changes
+more than `ledger/` after it. Every publish also writes an `npm` commit status
+to its commit. In a fork, or a copy under another owner, it publishes nothing on its
 own, because the packages there take that owner's scope. That owner runs it by
 hand, once each package names it as a trusted publisher. A trusted publisher can
 only be added to a package that exists, so the first publish runs
@@ -246,6 +248,12 @@ versions of each package. Those images let a team of AI coding agents install
 builds that are not yet meant for people:
 [cs-npmrevs](https://github.com/codesweep-ai/npmrevs) serves them to npm, or
 copies them into a directory.
+
+Each run posts a `publish images` commit status on the commit it published: a
+success once the wrapper is pushed, a failure otherwise. GitHub lists the run
+under main's head when `ci` finished, which can be a later commit. The CI status
+file reads the registry instead, and lists a commit as built, one a sibling can
+pin, once its wrapper's version is there.
 
 `npm/publish-images.sh` builds each image with cs-npmrevs and pushes it with
 podman. The workflow is what runs it, and `make images-snapshot` builds the
