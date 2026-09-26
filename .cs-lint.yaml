@@ -88,6 +88,10 @@ oss:
   # the same commit that makes the repository public.
   published: false
 
+  # github.com because git@github.com is the user of every GitHub SSH remote,
+  # which npm/build.mjs reads the owner out of, and its records quote on purpose.
+  emailAllow: ["github.com"]
+
   docSet:
     - README.md
     - INSTALL.md
