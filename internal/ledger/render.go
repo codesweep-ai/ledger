@@ -24,8 +24,9 @@ import (
 // component set: Tooltip is composed into several components, a component's
 // stylesheet now imports the sheets of what it renders, and four markdown
 // parser fixes change the bytes of a rendered record.
-const RendererVersion = "0.7.0"
-const UIVersion = "0.3.1-dev.20260909170256.1638d27"
+// 0.7.1 re-pins @codesweep-ai/ui to 0.3.1-dev.20260928063514.abadcfb.
+const RendererVersion = "0.7.1"
+const UIVersion = "0.3.1-dev.20260928063514.abadcfb"
 
 func escAttr(s string) string {
 	r := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", `"`, "&quot;")
