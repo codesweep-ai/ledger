@@ -215,7 +215,8 @@ already has from this commit, and stops on one it has from another commit.
 The `npm` workflow publishes each commit on main that passes `ci` to the `dev`
 channel. It builds the commit `ci` tested, and skips it once main's head changes
 more than `ledger/` after it. Every publish also writes an `npm` commit status
-to its commit. In a fork, or a copy under another owner, it publishes nothing on its
+to its commit. It finishes once npmjs.com lists the new version, so the CI
+status file published after it names that version. In a fork, or a copy under another owner, it publishes nothing on its
 own, because the packages there take that owner's scope. That owner runs it by
 hand, once each package names it as a trusted publisher. A trusted publisher can
 only be added to a package that exists, so the first publish runs
