@@ -138,7 +138,7 @@ make viewer-build                             # rebuild viewer/index.html; needs
 
 `viewer/app/` holds the Vite and React source. It builds against `@codesweep-ai/ui`, an npm
 dependency pinned to one exact version, and writes a self-contained `viewer/index.html` that the
-Go binary embeds. That file is committed, so building the tool needs Go alone. Node 22.13 or
+Go binary embeds. That file is committed, so building the tool needs Go alone. Node 24.21.0 or
 newer with npm is needed only to change the viewer, and by `make ci`, which rebuilds it to prove
 the committed copy is current.
 

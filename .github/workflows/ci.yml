@@ -37,10 +37,10 @@ jobs:
       # The viewer is a Vite/React app, and `make build` rebuilds it when its
       # sources have moved. Without a Node pinned here the build would run on
       # whatever the runner image happens to ship, and the version that matters
-      # is not ours: @codesweep-ai/ui sets the floor at ^22.13.0 || >=24.
+      # is not ours: @codesweep-ai/ui sets the floor at >=24.21.0.
       - uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: "24.21.0"
           cache: npm
           cache-dependency-path: viewer/package-lock.json
 
@@ -172,7 +172,7 @@ jobs:
       # Node for the viewer build; see build-test for why it is pinned.
       - uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: "24.21.0"
           cache: npm
           cache-dependency-path: viewer/package-lock.json
       - run: make surface
@@ -198,7 +198,7 @@ jobs:
       # Node for the viewer build; see build-test for why it is pinned.
       - uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: "24.21.0"
           cache: npm
           cache-dependency-path: viewer/package-lock.json
       - run: make build

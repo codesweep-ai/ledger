@@ -78,7 +78,7 @@ viewer needs npm, and `make ci` fails without it rather than pass on a bundle it
 The viewer is a React application under `viewer/app/`, built against the pinned
 `@codesweep-ai/ui` package into the single self-contained `viewer/index.html` the Go binary embeds.
 That file is committed, so building the binary needs Go alone. Changing the viewer needs Node
-22.13 or newer with npm, which is the floor `@codesweep-ai/ui` sets, so `node` and `npm` both on
+24.21.0 or newer with npm, which is the floor `@codesweep-ai/ui` sets, so `node` and `npm` both on
 your PATH. The viewer's `package.json`
 sits beside its source in `viewer/`, so npm runs there, and `make` does that for you:
 
