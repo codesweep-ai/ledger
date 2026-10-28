@@ -74,7 +74,7 @@ jobs:
           cache: true
       # make ledger builds cs-ledger from this tree, viewer included, and the
       # viewer's Node is pinned as ci.yml's ledger job pins it.
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "24.21.0"
           cache: npm
