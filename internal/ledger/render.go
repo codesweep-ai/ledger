@@ -27,7 +27,8 @@ import (
 // 0.7.1 re-pins @codesweep-ai/ui to 0.3.1-dev.20260928063514.abadcfb.
 // 0.7.2 re-pins @codesweep-ai/ui to 0.3.1-dev.20261028204931.cd6a832.
 // 0.7.3 rebuilds the viewer on the npm packages it now pins.
-const RendererVersion = "0.7.3"
+// 0.7.4 rebuilds the viewer on the npm packages it now pins.
+const RendererVersion = "0.7.4"
 const UIVersion = "0.3.1-dev.20261028204931.cd6a832"
 
 func escAttr(s string) string {
